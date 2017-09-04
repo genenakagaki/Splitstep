@@ -1,0 +1,39 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.3.3'
+
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+allprojects {
+    repositories {
+        jcenter()
+        maven { url "https://maven.google.com" }
+        maven { url "https://www.jitpack.io" }
+    }
+}
+
+// This block encapsulates custom properties and makes them available to all
+// modules in the project.
+ext {
+    // The following are only a few examples of the types of properties you can define.
+    compileSdkVersion = 26
+    buildToolsVersion = "26.0.1"
+    // You can also create properties to specify versions for dependencies.
+    // Having consistent versions between modules can avoid conflicts with behavior.
+    supportLibVersion = "26.0.1"
+    dbFlowVersion = "4.1.1"
+    timberVersion = "4.5.1"
+    butterknifeVersion = "8.8.1"
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
