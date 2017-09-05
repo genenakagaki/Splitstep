@@ -80,7 +80,7 @@ public class ExerciseTest {
     }
 
     @Test
-    public void testInsertExercise_ShouldBeInserted() {
+    public void testInsertAndGetExercise_ShouldReturnInsertedExercise() {
         EXERCISE.insert();
 
         List<Exercise> exercises = SQLite.select()
@@ -91,7 +91,7 @@ public class ExerciseTest {
     }
 
     @Test
-    public void testInsertExerciseAsync_ShouldBeInserted() throws InterruptedException {
+    public void testInsertAndGetExerciseAsync_ShouldReturnInsertedExercise() throws InterruptedException {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
 
         FlowManager.getDatabase(ExerciseDatabase.class).beginTransactionAsync(new ITransaction() {

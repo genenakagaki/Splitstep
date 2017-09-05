@@ -77,7 +77,7 @@ public class TimedSetsExerciseTest {
     }
 
     @Test
-    public void testInsertTimedSetsExercise_ShouldBeInserted() {
+    public void testInsertAndGetTimedSetsExercise_ShouldReturnInsertedExercise() {
         TIMED_SETS_EXERCISE.insert();
 
         List<TimedSetsExercise> exercises = SQLite.select()
@@ -88,7 +88,7 @@ public class TimedSetsExerciseTest {
     }
 
     @Test
-    public void testInsertTimedSetsExerciseAsync_ShouldBeInserted() throws InterruptedException {
+    public void testInsertAndGetTimedSetsExerciseAsync_ShouldReturnInsertedExercise() throws InterruptedException {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
 
         FlowManager.getDatabase(ExerciseDatabase.class).beginTransactionAsync(new ITransaction() {

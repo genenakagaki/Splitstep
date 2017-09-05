@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">Splitstep</string>
     <string name="action_settings">Settings</string>
+
+    <!-- Exercise Type -->
+    <string name="reps_exercise">Exercise with Reps</string>
+    <string name="timed_sets_exercise">Exercise with Timed Sets</string>
+    <string name="reaction_exercise">Reaction Exercise</string>
 </resources>
