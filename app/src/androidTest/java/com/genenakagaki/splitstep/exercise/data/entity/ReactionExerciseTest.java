@@ -32,9 +32,9 @@ import static org.junit.Assert.assertTrue;
  */
 
 @RunWith(AndroidJUnit4.class)
-public class ExerciseTest {
+public class ReactionExerciseTest {
 
-    private static final Exercise EXERCISE = new Exercise(1, "test", false);
+    private static final ReactionExercise REACTION_EXERCISE = new ReactionExercise(1, 1, 1, 1, 1, 1);
 
     @Before
     public void setUp() throws Exception {
@@ -53,24 +53,24 @@ public class ExerciseTest {
     }
 
     @Test
-    public void testGetExercise_WithNoExerciseInserted_ShouldReturnEmptyList() {
-        List<Exercise> exercises = SQLite.select()
-                .from(Exercise.class)
+    public void testGetReactionExercise_WithNoExerciseInserted_ShouldReturnEmptyList() {
+        List<ReactionExercise> exercises = SQLite.select()
+                .from(ReactionExercise.class)
                 .queryList();
 
         assertEquals(0, exercises.size());
     }
 
     @Test
-    public void testGetExerciseAsync_WithNoExerciseInserted_ShouldReturnEmptyList() throws InterruptedException {
+    public void testGetReactionExerciseAsync_WithNoExerciseInserted_ShouldReturnEmptyList() throws InterruptedException {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
 
         SQLite.select()
-                .from(Exercise.class)
+                .from(ReactionExercise.class)
                 .async()
-                .queryListResultCallback(new QueryTransaction.QueryResultListCallback<Exercise>() {
+                .queryListResultCallback(new QueryTransaction.QueryResultListCallback<ReactionExercise>() {
                     @Override
-                    public void onListQueryResult(QueryTransaction transaction, @NonNull List<Exercise> tResult) {
+                    public void onListQueryResult(QueryTransaction transaction, @NonNull List<ReactionExercise> tResult) {
                         assertEquals(0, tResult.size());
                         countDownLatch.countDown();
                     }
@@ -80,35 +80,35 @@ public class ExerciseTest {
     }
 
     @Test
-    public void testInsertExercise_ShouldBeInserted() {
-        EXERCISE.insert();
+    public void testInsertReactionExercise_ShouldBeInserted() {
+        REACTION_EXERCISE.insert();
 
-        List<Exercise> exercises = SQLite.select()
-                .from(Exercise.class)
+        List<ReactionExercise> exercises = SQLite.select()
+                .from(ReactionExercise.class)
                 .queryList();
 
-        assertTrue(isExerciseEqual(exercises.get(0), EXERCISE));
+        assertTrue(isExerciseEqual(exercises.get(0), REACTION_EXERCISE));
     }
 
     @Test
-    public void testInsertExerciseAsync_ShouldBeInserted() throws InterruptedException {
+    public void testInsertReactionExerciseAsync_ShouldBeInserted() throws InterruptedException {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
 
         FlowManager.getDatabase(ExerciseDatabase.class).beginTransactionAsync(new ITransaction() {
             @Override
             public void execute(DatabaseWrapper databaseWrapper) {
-                EXERCISE.insert();
+                REACTION_EXERCISE.insert();
             }
         }).success(new Transaction.Success() {
             @Override
             public void onSuccess(@NonNull Transaction transaction) {
                 SQLite.select()
-                        .from(Exercise.class)
+                        .from(ReactionExercise.class)
                         .async()
-                        .queryListResultCallback(new QueryTransaction.QueryResultListCallback<Exercise>() {
+                        .queryListResultCallback(new QueryTransaction.QueryResultListCallback<ReactionExercise>() {
                             @Override
-                            public void onListQueryResult(QueryTransaction transaction, @NonNull List<Exercise> tResult) {
-                                assertTrue(isExerciseEqual(tResult.get(0), EXERCISE));
+                            public void onListQueryResult(QueryTransaction transaction, @NonNull List<ReactionExercise> tResult) {
+                                assertTrue(isExerciseEqual(tResult.get(0), REACTION_EXERCISE));
                                 countDownLatch.countDown();
                             }
                         }).execute();
@@ -119,48 +119,49 @@ public class ExerciseTest {
     }
 
     @Test
-    public void testUpdateExercise_ShouldBeUpdated() {
-        final Exercise exerciseToUpdate = new Exercise(1, "test", false);
-        String newName = "new";
+    public void testUpdateReactionExercise_ShouldBeUpdated() {
+        final ReactionExercise exerciseToUpdate = new ReactionExercise(1, 1, 1, 1, 1, 1);
 
         exerciseToUpdate.insert();
-        exerciseToUpdate.type = 2;
-        exerciseToUpdate.favorite = true;
-        exerciseToUpdate.name = newName;
+        exerciseToUpdate.reps = 2;
+        exerciseToUpdate.sets = 2;
+        exerciseToUpdate.cones = 2;
+        exerciseToUpdate.repDuration = 2;
+        exerciseToUpdate.restDuration = 2;
         exerciseToUpdate.update();
 
-        List<Exercise> exercises = SQLite.select()
-                .from(Exercise.class)
+        List<ReactionExercise> exercises = SQLite.select()
+                .from(ReactionExercise.class)
                 .queryList();
 
         assertTrue(isExerciseEqual(exerciseToUpdate, exercises.get(0)));
     }
 
     @Test
-    public void testUpdateExerciseAsync_ShouldBeUpdated() throws InterruptedException {
+    public void testUpdateReactionExerciseAsync_ShouldBeUpdated() throws InterruptedException {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
-
-        final Exercise exerciseToUpdate = new Exercise(1, "test", false);
-        final String newName = "new";
+        final ReactionExercise exerciseToUpdate = new ReactionExercise(1, 1, 1, 1, 1, 1);
 
         FlowManager.getDatabase(ExerciseDatabase.class).beginTransactionAsync(new ITransaction() {
             @Override
             public void execute(DatabaseWrapper databaseWrapper) {
                 exerciseToUpdate.insert();
-                exerciseToUpdate.type = 2;
-                exerciseToUpdate.favorite = true;
-                exerciseToUpdate.name = newName;
+                exerciseToUpdate.reps = 2;
+                exerciseToUpdate.sets = 2;
+                exerciseToUpdate.cones = 2;
+                exerciseToUpdate.repDuration = 2;
+                exerciseToUpdate.restDuration = 2;
                 exerciseToUpdate.update();
             }
         }).success(new Transaction.Success() {
             @Override
             public void onSuccess(@NonNull Transaction transaction) {
                 SQLite.select()
-                        .from(Exercise.class)
+                        .from(ReactionExercise.class)
                         .async()
-                        .queryListResultCallback(new QueryTransaction.QueryResultListCallback<Exercise>() {
+                        .queryListResultCallback(new QueryTransaction.QueryResultListCallback<ReactionExercise>() {
                             @Override
-                            public void onListQueryResult(QueryTransaction transaction, @NonNull List<Exercise> tResult) {
+                            public void onListQueryResult(QueryTransaction transaction, @NonNull List<ReactionExercise> tResult) {
                                 assertTrue(isExerciseEqual(exerciseToUpdate, tResult.get(0)));
                                 countDownLatch.countDown();
                             }
@@ -171,9 +172,12 @@ public class ExerciseTest {
         countDownLatch.await(10, TimeUnit.SECONDS);
     }
 
-    private boolean isExerciseEqual(Exercise e1, Exercise e2) {
-        return e1.type == e2.type
-                && e1.favorite == e2.favorite
-                && e1.name.equals(e2.name);
+    private boolean isExerciseEqual(ReactionExercise r1, ReactionExercise r2) {
+        return r1.reps == r2.reps
+                && r1.sets == r2.sets
+                && r1.cones == r2.cones
+                && r1.repDuration == r2.repDuration
+                && r1.restDuration == r2.restDuration;
     }
+
 }

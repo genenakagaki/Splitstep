@@ -36,5 +36,14 @@ public class ReactionExercise extends BaseModel {
     @Column(defaultValue = "1") public int restDuration;
 
     public ReactionExercise() {}
+
+    public ReactionExercise(long id, int reps, int sets, int cones, int repDuration, int restDuration) {
+        this.id = id;
+        this.reps = reps;
+        this.sets = sets;
+        this.cones = cones;
+        this.repDuration = repDuration;
+        this.restDuration = restDuration;
+    }
 }
 

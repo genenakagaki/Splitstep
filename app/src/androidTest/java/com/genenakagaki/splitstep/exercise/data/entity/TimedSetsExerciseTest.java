@@ -3,7 +3,6 @@ package com.genenakagaki.splitstep.exercise.data.entity;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
-import android.support.test.runner.AndroidJUnit4;
 
 import com.genenakagaki.splitstep.exercise.data.ExerciseDatabase;
 import com.raizlabs.android.dbflow.config.DatabaseConfig;
@@ -18,7 +17,6 @@ import com.raizlabs.android.dbflow.structure.database.transaction.Transaction;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -30,11 +28,10 @@ import static org.junit.Assert.assertTrue;
 /**
  * Created by gene on 9/4/17.
  */
+public class TimedSetsExerciseTest {
 
-@RunWith(AndroidJUnit4.class)
-public class ExerciseTest {
 
-    private static final Exercise EXERCISE = new Exercise(1, "test", false);
+    private static final TimedSetsExercise TIMED_SETS_EXERCISE = new TimedSetsExercise(1, 1, 1, 1);
 
     @Before
     public void setUp() throws Exception {
@@ -53,24 +50,24 @@ public class ExerciseTest {
     }
 
     @Test
-    public void testGetExercise_WithNoExerciseInserted_ShouldReturnEmptyList() {
-        List<Exercise> exercises = SQLite.select()
-                .from(Exercise.class)
+    public void testGetTimedSetsExercise_WithNoExerciseInserted_ShouldReturnEmptyList() {
+        List<TimedSetsExercise> exercises = SQLite.select()
+                .from(TimedSetsExercise.class)
                 .queryList();
 
         assertEquals(0, exercises.size());
     }
 
     @Test
-    public void testGetExerciseAsync_WithNoExerciseInserted_ShouldReturnEmptyList() throws InterruptedException {
+    public void testGetTimedSetsExerciseAsync_WithNoExerciseInserted_ShouldReturnEmptyList() throws InterruptedException {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
 
         SQLite.select()
-                .from(Exercise.class)
+                .from(TimedSetsExercise.class)
                 .async()
-                .queryListResultCallback(new QueryTransaction.QueryResultListCallback<Exercise>() {
+                .queryListResultCallback(new QueryTransaction.QueryResultListCallback<TimedSetsExercise>() {
                     @Override
-                    public void onListQueryResult(QueryTransaction transaction, @NonNull List<Exercise> tResult) {
+                    public void onListQueryResult(QueryTransaction transaction, @NonNull List<TimedSetsExercise> tResult) {
                         assertEquals(0, tResult.size());
                         countDownLatch.countDown();
                     }
@@ -80,35 +77,35 @@ public class ExerciseTest {
     }
 
     @Test
-    public void testInsertExercise_ShouldBeInserted() {
-        EXERCISE.insert();
+    public void testInsertTimedSetsExercise_ShouldBeInserted() {
+        TIMED_SETS_EXERCISE.insert();
 
-        List<Exercise> exercises = SQLite.select()
-                .from(Exercise.class)
+        List<TimedSetsExercise> exercises = SQLite.select()
+                .from(TimedSetsExercise.class)
                 .queryList();
 
-        assertTrue(isExerciseEqual(exercises.get(0), EXERCISE));
+        assertTrue(isExerciseEqual(exercises.get(0), TIMED_SETS_EXERCISE));
     }
 
     @Test
-    public void testInsertExerciseAsync_ShouldBeInserted() throws InterruptedException {
+    public void testInsertTimedSetsExerciseAsync_ShouldBeInserted() throws InterruptedException {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
 
         FlowManager.getDatabase(ExerciseDatabase.class).beginTransactionAsync(new ITransaction() {
             @Override
             public void execute(DatabaseWrapper databaseWrapper) {
-                EXERCISE.insert();
+                TIMED_SETS_EXERCISE.insert();
             }
         }).success(new Transaction.Success() {
             @Override
             public void onSuccess(@NonNull Transaction transaction) {
                 SQLite.select()
-                        .from(Exercise.class)
+                        .from(TimedSetsExercise.class)
                         .async()
-                        .queryListResultCallback(new QueryTransaction.QueryResultListCallback<Exercise>() {
+                        .queryListResultCallback(new QueryTransaction.QueryResultListCallback<TimedSetsExercise>() {
                             @Override
-                            public void onListQueryResult(QueryTransaction transaction, @NonNull List<Exercise> tResult) {
-                                assertTrue(isExerciseEqual(tResult.get(0), EXERCISE));
+                            public void onListQueryResult(QueryTransaction transaction, @NonNull List<TimedSetsExercise> tResult) {
+                                assertTrue(isExerciseEqual(tResult.get(0), TIMED_SETS_EXERCISE));
                                 countDownLatch.countDown();
                             }
                         }).execute();
@@ -119,48 +116,45 @@ public class ExerciseTest {
     }
 
     @Test
-    public void testUpdateExercise_ShouldBeUpdated() {
-        final Exercise exerciseToUpdate = new Exercise(1, "test", false);
-        String newName = "new";
+    public void testUpdateTimedSetsExercise_ShouldBeUpdated() {
+        final TimedSetsExercise exerciseToUpdate = new TimedSetsExercise(1, 1, 1, 1);
 
         exerciseToUpdate.insert();
-        exerciseToUpdate.type = 2;
-        exerciseToUpdate.favorite = true;
-        exerciseToUpdate.name = newName;
+        exerciseToUpdate.sets = 2;
+        exerciseToUpdate.setDuration = 2;
+        exerciseToUpdate.restDuration = 2;
         exerciseToUpdate.update();
 
-        List<Exercise> exercises = SQLite.select()
-                .from(Exercise.class)
+        List<TimedSetsExercise> exercises = SQLite.select()
+                .from(TimedSetsExercise.class)
                 .queryList();
 
         assertTrue(isExerciseEqual(exerciseToUpdate, exercises.get(0)));
     }
 
     @Test
-    public void testUpdateExerciseAsync_ShouldBeUpdated() throws InterruptedException {
+    public void testUpdateTimedSetsExerciseAsync_ShouldBeUpdated() throws InterruptedException {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
-
-        final Exercise exerciseToUpdate = new Exercise(1, "test", false);
-        final String newName = "new";
+        final TimedSetsExercise exerciseToUpdate = new TimedSetsExercise(1, 1, 1, 1);
 
         FlowManager.getDatabase(ExerciseDatabase.class).beginTransactionAsync(new ITransaction() {
             @Override
             public void execute(DatabaseWrapper databaseWrapper) {
                 exerciseToUpdate.insert();
-                exerciseToUpdate.type = 2;
-                exerciseToUpdate.favorite = true;
-                exerciseToUpdate.name = newName;
+                exerciseToUpdate.sets = 2;
+                exerciseToUpdate.setDuration = 2;
+                exerciseToUpdate.restDuration = 2;
                 exerciseToUpdate.update();
             }
         }).success(new Transaction.Success() {
             @Override
             public void onSuccess(@NonNull Transaction transaction) {
                 SQLite.select()
-                        .from(Exercise.class)
+                        .from(TimedSetsExercise.class)
                         .async()
-                        .queryListResultCallback(new QueryTransaction.QueryResultListCallback<Exercise>() {
+                        .queryListResultCallback(new QueryTransaction.QueryResultListCallback<TimedSetsExercise>() {
                             @Override
-                            public void onListQueryResult(QueryTransaction transaction, @NonNull List<Exercise> tResult) {
+                            public void onListQueryResult(QueryTransaction transaction, @NonNull List<TimedSetsExercise> tResult) {
                                 assertTrue(isExerciseEqual(exerciseToUpdate, tResult.get(0)));
                                 countDownLatch.countDown();
                             }
@@ -171,9 +165,11 @@ public class ExerciseTest {
         countDownLatch.await(10, TimeUnit.SECONDS);
     }
 
-    private boolean isExerciseEqual(Exercise e1, Exercise e2) {
-        return e1.type == e2.type
-                && e1.favorite == e2.favorite
-                && e1.name.equals(e2.name);
+    private boolean isExerciseEqual(TimedSetsExercise r1, TimedSetsExercise r2) {
+        return r1.sets == r2.sets
+                && r1.setDuration == r2.setDuration
+                && r1.restDuration == r2.restDuration;
     }
+
+
 }

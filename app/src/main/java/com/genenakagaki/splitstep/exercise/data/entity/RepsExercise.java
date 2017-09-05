@@ -32,10 +32,10 @@ public class RepsExercise extends BaseModel {
 
     public RepsExercise() {}
 
-    //    public RepsExercise(long id) {
-//        this.id = id;
-//        this.reps = 1;
-//        this.sets = 1;
-//        this.restDuration = 1;
-//    }
+    public RepsExercise(long id, int reps, int sets, int restDuration) {
+        this.id = id;
+        this.reps = reps;
+        this.sets = sets;
+        this.restDuration = restDuration;
+    }
 }

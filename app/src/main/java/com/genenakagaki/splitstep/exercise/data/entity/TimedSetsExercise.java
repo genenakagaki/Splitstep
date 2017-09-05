@@ -33,12 +33,11 @@ public class TimedSetsExercise extends BaseModel {
 
     public TimedSetsExercise() {}
 
-//    public TimedSetsExercise(long id) {
-//        this.id = id;
-//        this.sets = 1;
-//        this.setDuration = 1;
-//        this.restDuration = 1;
-//    }
-
+    public TimedSetsExercise(long id, int sets, int setDuration, int restDuration) {
+        this.id = id;
+        this.sets = sets;
+        this.setDuration = setDuration;
+        this.restDuration = restDuration;
+    }
 }
 
