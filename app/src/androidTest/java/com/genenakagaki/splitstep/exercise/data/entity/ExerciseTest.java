@@ -108,8 +108,10 @@ public class ExerciseTest {
                         .queryListResultCallback(new QueryTransaction.QueryResultListCallback<Exercise>() {
                             @Override
                             public void onListQueryResult(QueryTransaction transaction, @NonNull List<Exercise> tResult) {
-                                assertTrue(isExerciseEqual(tResult.get(0), EXERCISE));
+                                assertTrue(isExerciseEqual(EXERCISE, tResult.get(0)));
+                                assertTrue(true);
                                 countDownLatch.countDown();
+
                             }
                         }).execute();
             }

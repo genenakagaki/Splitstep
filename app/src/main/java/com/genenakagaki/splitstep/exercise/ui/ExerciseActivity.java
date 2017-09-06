@@ -85,6 +85,11 @@ public class ExerciseActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void setTitle(CharSequence title) {
+        getSupportActionBar().setTitle(title);
+    }
+
     public void showFragment(Fragment fragment, String tag, boolean addToBackStack) {
         Timber.d("showFragment with tag " + tag);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -97,4 +102,5 @@ public class ExerciseActivity extends AppCompatActivity {
 
         transaction.commit();
     }
+
 }

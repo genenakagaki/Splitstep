@@ -2,6 +2,10 @@
     <string name="app_name">Splitstep</string>
     <string name="action_settings">Settings</string>
 
+    <!-- Action -->
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+
     <!-- Exercise Type -->
     <string name="reps_exercise">Exercise with Reps</string>
     <string name="timed_sets_exercise">Exercise with Timed Sets</string>
@@ -9,4 +13,15 @@
 
     <!-- Exercise List -->
     <string name="exercise_list_empty">No exercises created yet.</string>
+    
+    <!-- Add Exercise -->
+    <string name="add_exercise_title">Add New Exercise</string>
+
+    <!-- Input Hint -->
+    <string name="hint_exercise_name">Exercise Name</string>
+
+    <!-- Error -->
+    <string name="error_empty_exercise_name">Enter an exercise name.</string>
+    <string name="error_exercise_name_duplicate">An exercise with the same name already exists.</string>
+    <string name="error_zero_duration">Must be more than 0 seconds</string>
 </resources>

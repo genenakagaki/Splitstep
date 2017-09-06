@@ -37,6 +37,10 @@ public class ReactionExercise extends BaseModel {
 
     public ReactionExercise() {}
 
+    public ReactionExercise(long id) {
+        this.id = id;
+    }
+
     public ReactionExercise(long id, int reps, int sets, int cones, int repDuration, int restDuration) {
         this.id = id;
         this.reps = reps;

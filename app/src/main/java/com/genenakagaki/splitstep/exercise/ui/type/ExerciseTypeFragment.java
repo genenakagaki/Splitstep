@@ -48,13 +48,14 @@ public class ExerciseTypeFragment extends Fragment {
 
     @Override
     public void onResume() {
+        Timber.d("onResume");
         super.onResume();
-        ((ExerciseActivity)getActivity()).
-                getSupportActionBar().setTitle(getString(R.string.app_name));
+        getActivity().setTitle(getString(R.string.app_name));
     }
 
     @Override
     public void onDestroyView() {
+        Timber.d("onDestroyView");
         super.onDestroyView();
         mUnbinder.unbind();
     }

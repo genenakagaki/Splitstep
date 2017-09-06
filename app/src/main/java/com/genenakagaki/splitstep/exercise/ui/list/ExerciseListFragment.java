@@ -14,11 +14,13 @@ import android.widget.TextView;
 
 import com.genenakagaki.splitstep.R;
 import com.genenakagaki.splitstep.exercise.data.entity.Exercise;
+import com.genenakagaki.splitstep.exercise.ui.add.AddExerciseDialog;
 
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -30,7 +32,7 @@ import timber.log.Timber;
  * Created by gene on 8/2/17.
  */
 
-public class ExerciseListFragment extends Fragment implements View.OnClickListener {
+public class ExerciseListFragment extends Fragment {
 
     @BindView(R.id.recyclerview) RecyclerView mRecyclerView;
     @BindView(R.id.empty_textview) TextView mEmptyTextView;
@@ -56,6 +58,8 @@ public class ExerciseListFragment extends Fragment implements View.OnClickListen
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Timber.d("onCreateView");
 
+        getActivity().setTitle(mViewModel.getTitle());
+
         View view = inflater.inflate(R.layout.fragment_exercise_list, container, false);
         mUnbinder = ButterKnife.bind(this, view);
 
@@ -78,12 +82,14 @@ public class ExerciseListFragment extends Fragment implements View.OnClickListen
         super.onResume();
         mDisposable = new CompositeDisposable();
 
-        mDisposable.add(mViewModel.getExerciseList()
+        mDisposable.add(mViewModel.getExercisesSubject()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.computation())
                 .subscribe(new Consumer<List<Exercise>>() {
                     @Override
                     public void accept(List<Exercise> exercises) throws Exception {
+                        Timber.d("onNext");
+
                         mExerciseAdapter.clear();
                         mExerciseAdapter.addAll(exercises);
 
@@ -96,6 +102,8 @@ public class ExerciseListFragment extends Fragment implements View.OnClickListen
                         }
                     }
                 }));
+
+        mViewModel.getExerciseList();
     }
 
     @Override
@@ -109,17 +117,18 @@ public class ExerciseListFragment extends Fragment implements View.OnClickListen
 
     @Override
     public void onDestroyView() {
+        Timber.d("onDestroyView");
         super.onDestroyView();
         mUnbinder.unbind();
     }
 
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.fab:
-//                AddExerciseDialog fragment = new AddExerciseDialog();
-//                fragment.show(getFragmentManager(), AddExerciseDialog.class.getSimpleName());
-                break;
-        }
+    @OnClick(R.id.fab)
+    public void onFabClick() {
+        AddExerciseDialog fragment = new AddExerciseDialog();
+        fragment.show(getFragmentManager(), AddExerciseDialog.class.getSimpleName());
+    }
+
+    public ExerciseListViewModel getViewModel() {
+        return mViewModel;
     }
 }
