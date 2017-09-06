@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.genenakagaki.splitstep.R;
-import com.genenakagaki.splitstep.exercise.data.ExercisePreference;
+import com.genenakagaki.splitstep.exercise.data.ExerciseSharedPref;
 import com.genenakagaki.splitstep.exercise.data.entity.ExerciseType;
 import com.genenakagaki.splitstep.exercise.ui.ExerciseActivity;
 import com.genenakagaki.splitstep.exercise.ui.list.ExerciseListFragment;
@@ -59,20 +59,20 @@ public class ExerciseTypeFragment extends Fragment {
         mUnbinder.unbind();
     }
 
-    @OnClick({R.id.reps_exercise_button, R.id.timed_sets_exercise_button, R.id.reaction_exercise_button})
+    @OnClick({ R.id.reps_exercise_button, R.id.timed_sets_exercise_button, R.id.reaction_exercise_button })
     public void onButtonClick(View view) {
         switch (view.getId()) {
             case R.id.reps_exercise_button:
                 Timber.d("onClick on reps exercise");
-                ExercisePreference.setExerciseType(getActivity(), ExerciseType.REPS);
+                ExerciseSharedPref.setExerciseType(getActivity(), ExerciseType.REPS);
                 break;
             case R.id.timed_sets_exercise_button:
                 Timber.d("onClick on timed sets exercise");
-                ExercisePreference.setExerciseType(getActivity(), ExerciseType.TIMED_SETS);
+                ExerciseSharedPref.setExerciseType(getActivity(), ExerciseType.TIMED_SETS);
                 break;
             default: //R.id.reaction_exercise_button:
                 Timber.d("onClick on reaction exercise");
-                ExercisePreference.setExerciseType(getActivity(), ExerciseType.REACTION);
+                ExerciseSharedPref.setExerciseType(getActivity(), ExerciseType.REACTION);
         }
 
         ExerciseActivity activity = (ExerciseActivity) getActivity();

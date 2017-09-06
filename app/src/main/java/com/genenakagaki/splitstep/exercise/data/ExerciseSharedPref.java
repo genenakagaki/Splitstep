@@ -10,7 +10,7 @@ import com.genenakagaki.splitstep.exercise.data.entity.ExerciseType;
  * Created by gene on 4/7/17.
  */
 
-public class ExercisePreference {
+public class ExerciseSharedPref {
 
     public static final String PREF_EXERCISE_TYPE = "PREF_EXERCISE_TYPE";
     public static final String PREF_EXERCISE_ID = "PREF_EXERCISE_ID";

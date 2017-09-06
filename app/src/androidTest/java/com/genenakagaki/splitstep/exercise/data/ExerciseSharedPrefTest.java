@@ -18,7 +18,7 @@ import static org.junit.Assert.assertEquals;
  */
 
 @RunWith(AndroidJUnit4.class)
-public class ExercisePreferenceTest {
+public class ExerciseSharedPrefTest {
 
     private Context mContext = InstrumentationRegistry.getTargetContext();
 
@@ -29,46 +29,46 @@ public class ExercisePreferenceTest {
 
     @Test
     public void testGetExerciseType_WithNoValueSet_ShouldReturnNull() {
-        ExerciseType exerciseType = ExercisePreference.getExerciseType(mContext);
+        ExerciseType exerciseType = ExerciseSharedPref.getExerciseType(mContext);
         assertEquals(null, exerciseType);
     }
 
     @Test
     public void testSetAndGetExerciseType_ShouldReturnSetValue() {
-        ExercisePreference.setExerciseType(mContext, ExerciseType.REPS);
+        ExerciseSharedPref.setExerciseType(mContext, ExerciseType.REPS);
 
-        ExerciseType exerciseType = ExercisePreference.getExerciseType(mContext);
+        ExerciseType exerciseType = ExerciseSharedPref.getExerciseType(mContext);
         assertEquals(ExerciseType.REPS, exerciseType);
     }
 
     @Test
     public void testSetExerciseType_WithSetValueReplaced_ShouldReturnNewValue() {
-        ExercisePreference.setExerciseType(mContext, ExerciseType.REPS);
-        ExercisePreference.setExerciseType(mContext, ExerciseType.TIMED_SETS);
+        ExerciseSharedPref.setExerciseType(mContext, ExerciseType.REPS);
+        ExerciseSharedPref.setExerciseType(mContext, ExerciseType.TIMED_SETS);
 
-        ExerciseType exerciseType = ExercisePreference.getExerciseType(mContext);
+        ExerciseType exerciseType = ExerciseSharedPref.getExerciseType(mContext);
         assertEquals(ExerciseType.TIMED_SETS, exerciseType);
     }
 
     @Test
     public void testGetExerciseId_WithNoValueSet_ShouldReturnInvalidValue() {
-        long exerciseId = ExercisePreference.getExerciseId(mContext);
+        long exerciseId = ExerciseSharedPref.getExerciseId(mContext);
         assertEquals(-1, exerciseId);
     }
 
     @Test
     public void testSetAndGetExerciseId_ShouldReturnSetValue() {
-        ExercisePreference.setExerciseId(mContext, 1);
-        long exerciseId = ExercisePreference.getExerciseId(mContext);
+        ExerciseSharedPref.setExerciseId(mContext, 1);
+        long exerciseId = ExerciseSharedPref.getExerciseId(mContext);
         assertEquals(1, exerciseId);
     }
 
     @Test
     public void testSetExerciseId_WithSetValueReplaced_ShouldReturnNewValue() {
-        ExercisePreference.setExerciseId(mContext, 1);
-        ExercisePreference.setExerciseId(mContext, 2);
+        ExerciseSharedPref.setExerciseId(mContext, 1);
+        ExerciseSharedPref.setExerciseId(mContext, 2);
 
-        long exerciseId = ExercisePreference.getExerciseId(mContext);
+        long exerciseId = ExerciseSharedPref.getExerciseId(mContext);
         assertEquals(2, exerciseId);
     }
 }

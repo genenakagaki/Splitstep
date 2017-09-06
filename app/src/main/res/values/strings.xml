@@ -6,4 +6,7 @@
     <string name="reps_exercise">Exercise with Reps</string>
     <string name="timed_sets_exercise">Exercise with Timed Sets</string>
     <string name="reaction_exercise">Reaction Exercise</string>
+
+    <!-- Exercise List -->
+    <string name="exercise_list_empty">No exercises created yet.</string>
 </resources>
