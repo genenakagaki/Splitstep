@@ -1,26 +1,30 @@
 package com.genenakagaki.splitstep.exercise.ui.list;
 
 import android.content.Context;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RadioButton;
+import android.widget.ImageButton;
+import android.widget.ImageSwitcher;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.ViewSwitcher;
 
 import com.genenakagaki.splitstep.R;
-import com.genenakagaki.splitstep.exercise.data.ExerciseSharedPref;
 import com.genenakagaki.splitstep.exercise.data.entity.Exercise;
-import com.genenakagaki.splitstep.exercise.data.entity.ExerciseType;
-import com.genenakagaki.splitstep.exercise.ui.ExerciseActivity;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 /**
@@ -29,25 +33,67 @@ import timber.log.Timber;
 
 public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.ViewHolder> {
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        @BindView(R.id.exercise_radiobutton)
-        RadioButton mExerciseRadioButton;
-        @BindView(R.id.exercise_textview)
-        TextView mExerciseTextButton;
-        Exercise mExercise;
+    public class ViewHolder extends RecyclerView.ViewHolder {
+        @BindView(R.id.delete_button)
+        ImageButton mDeleteButton;
+        @BindView(R.id.favorite_imageswitcher) ImageSwitcher mFavoriteImageSwitcher;
+        @BindView(R.id.exercise_textview) TextView mExerciseTextButton;
+        private ExerciseListItemViewModel mViewModel;
 
         public ViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
-            view.setOnClickListener(this);
+            mFavoriteImageSwitcher.setFactory(new ViewSwitcher.ViewFactory() {
+                @Override
+                public View makeView() {
+                    ImageView switcherImageView = new ImageView(mContext);
+                    switcherImageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                    switcherImageView.setLayoutParams(new ImageSwitcher.LayoutParams(
+                            LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+                    return switcherImageView;
+                }
+            });
         }
 
-        @Override
-        public void onClick(View view) {
-            ExerciseActivity activity = (ExerciseActivity) mContext;
-            ExerciseSharedPref.setExerciseId(mContext, mExercise.id);
+        public void setExercise(Exercise exercise) {
+            mViewModel = new ExerciseListItemViewModel(mContext, exercise);
 
-            switch (ExerciseSharedPref.getExerciseType(mContext)) {
+            mViewModel.getExerciseSubject()
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.computation())
+                    .subscribe(new Consumer<Exercise>() {
+                        @Override
+                        public void accept(Exercise exercise) throws Exception {
+                            if (exercise.favorite) {
+                                mFavoriteImageSwitcher.setImageResource(R.drawable.ic_star);
+                            } else {
+                                mFavoriteImageSwitcher.setImageResource(R.drawable.ic_star_border);
+                            }
+                        }
+                    });
+        }
+
+        @OnClick(R.id.delete_button)
+        public void onDeleteButtonClick() {
+            DeleteExerciseDialog dialog = DeleteExerciseDialog.newInstance(
+                    mViewModel.getExercise().id, mViewModel.getDeleteMessage());
+            AppCompatActivity activity = (AppCompatActivity) mContext;
+            dialog.show(activity.getSupportFragmentManager(), DeleteExerciseDialog.class.getSimpleName());
+        }
+
+        @OnClick(R.id.favorite_imageswitcher)
+        public void onFavoriteClick() {
+            Timber.d("onFavoriteClick");
+            mViewModel.toggleExerciseFavorite();
+        }
+
+        @OnClick(R.id.exercise_textview)
+        public void onExerciseClick() {
+            Timber.d("onExerciseClick");
+//            ExerciseActivity activity = (ExerciseActivity) mContext;
+//                ExerciseSharedPref.setExerciseId(mContext, mExercise.id);
+//
+//                switch (ExerciseSharedPref.getExerciseType(mContext)) {
 //                case REPS:
 //                    activity.showFragment(new RepsExerciseDetailFragment(),
 //                            RepsExerciseDetailFragment.class.getSimpleName(),
@@ -62,19 +108,16 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.ViewHo
 //                    activity.showFragment(new ReactionExerciseDetailFragment(),
 //                            ReactionExerciseDetailFragment.class.getSimpleName(),
 //                            true);
-            }
         }
     }
 
-    private Map<Integer, Boolean> mIsSelectedByExerciseId = new HashMap<>();
     private Context mContext;
+    private ExerciseListViewModel mViewModel;
     private List<Exercise> mExercises;
 
-    private int mMode;
-
-    public ExerciseAdapter(Context context, ExerciseType exerciseType) {
-//        mMode = ExerciseChooserFragment.MODE_CHOOSE;
+    public ExerciseAdapter(Context context, ExerciseListViewModel viewModel) {
         mContext = context;
+        mViewModel = viewModel;
         mExercises = new ArrayList<>();
     }
 
@@ -88,15 +131,28 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-//        if (mMode == ExerciseChooserFragment.MODE_CHOOSE) {
-//            viewHolder.mExerciseRadioButton.setVisibility(View.GONE);
-//        } else {
-//            viewHolder.mExerciseRadioButton.setVisibility(View.VISIBLE);
-//        }
+        if (mViewModel.isEditMode()) {
+            holder.mDeleteButton.setVisibility(View.VISIBLE);
+            holder.mFavoriteImageSwitcher.setVisibility(View.GONE);
+        } else {
+            holder.mDeleteButton.setVisibility(View.GONE);
+            holder.mFavoriteImageSwitcher.setVisibility(View.VISIBLE);
+        }
 
         Exercise exercise = mExercises.get(position);
-        holder.mExercise = exercise;
+        holder.setExercise(exercise);
         holder.mExerciseTextButton.setText(exercise.name);
+
+//        if (exercise.favorite) {
+//            holder.mFavoriteImageSwitcher.setImageResource(R.drawable.ic_star);
+//        } else {
+//            holder.mFavoriteImageSwitcher.setImageResource(R.drawable.ic_star_border);
+//        }
+//        Animation animationOut = AnimationUtils.loadAnimation(this, android.R.anim.slide_out_right);
+//        Animation animationIn = AnimationUtils.loadAnimation(this, android.R.anim.slide_in_left);
+//
+//        myImageSwitcher.setOutAnimation(animationOut);
+//        myImageSwitcher.setInAnimation(animationIn);
     }
 
     @Override
@@ -120,203 +176,4 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.ViewHo
         return mExercises;
     }
 
-    private void showEditDialog(Context context, ViewHolder viewHolder) {
-        Timber.d("showEditDialog");
-
-//        try {
-//            switch (mExerciseType) {
-////                case Exercise.TYPE_REPS:
-//                    TimedSetsExercise timedSetsExercise = RegularExerciseDb.getExerciseByName(
-//                            context, viewHolder.mExerciseRadioButton.getText().toString());
-//                    EditExerciseDialog.newInstance(mExerciseType, timedSetsExercise.id).show(
-//                            ((ExerciseChooserActivity) context).getSupportFragmentManager(), null);
-//                    break;
-//                case Exercise.TYPE_TIMED_SETS:
-//
-//                    break;
-//                case Exercise.TYPE_REACTION:
-//                    ReactionExercise reactionExercise = ReactionExerciseDb.getExerciseByName(
-//                            context, viewHolder.mExerciseRadioButton.getText().toString());
-//                    EditExerciseDialog.newInstance(mExerciseType, reactionExercise.id).show(
-//                            ((ExerciseChooserActivity) context).getSupportFragmentManager(), null);
-//                    break;
-//            }
-//        } catch (ExerciseNotFoundException e) {
-//            Timber.d(e.getMessage());
-//            e.printStackTrace();
-//        }
-    }
-
-    public void setMode(int mode) {
-        mMode = mode;
-        mIsSelectedByExerciseId.clear();
-    }
-
-    public List<Integer> getSelectedIds() {
-        List<Integer> selectedIds = new ArrayList<>();
-
-        for (Map.Entry<Integer, Boolean> entry: mIsSelectedByExerciseId.entrySet()) {
-            if (entry.getValue()) {
-                selectedIds.add(entry.getKey());
-            }
-        }
-
-        return selectedIds;
-    }
-
-    public void onClick(Context context, View view) {
-
-        ViewHolder viewHolder = (ViewHolder) view.getTag();
-
-//        if (mMode == ExerciseChooserFragment.MODE_CHOOSE) {
-//            Timber.d("onClick Mode: Choose");
-//            switch (mExerciseType) {
-//                case REGULAR:
-//                    RegularExerciseDb.setCurrentExercise(context, viewHolder.mExerciseId);
-//                    break;
-//                case REACTION:
-//                    ReactionExerciseDb.setCurrentExercise(context, viewHolder.mExerciseId);
-//                    break;
-//            }
-//            Intent intent = new Intent(view.getContext(), ExerciseSettingActivity.class);
-//            intent.putExtra(ExerciseSettingActivity.EXTRA_EXERCISE_TYPE, mExerciseType);
-//            intent.putExtra(ExerciseSettingActivity.EXTRA_EXERCISE_ID, viewHolder.mExerciseId);
-//            view.getContext().startActivity(intent);
-//        } else {
-//            Timber.d("onClick Mode: Edit");
-//            Boolean selected = mIsSelectedByExerciseId.get(viewHolder.mExerciseId);
-//            if (selected == null) {
-//                selected = true;
-//            } else {
-//                selected = !selected;
-//            }
-//
-//            mIsSelectedByExerciseId.put(viewHolder.mExerciseId, selected);
-//            viewHolder.mExerciseRadioButton.setChecked(selected);
-//        }
-
-    }
-
-
-//        implements View.OnTouchListener, View.OnDragListener {
-
-//    private static final long DRAG_START_TIME = 100;
-
-
-//    private View mDragView;
-//    private float mDragOffset;
-//    private boolean mDragging = false;
-//    private long mTouchStartTime;
-
-    //    @Override
-//    public boolean onTouch(View v, MotionEvent event) {
-//        Timber.d("onTouch");
-//
-//        final int action = MotionEventCompat.getActionMasked(event);
-//
-//        switch (action) {
-//            case MotionEvent.ACTION_DOWN:
-//                Timber.d("ACTION_DOWN");
-//                mTouchStartTime = Calendar.getInstance().getTimeInMillis();
-//
-//                break;
-//            case MotionEvent.ACTION_MOVE:
-//                Timber.d("ACTION_MOVE");
-//                long touchDuration = Calendar.getInstance().getTimeInMillis() - mTouchStartTime;
-//                if(touchDuration > DRAG_START_TIME && !mDragging) {
-//                    mDragView = v;
-//                    ClipData data = ClipData.newPlainText("", "");
-//                    View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(new View(v.getContext()));
-//
-//                    if (Build.VERSION.SDK_INT >= 24) {
-//                        v.startDragAndDrop(data, shadowBuilder, v.findViewById(R.id.exercise_container), 0);
-//                    } else {
-//                        v.startDrag(data, shadowBuilder, v.findViewById(R.id.exercise_container), 0);
-//                    }
-//                }
-//                break;
-//            case MotionEvent.ACTION_UP:
-//                touchDuration = Calendar.getInstance().getTimeInMillis() - mTouchStartTime;
-//                if (touchDuration < DRAG_START_TIME) {
-//                    onClick(v.getContext(), v);
-//                }
-//                break;
-//        }
-//        return true;
-//    }
-
-    //    @Override
-//    public boolean onDrag(View v, DragEvent event) {
-//        ViewHolder viewHolder = (ViewHolder) mDragView.getTag();
-//
-//        Context context = v.getContext();
-//
-//        switch (event.getAction()) {
-//            case DragEvent.ACTION_DRAG_STARTED:
-//                Timber.d("ACTION_DRAG_STARTED");
-//
-//                mDragging = true;
-//                mDragOffset = event.getX();
-//                break;
-//            case DragEvent.ACTION_DRAG_LOCATION:
-//                Timber.d("ACTION_DRAG_LOCATION");
-//
-//                float x = event.getX();
-//
-//                int margin = (int) (x - mDragOffset);
-//                int marginLeft = margin;
-//                int marginRight = 0 - margin;
-//
-//                Drawable background = viewHolder.mExerciseContainer.getBackground();
-//                background.setAlpha(200);
-//
-//                if (marginLeft > 0) { // Dragging to right
-//                    ButterKnife.findById(mDragView, R.id.content).setBackgroundColor(
-//                            ContextCompat.getColor(context, R.color.colorPrimary));
-//                    viewHolder.mEditLayout.setVisibility(View.VISIBLE);
-//                    viewHolder.deleteLayout.setVisibility(View.INVISIBLE);
-//                } else {
-//                    ButterKnife.findById(mDragView, R.id.content).setBackgroundColor(
-//                            ContextCompat.getColor(context, R.color.error));
-//                    viewHolder.mEditLayout.setVisibility(View.INVISIBLE);
-//                    viewHolder.deleteLayout.setVisibility(View.VISIBLE);
-//                }
-//
-//                RelativeLayout.LayoutParams layoutParams =
-//                        (RelativeLayout.LayoutParams) viewHolder.mExerciseContainer.getLayoutParams();
-//                layoutParams.setMargins(marginLeft, 0, marginRight, 0);
-//                viewHolder.mExerciseContainer.setLayoutParams(layoutParams);
-//                break;
-//            case DragEvent.ACTION_DROP:
-//                Timber.d("ACTION_DROP");
-//
-//                background = viewHolder.mExerciseContainer.getBackground();
-//                background.setAlpha(255);
-//
-//                layoutParams = (RelativeLayout.LayoutParams) viewHolder.mExerciseContainer.getLayoutParams();
-//
-//                DisplayMetrics displayMetrics = new DisplayMetrics();
-//                ((Activity) context).getWindowManager()
-//                        .getDefaultDisplay()
-//                        .getMetrics(displayMetrics);
-//                int width = displayMetrics.widthPixels;
-//
-//                if (layoutParams.leftMargin > width / 3) {
-//                    showEditDialog(context, viewHolder);
-//
-//                } else if (layoutParams.rightMargin > width / 3) {
-//                    showDeleteDialog(context, viewHolder);
-//
-//                }
-//                layoutParams.setMargins(0, 0, 0, 0);
-//
-//                viewHolder.mExerciseContainer.setLayoutParams(layoutParams);
-//
-//                mDragging = false;
-//                break;
-//            default:
-//                break;
-//        }
-//        return true;
-//    }
 }

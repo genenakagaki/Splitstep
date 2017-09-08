@@ -12,7 +12,6 @@ import com.raizlabs.android.dbflow.structure.database.transaction.QueryTransacti
 
 import java.util.List;
 
-import io.reactivex.functions.Consumer;
 import io.reactivex.subjects.BehaviorSubject;
 import timber.log.Timber;
 
@@ -24,6 +23,7 @@ public class ExerciseListViewModel {
 
     private Context mContext;
     private ExerciseType mExerciseType;
+    private boolean mIsEditMode;
 
     private BehaviorSubject<List<Exercise>> mExercisesSubject = BehaviorSubject.create();
 
@@ -32,12 +32,16 @@ public class ExerciseListViewModel {
         mExerciseType = ExerciseSharedPref.getExerciseType(context);
     }
 
-    public ExerciseType getExerciseType() {
-        return mExerciseType;
-    }
-
     public BehaviorSubject<List<Exercise>> getExercisesSubject() {
         return mExercisesSubject;
+    }
+
+    public void setEditMode(boolean isEditMode) {
+        mIsEditMode = isEditMode;
+    }
+
+    public boolean isEditMode() {
+        return mIsEditMode;
     }
 
     public String getTitle() {
@@ -49,22 +53,6 @@ public class ExerciseListViewModel {
             default: // REACTION:
                 return mContext.getString(R.string.reaction_exercise);
         }
-    }
-
-    public void test() {
-        BehaviorSubject<String> subject = BehaviorSubject.create();
-        subject.subscribe(new Consumer<String>() {
-            @Override
-            public void accept(String s) throws Exception {
-                Timber.d(s);
-            }
-        });
-    }
-
-    public List<Exercise> getExercises() {
-        return SQLite.select()
-                .from(Exercise.class)
-                .queryList();
     }
 
     public void getExerciseList() {

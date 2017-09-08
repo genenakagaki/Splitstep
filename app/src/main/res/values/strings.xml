@@ -4,15 +4,21 @@
 
     <!-- Action -->
     <string name="save">Save</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
     <string name="cancel">Cancel</string>
 
     <!-- Exercise Type -->
     <string name="reps_exercise">Exercise with Reps</string>
+    <string name="reps_exercise_short">with Reps</string>
     <string name="timed_sets_exercise">Exercise with Timed Sets</string>
+    <string name="timed_sets_exercise_short">with Timed Sets</string>
     <string name="reaction_exercise">Reaction Exercise</string>
+    <string name="reaction_exercise_short">Reaction</string>
 
     <!-- Exercise List -->
     <string name="exercise_list_empty">No exercises created yet.</string>
+    <string name="delete_exercise_title">Delete this Exercise?</string>
     
     <!-- Add Exercise -->
     <string name="add_exercise_title">Add New Exercise</string>

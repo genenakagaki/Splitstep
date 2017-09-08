@@ -172,6 +172,49 @@ public class ReactionExerciseTest {
         countDownLatch.await(10, TimeUnit.SECONDS);
     }
 
+    @Test
+    public void testDeleteReactionExercise_ShouldBeDeleted() {
+        REACTION_EXERCISE.insert();
+        REACTION_EXERCISE.delete();
+
+        List<ReactionExercise> exercises = SQLite.select()
+                .from(ReactionExercise.class)
+                .queryList();
+
+        assertEquals(0, exercises.size());
+    }
+
+    @Test
+    public void testDeleteReactionExerciseAsync_ShouldBeDeleted() throws InterruptedException {
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+        REACTION_EXERCISE.insert();
+        FlowManager.getDatabase(ExerciseDatabase.class).beginTransactionAsync(new ITransaction() {
+            @Override
+            public void execute(DatabaseWrapper databaseWrapper) {
+                SQLite.delete(ReactionExercise.class)
+                        .where(ReactionExercise_Table.id.eq(REACTION_EXERCISE.id))
+                        .execute();
+            }
+        }).success(new Transaction.Success() {
+            @Override
+            public void onSuccess(@NonNull Transaction transaction) {
+                SQLite.select()
+                        .from(ReactionExercise.class)
+                        .async()
+                        .queryListResultCallback(new QueryTransaction.QueryResultListCallback<ReactionExercise>() {
+                            @Override
+                            public void onListQueryResult(QueryTransaction transaction, @NonNull List<ReactionExercise> tResult) {
+                                assertEquals(0, tResult.size());
+                                countDownLatch.countDown();
+                            }
+                        }).execute();
+            }
+        }).build().execute();
+
+        countDownLatch.await(10, TimeUnit.SECONDS);
+    }
+
     private boolean isExerciseEqual(ReactionExercise r1, ReactionExercise r2) {
         return r1.reps == r2.reps
                 && r1.sets == r2.sets

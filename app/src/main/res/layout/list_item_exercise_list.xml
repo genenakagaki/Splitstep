@@ -4,19 +4,27 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="@dimen/list_item_padding"
-    android:descendantFocusability="blocksDescendants">
+    android:padding="@dimen/list_item_padding">
 
-    <RadioButton
-        android:id="@+id/exercise_radiobutton"
+    <ImageButton
+        android:id="@+id/delete_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:clickable="false"
-        android:visibility="gone"/>
+        android:src="@drawable/ic_clear"
+        android:background="@null"
+        android:visibility="gone"
+        android:paddingRight="@dimen/list_item_padding" />
+
+    <ImageSwitcher
+        android:id="@+id/favorite_imageswitcher"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingRight="@dimen/list_item_padding"/>
 
     <TextView
         android:id="@+id/exercise_textview"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="1"
         android:layout_height="wrap_content"
         android:textSize="16sp"/>
 </LinearLayout>

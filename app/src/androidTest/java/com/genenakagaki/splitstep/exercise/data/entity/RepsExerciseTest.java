@@ -97,7 +97,10 @@ public class RepsExerciseTest {
         FlowManager.getDatabase(ExerciseDatabase.class).beginTransactionAsync(new ITransaction() {
             @Override
             public void execute(DatabaseWrapper databaseWrapper) {
-                REPS_EXERCISE.insert();
+                SQLite.insert(RepsExercise.class)
+                        .columns(RepsExercise_Table.reps, RepsExercise_Table.sets, RepsExercise_Table.restDuration)
+                        .values(REPS_EXERCISE.reps, REPS_EXERCISE.sets, REPS_EXERCISE.restDuration)
+                        .execute();
             }
         }).success(new Transaction.Success() {
             @Override
@@ -159,6 +162,49 @@ public class RepsExerciseTest {
                             @Override
                             public void onListQueryResult(QueryTransaction transaction, @NonNull List<RepsExercise> tResult) {
                                 assertTrue(isExerciseEqual(exerciseToUpdate, tResult.get(0)));
+                                countDownLatch.countDown();
+                            }
+                        }).execute();
+            }
+        }).build().execute();
+
+        countDownLatch.await(10, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void testDeleteRepsExercise_ShouldBeDeleted() {
+        REPS_EXERCISE.insert();
+        REPS_EXERCISE.delete();
+
+        List<RepsExercise> exercises = SQLite.select()
+                .from(RepsExercise.class)
+                .queryList();
+
+        assertEquals(0, exercises.size());
+    }
+
+    @Test
+    public void testDeleteRepsExerciseAsync_ShouldBeDeleted() throws InterruptedException {
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+        REPS_EXERCISE.insert();
+        FlowManager.getDatabase(ExerciseDatabase.class).beginTransactionAsync(new ITransaction() {
+            @Override
+            public void execute(DatabaseWrapper databaseWrapper) {
+                SQLite.delete(RepsExercise.class)
+                        .where(RepsExercise_Table.id.eq(REPS_EXERCISE.id))
+                        .execute();
+            }
+        }).success(new Transaction.Success() {
+            @Override
+            public void onSuccess(@NonNull Transaction transaction) {
+                SQLite.select()
+                        .from(RepsExercise.class)
+                        .async()
+                        .queryListResultCallback(new QueryTransaction.QueryResultListCallback<RepsExercise>() {
+                            @Override
+                            public void onListQueryResult(QueryTransaction transaction, @NonNull List<RepsExercise> tResult) {
+                                assertEquals(0, tResult.size());
                                 countDownLatch.countDown();
                             }
                         }).execute();

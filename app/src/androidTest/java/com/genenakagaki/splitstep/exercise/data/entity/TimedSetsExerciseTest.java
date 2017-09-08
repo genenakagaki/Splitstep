@@ -165,6 +165,47 @@ public class TimedSetsExerciseTest {
         countDownLatch.await(10, TimeUnit.SECONDS);
     }
 
+    @Test
+    public void testDeleteTimedSetsExercise_ShouldBeDeleted() {
+        TIMED_SETS_EXERCISE.insert();
+        TIMED_SETS_EXERCISE.delete();
+
+        List<TimedSetsExercise> exercises = SQLite.select()
+                .from(TimedSetsExercise.class)
+                .queryList();
+
+        assertEquals(0, exercises.size());
+    }
+
+    @Test
+    public void testDeleteTimedSetsExerciseAsync_ShouldBeDeleted() throws InterruptedException {
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+        TIMED_SETS_EXERCISE.insert();
+        FlowManager.getDatabase(ExerciseDatabase.class).beginTransactionAsync(new ITransaction() {
+            @Override
+            public void execute(DatabaseWrapper databaseWrapper) {
+                TIMED_SETS_EXERCISE.delete();
+            }
+        }).success(new Transaction.Success() {
+            @Override
+            public void onSuccess(@NonNull Transaction transaction) {
+                SQLite.select()
+                        .from(TimedSetsExercise.class)
+                        .async()
+                        .queryListResultCallback(new QueryTransaction.QueryResultListCallback<TimedSetsExercise>() {
+                            @Override
+                            public void onListQueryResult(QueryTransaction transaction, @NonNull List<TimedSetsExercise> tResult) {
+                                assertEquals(0, tResult.size());
+                                countDownLatch.countDown();
+                            }
+                        }).execute();
+            }
+        }).build().execute();
+
+        countDownLatch.await(10, TimeUnit.SECONDS);
+    }
+
     private boolean isExerciseEqual(TimedSetsExercise r1, TimedSetsExercise r2) {
         return r1.sets == r2.sets
                 && r1.setDuration == r2.setDuration

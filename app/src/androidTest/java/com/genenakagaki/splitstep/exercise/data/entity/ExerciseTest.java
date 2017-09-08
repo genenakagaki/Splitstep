@@ -102,18 +102,12 @@ public class ExerciseTest {
         }).success(new Transaction.Success() {
             @Override
             public void onSuccess(@NonNull Transaction transaction) {
-                SQLite.select()
+                List<Exercise> exercises = SQLite.select()
                         .from(Exercise.class)
-                        .async()
-                        .queryListResultCallback(new QueryTransaction.QueryResultListCallback<Exercise>() {
-                            @Override
-                            public void onListQueryResult(QueryTransaction transaction, @NonNull List<Exercise> tResult) {
-                                assertTrue(isExerciseEqual(EXERCISE, tResult.get(0)));
-                                assertTrue(true);
-                                countDownLatch.countDown();
+                        .queryList();
 
-                            }
-                        }).execute();
+                assertTrue(isExerciseEqual(EXERCISE, exercises.get(0)));
+                countDownLatch.countDown();
             }
         }).build().execute();
 
@@ -157,16 +151,49 @@ public class ExerciseTest {
         }).success(new Transaction.Success() {
             @Override
             public void onSuccess(@NonNull Transaction transaction) {
-                SQLite.select()
+                List<Exercise> exercises = SQLite.select()
                         .from(Exercise.class)
-                        .async()
-                        .queryListResultCallback(new QueryTransaction.QueryResultListCallback<Exercise>() {
-                            @Override
-                            public void onListQueryResult(QueryTransaction transaction, @NonNull List<Exercise> tResult) {
-                                assertTrue(isExerciseEqual(exerciseToUpdate, tResult.get(0)));
-                                countDownLatch.countDown();
-                            }
-                        }).execute();
+                        .queryList();
+                assertTrue(isExerciseEqual(exerciseToUpdate, exercises.get(0)));
+                countDownLatch.countDown();
+            }
+        }).build().execute();
+
+        countDownLatch.await(10, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void testDeleteExercise_ShouldBeDeleted() {
+        EXERCISE.insert();
+        EXERCISE.delete();
+
+        List<Exercise> exercises = SQLite.select()
+                .from(Exercise.class)
+                .queryList();
+
+        assertEquals(0, exercises.size());
+    }
+
+    @Test
+    public void testDeleteExerciseAsync_ShouldBeDeleted() throws InterruptedException {
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+        EXERCISE.insert();
+        FlowManager.getDatabase(ExerciseDatabase.class).beginTransactionAsync(new ITransaction() {
+            @Override
+            public void execute(DatabaseWrapper databaseWrapper) {
+                SQLite.delete(Exercise.class)
+                        .where(Exercise_Table.id.eq(EXERCISE.id))
+                        .execute();
+            }
+        }).success(new Transaction.Success() {
+            @Override
+            public void onSuccess(@NonNull Transaction transaction) {
+                List<Exercise> exercises = SQLite.select()
+                        .from(Exercise.class)
+                        .queryList();
+                assertEquals(0, exercises.size());
+                countDownLatch.countDown();
             }
         }).build().execute();
 

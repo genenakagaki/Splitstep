@@ -1,13 +1,19 @@
 package com.genenakagaki.splitstep.exercise.ui.list;
 
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -51,6 +57,50 @@ public class ExerciseListFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         mViewModel = new ExerciseListViewModel(getActivity());
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_exercise_list, menu);
+
+        Drawable drawable = menu.findItem(R.id.action_edit).getIcon();
+        if (drawable != null) {
+            // If we don't mutate the drawable, then all drawable's with this id will have a color
+            // filter applied to it.
+            drawable.mutate();
+            int color = ContextCompat.getColor(getActivity(), android.R.color.white);
+            drawable.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+        }
+
+        if (mViewModel.isEditMode()) {
+            menu.findItem(R.id.action_edit).setVisible(false);
+            menu.findItem(R.id.action_cancel).setVisible(true);
+        } else {
+            menu.findItem(R.id.action_edit).setVisible(true);
+            menu.findItem(R.id.action_cancel).setVisible(false);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_edit:
+                Timber.d("action_edit");
+                mViewModel.setEditMode(true);
+                getActivity().invalidateOptionsMenu();
+                mExerciseAdapter.notifyDataSetChanged();
+                break;
+            case R.id.action_cancel:
+                Timber.d("action_cancel");
+                mViewModel.setEditMode(false);
+                getActivity().invalidateOptionsMenu();
+                mExerciseAdapter.notifyDataSetChanged();
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Nullable
@@ -64,7 +114,7 @@ public class ExerciseListFragment extends Fragment {
         mUnbinder = ButterKnife.bind(this, view);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
-        mExerciseAdapter = new ExerciseAdapter(getContext(), mViewModel.getExerciseType());
+        mExerciseAdapter = new ExerciseAdapter(getContext(), mViewModel);
 
         mRecyclerView.setHasFixedSize(false);
         mRecyclerView.setLayoutManager(layoutManager);
@@ -88,8 +138,6 @@ public class ExerciseListFragment extends Fragment {
                 .subscribe(new Consumer<List<Exercise>>() {
                     @Override
                     public void accept(List<Exercise> exercises) throws Exception {
-                        Timber.d("onNext");
-
                         mExerciseAdapter.clear();
                         mExerciseAdapter.addAll(exercises);
 
