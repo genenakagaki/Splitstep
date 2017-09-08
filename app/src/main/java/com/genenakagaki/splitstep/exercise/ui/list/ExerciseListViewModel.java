@@ -8,13 +8,19 @@ import com.genenakagaki.splitstep.exercise.data.entity.Exercise;
 import com.genenakagaki.splitstep.exercise.data.entity.ExerciseType;
 import com.genenakagaki.splitstep.exercise.data.entity.Exercise_Table;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
-import com.raizlabs.android.dbflow.structure.database.transaction.QueryTransaction;
 
 import java.util.List;
 
+import io.reactivex.Completable;
+import io.reactivex.CompletableEmitter;
+import io.reactivex.CompletableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 import timber.log.Timber;
+
 
 /**
  * Created by gene on 8/21/17.
@@ -69,15 +75,18 @@ public class ExerciseListViewModel {
     public void getExerciseList() {
         Timber.d("getExerciseList");
 
-        SQLite.select()
-                .from(Exercise.class)
-                .where(Exercise_Table.type.eq(mExerciseType.getValue()))
-                .async()
-                .queryListResultCallback(new QueryTransaction.QueryResultListCallback<Exercise>() {
-                    @Override
-                    public void onListQueryResult(QueryTransaction transaction, @android.support.annotation.NonNull List<Exercise> tResult) {
-                        mExercisesSubject.onNext(tResult);
-                    }
-                }).execute();
+        Completable.create(new CompletableOnSubscribe() {
+            @Override
+            public void subscribe(@NonNull CompletableEmitter e) throws Exception {
+                List<Exercise> exercises = SQLite.select()
+                        .from(Exercise.class)
+                        .where(Exercise_Table.type.eq(mExerciseType.getValue()))
+                        .queryList();
+
+                mExercisesSubject.onNext(exercises);
+            }
+        }).observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.computation())
+                .subscribe();
     }
 }
