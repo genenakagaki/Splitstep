@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.genenakagaki.splitstep.R;
+import com.genenakagaki.splitstep.exercise.data.ExerciseSharedPref;
 import com.genenakagaki.splitstep.exercise.data.entity.Exercise;
 import com.genenakagaki.splitstep.exercise.ui.add.AddExerciseDialog;
 
@@ -45,6 +46,7 @@ public class ExerciseListFragment extends Fragment {
     @BindView(R.id.fab) FloatingActionButton mFab;
 
     private Unbinder mUnbinder;
+    private CompositeDisposable mDisposable;
     private ExerciseListViewModel mViewModel;
 
     private ExerciseAdapter mExerciseAdapter;
@@ -55,7 +57,7 @@ public class ExerciseListFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mViewModel = new ExerciseListViewModel(getActivity());
+        mViewModel = new ExerciseListViewModel(getActivity(), ExerciseSharedPref.getExerciseType(getActivity()));
         setHasOptionsMenu(true);
     }
 
@@ -129,9 +131,9 @@ public class ExerciseListFragment extends Fragment {
     public void onResume() {
         Timber.d("onResume");
         super.onResume();
-        mViewModel.initDisposable();
+        mDisposable = new CompositeDisposable();
 
-        mViewModel.getDisposable().add(mViewModel.getExercisesSubject()
+        mDisposable.add(mViewModel.getExercisesSubject()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.computation())
                 .subscribe(new Consumer<List<Exercise>>() {
@@ -150,16 +152,18 @@ public class ExerciseListFragment extends Fragment {
                     }
                 }));
 
-        mViewModel.getExerciseList();
+        mDisposable.add(mViewModel.getExerciseList()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.computation())
+                .subscribe());
     }
 
     @Override
     public void onPause() {
         Timber.d("onPause");
         super.onPause();
-        CompositeDisposable disposable = mViewModel.getDisposable();
-        if (disposable != null && !disposable.isDisposed()) {
-            disposable.dispose();
+        if (mDisposable != null && !mDisposable.isDisposed()) {
+            mDisposable.dispose();
         }
     }
 

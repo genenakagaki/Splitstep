@@ -26,6 +26,7 @@ import org.junit.runner.RunWith;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Predicate;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -57,7 +58,7 @@ public class AddExerciseViewModelTest {
     public void testValidateExerciseName_WithEmptyString_ShouldBeInvalid() {
         AddExerciseViewModel viewModel = new AddExerciseViewModel(mContext, ExerciseType.REPS);
 
-        viewModel.validateExerciseName("")
+        viewModel.validateExerciseNameSingle("")
                 .test()
                 .assertValue(new Predicate<ValidationModel>() {
                     @Override
@@ -80,7 +81,7 @@ public class AddExerciseViewModelTest {
 
         DatabaseUtils.insertExercises(exerciseNames, ExerciseType.REPS_VALUE, false);
 
-        viewModel.validateExerciseName("Exercise1")
+        viewModel.validateExerciseNameSingle("Exercise1")
                 .test()
                 .assertValue(new Predicate<ValidationModel>() {
                     @Override
@@ -96,7 +97,7 @@ public class AddExerciseViewModelTest {
     public void testValidateExerciseName_WithUniqueName_ShouldBeValid() {
         AddExerciseViewModel viewModel = new AddExerciseViewModel(mContext, ExerciseType.REPS);
 
-        viewModel.validateExerciseName("Exercise1")
+        viewModel.validateExerciseNameSingle("Exercise1")
                 .test()
                 .assertValue(new Predicate<ValidationModel>() {
                     @Override
@@ -118,7 +119,7 @@ public class AddExerciseViewModelTest {
 
         DatabaseUtils.insertExercises(exerciseNames, ExerciseType.TIMED_SETS_VALUE, false);
 
-        viewModel.validateExerciseName("Exercise1")
+        viewModel.validateExerciseNameSingle("Exercise1")
                 .test()
                 .assertValue(new Predicate<ValidationModel>() {
                     @Override
@@ -134,7 +135,7 @@ public class AddExerciseViewModelTest {
         AddExerciseViewModel viewModel = new AddExerciseViewModel(mContext, ExerciseType.REPS);
 
         String newName = "Exercise1";
-        viewModel.insertExercise(newName)
+        viewModel.insertExerciseCompletable(newName)
                 .test()
                 .awaitTerminalEvent();
 
@@ -146,9 +147,9 @@ public class AddExerciseViewModelTest {
                 .from(RepsExercise.class)
                 .queryList().get(0);
 
-        assertTrue(exercise.name.equals(newName)
-                && exercise.type == ExerciseType.REPS_VALUE
-                && repsExercise.id == exercise.id);
+        assertEquals(newName, exercise.name);
+        assertEquals(ExerciseType.REPS_VALUE, exercise.type);
+        assertEquals(exercise.id, repsExercise.id);
     }
 
     @Test
@@ -156,7 +157,7 @@ public class AddExerciseViewModelTest {
         AddExerciseViewModel viewModel = new AddExerciseViewModel(mContext, ExerciseType.TIMED_SETS);
 
         String newName = "Exercise1";
-        viewModel.insertExercise(newName)
+        viewModel.insertExerciseCompletable(newName)
                 .test()
                 .awaitTerminalEvent();
 
@@ -178,7 +179,7 @@ public class AddExerciseViewModelTest {
         AddExerciseViewModel viewModel = new AddExerciseViewModel(mContext, ExerciseType.REACTION);
 
         String newName = "Exercise1";
-        viewModel.insertExercise(newName)
+        viewModel.insertExerciseCompletable(newName)
                 .test()
                 .awaitTerminalEvent();
 

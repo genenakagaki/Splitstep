@@ -21,7 +21,6 @@ import io.reactivex.Single;
 import io.reactivex.SingleEmitter;
 import io.reactivex.SingleOnSubscribe;
 import io.reactivex.annotations.NonNull;
-import io.reactivex.disposables.CompositeDisposable;
 
 /**
  * Created by Gene on 9/6/2017.
@@ -30,7 +29,6 @@ import io.reactivex.disposables.CompositeDisposable;
 public class AddExerciseViewModel {
 
     private Context mContext;
-    private CompositeDisposable mDisposable;
     private ExerciseType mExerciseType;
 
     public AddExerciseViewModel(Context context, ExerciseType exerciseType) {
@@ -38,15 +36,7 @@ public class AddExerciseViewModel {
         mExerciseType = exerciseType;
     }
 
-    public CompositeDisposable getDisposable() {
-        return mDisposable;
-    }
-
-    public void initDisposable() {
-        mDisposable = new CompositeDisposable();
-    }
-
-    public Single<ValidationModel> validateExerciseName(final String exerciseName) {
+    public Single<ValidationModel> validateExerciseNameSingle(final String exerciseName) {
         return Single.create(new SingleOnSubscribe<ValidationModel>() {
             @Override
             public void subscribe(@NonNull SingleEmitter<ValidationModel> e) throws Exception {
@@ -77,7 +67,7 @@ public class AddExerciseViewModel {
         });
     }
 
-    public Completable insertExercise(final String name) {
+    public Completable insertExerciseCompletable(final String name) {
         return Completable.create(new CompletableOnSubscribe() {
             @Override
             public void subscribe(@NonNull CompletableEmitter e) throws Exception {

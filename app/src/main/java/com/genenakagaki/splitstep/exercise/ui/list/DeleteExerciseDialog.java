@@ -9,6 +9,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 
 import com.genenakagaki.splitstep.R;
+import com.genenakagaki.splitstep.exercise.data.ExerciseSharedPref;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -33,6 +34,7 @@ public class DeleteExerciseDialog extends DialogFragment {
         return dialog;
     }
 
+    private CompositeDisposable mDisposable;
     private DeleteExerciseViewModel mViewModel;
 
     public DeleteExerciseDialog() {}
@@ -43,7 +45,7 @@ public class DeleteExerciseDialog extends DialogFragment {
 
         long exerciseId = getArguments().getLong(ARG_EXERCISE_ID);
         String deleteMessage = getArguments().getString(ARG_DELETE_MESSAGE);
-        mViewModel = new DeleteExerciseViewModel(exerciseId, deleteMessage);
+        mViewModel = new DeleteExerciseViewModel(exerciseId, ExerciseSharedPref.getExerciseType(getActivity()), deleteMessage);
     }
 
     @NonNull
@@ -63,7 +65,7 @@ public class DeleteExerciseDialog extends DialogFragment {
     }
 
     private void onDeleteButtonClick() {
-        mViewModel.getDisposable().add(mViewModel.deleteExercise()
+        mDisposable.add(mViewModel.deleteExerciseCompletable()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.computation())
                 .subscribe(new Action() {
@@ -71,7 +73,10 @@ public class DeleteExerciseDialog extends DialogFragment {
                     public void run() throws Exception {
                         ExerciseListFragment fragment =
                                 (ExerciseListFragment) getFragmentManager().findFragmentByTag(ExerciseListFragment.class.getSimpleName());
-                        fragment.getViewModel().getExerciseList();
+                        fragment.getViewModel().getExerciseList()
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribeOn(Schedulers.computation())
+                                .subscribe();
                     }
                 }));
     }
@@ -79,16 +84,14 @@ public class DeleteExerciseDialog extends DialogFragment {
     @Override
     public void onResume() {
         super.onResume();
-        mViewModel.initDisposable();
+        mDisposable = new CompositeDisposable();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-
-        CompositeDisposable disposable = mViewModel.getDisposable();
-        if (disposable != null && !disposable.isDisposed()) {
-            disposable.dispose();
+        if (mDisposable != null && !mDisposable.isDisposed()) {
+            mDisposable.dispose();
         }
     }
 }

@@ -3,7 +3,6 @@ package com.genenakagaki.splitstep.exercise.ui.list;
 import android.content.Context;
 
 import com.genenakagaki.splitstep.R;
-import com.genenakagaki.splitstep.exercise.data.ExerciseSharedPref;
 import com.genenakagaki.splitstep.exercise.data.entity.Exercise;
 import com.genenakagaki.splitstep.exercise.data.entity.ExerciseType;
 import com.genenakagaki.splitstep.exercise.data.entity.Exercise_Table;
@@ -14,10 +13,7 @@ import java.util.List;
 import io.reactivex.Completable;
 import io.reactivex.CompletableEmitter;
 import io.reactivex.CompletableOnSubscribe;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 import timber.log.Timber;
 
@@ -29,24 +25,15 @@ import timber.log.Timber;
 public class ExerciseListViewModel {
 
     private Context mContext;
-    private CompositeDisposable mDisposable;
 
     private ExerciseType mExerciseType;
     private boolean mIsEditMode;
 
     private BehaviorSubject<List<Exercise>> mExercisesSubject = BehaviorSubject.create();
 
-    public ExerciseListViewModel(Context context) {
+    public ExerciseListViewModel(Context context, ExerciseType exerciseType) {
         mContext = context;
-        mExerciseType = ExerciseSharedPref.getExerciseType(context);
-    }
-
-    public CompositeDisposable getDisposable() {
-        return mDisposable;
-    }
-
-    public void initDisposable() {
-        mDisposable = new CompositeDisposable();
+        mExerciseType = exerciseType;
     }
 
     public BehaviorSubject<List<Exercise>> getExercisesSubject() {
@@ -72,10 +59,10 @@ public class ExerciseListViewModel {
         }
     }
 
-    public void getExerciseList() {
+    public Completable getExerciseList() {
         Timber.d("getExerciseList");
 
-        Completable.create(new CompletableOnSubscribe() {
+        return Completable.create(new CompletableOnSubscribe() {
             @Override
             public void subscribe(@NonNull CompletableEmitter e) throws Exception {
                 List<Exercise> exercises = SQLite.select()
@@ -84,9 +71,9 @@ public class ExerciseListViewModel {
                         .queryList();
 
                 mExercisesSubject.onNext(exercises);
+
+                e.onComplete();
             }
-        }).observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.computation())
-                .subscribe();
+        });
     }
 }

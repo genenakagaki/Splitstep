@@ -1,18 +1,14 @@
 package com.genenakagaki.splitstep.exercise.ui.list;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 
 import com.genenakagaki.splitstep.R;
-import com.genenakagaki.splitstep.exercise.data.ExerciseDatabase;
 import com.genenakagaki.splitstep.exercise.data.entity.Exercise;
 import com.genenakagaki.splitstep.exercise.data.entity.ExerciseType;
-import com.raizlabs.android.dbflow.config.FlowManager;
-import com.raizlabs.android.dbflow.structure.database.DatabaseWrapper;
-import com.raizlabs.android.dbflow.structure.database.transaction.ITransaction;
-import com.raizlabs.android.dbflow.structure.database.transaction.Transaction;
 
-import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.Completable;
+import io.reactivex.CompletableEmitter;
+import io.reactivex.CompletableOnSubscribe;
 import io.reactivex.subjects.BehaviorSubject;
 
 /**
@@ -22,7 +18,6 @@ import io.reactivex.subjects.BehaviorSubject;
 public class ExerciseListItemViewModel {
 
     private Context mContext;
-    private CompositeDisposable mDisposable;
     private Exercise mExercise;
 
     private BehaviorSubject<Exercise> mExerciseSubject = BehaviorSubject.create();
@@ -33,14 +28,6 @@ public class ExerciseListItemViewModel {
         mExerciseSubject.onNext(exercise);
     }
 
-    public CompositeDisposable getDisposable() {
-        return mDisposable;
-    }
-
-    public void initDisposable() {
-        mDisposable = new CompositeDisposable();
-    }
-
     public Exercise getExercise() {
         return mExercise;
     }
@@ -49,19 +36,16 @@ public class ExerciseListItemViewModel {
         return mExerciseSubject;
     }
 
-    public void toggleExerciseFavorite() {
-        FlowManager.getDatabase(ExerciseDatabase.class).beginTransactionAsync(new ITransaction() {
+    public Completable toggleExerciseFavorite() {
+        return Completable.create(new CompletableOnSubscribe() {
             @Override
-            public void execute(DatabaseWrapper databaseWrapper) {
+            public void subscribe(@io.reactivex.annotations.NonNull CompletableEmitter e) throws Exception {
                 mExercise.favorite = !mExercise.favorite;
                 mExercise.update();
-            }
-        }).success(new Transaction.Success() {
-            @Override
-            public void onSuccess(@NonNull Transaction transaction) {
                 mExerciseSubject.onNext(mExercise);
+                e.onComplete();
             }
-        }).build().execute();
+        });
     }
 
     public String getDeleteMessage() {

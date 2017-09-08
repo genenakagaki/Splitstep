@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
+
+        <EditText
+            android:id="@+id/input"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:maxLength="3"/>
+
+        <TextView
+            android:id="@+id/label_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"/>
+
+        <ImageButton
+            android:id="@+id/minus_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp"
+            android:padding="4dp"
+            android:src="@drawable/ic_remove"
+            android:scaleType="fitCenter"
+            android:tint="@color/red"
+            android:background="@drawable/background_circle"/>
+
+        <ImageButton
+            android:id="@+id/plus_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp"
+            android:padding="4dp"
+            android:src="@drawable/ic_add"
+            android:scaleType="fitCenter"
+            android:tint="@color/green"
+            android:background="@drawable/background_circle"/>
+
+    </LinearLayout>
+</merge>

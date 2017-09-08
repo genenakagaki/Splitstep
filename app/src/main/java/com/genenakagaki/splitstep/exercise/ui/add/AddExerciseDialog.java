@@ -38,6 +38,7 @@ public class AddExerciseDialog extends DialogFragment {
     @BindView(R.id.name_inputlayout) TextInputLayout mExerciseNameInputLayout;
 
     private Unbinder mUnbinder;
+    private CompositeDisposable mDisposable;
     private AddExerciseViewModel mViewModel;
 
     public AddExerciseDialog() {}
@@ -86,16 +87,14 @@ public class AddExerciseDialog extends DialogFragment {
     @Override
     public void onResume() {
         super.onResume();
-        mViewModel.initDisposable();
+        mDisposable = new CompositeDisposable();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-
-        CompositeDisposable disposable = mViewModel.getDisposable();
-        if (disposable != null && !disposable.isDisposed()) {
-            disposable.dispose();
+        if (mDisposable != null && !mDisposable.isDisposed()) {
+            mDisposable.dispose();
         }
     }
 
@@ -108,7 +107,7 @@ public class AddExerciseDialog extends DialogFragment {
     public void validateExerciseName() {
         final String exerciseName = mExerciseNameInput.getText().toString();
 
-        mViewModel.getDisposable().add(mViewModel.validateExerciseName(exerciseName)
+        mDisposable.add(mViewModel.validateExerciseNameSingle(exerciseName)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.computation())
                 .subscribe(new Consumer<ValidationModel>() {
@@ -125,7 +124,7 @@ public class AddExerciseDialog extends DialogFragment {
     }
 
     public void insertExercise(String exerciseName) {
-        mViewModel.getDisposable().add(mViewModel.insertExercise(exerciseName)
+        mDisposable.add(mViewModel.insertExerciseCompletable(exerciseName)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(new Action() {
@@ -133,9 +132,16 @@ public class AddExerciseDialog extends DialogFragment {
                     public void run() throws Exception {
                         ExerciseListFragment fragment = (ExerciseListFragment) getFragmentManager()
                                 .findFragmentByTag(ExerciseListFragment.class.getSimpleName());
-                        fragment.getViewModel().getExerciseList();
+                        fragment.getViewModel().getExerciseList()
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribeOn(Schedulers.computation())
+                                .subscribe(new Action() {
+                                    @Override
+                                    public void run() throws Exception {
+                                        getDialog().dismiss();
+                                    }
+                                });
 
-                        getDialog().dismiss();
                     }
                 }));
     }
