@@ -45,7 +45,6 @@ public class ExerciseListFragment extends Fragment {
     @BindView(R.id.fab) FloatingActionButton mFab;
 
     private Unbinder mUnbinder;
-    private CompositeDisposable mDisposable;
     private ExerciseListViewModel mViewModel;
 
     private ExerciseAdapter mExerciseAdapter;
@@ -130,9 +129,9 @@ public class ExerciseListFragment extends Fragment {
     public void onResume() {
         Timber.d("onResume");
         super.onResume();
-        mDisposable = new CompositeDisposable();
+        mViewModel.initDisposable();
 
-        mDisposable.add(mViewModel.getExercisesSubject()
+        mViewModel.getDisposable().add(mViewModel.getExercisesSubject()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.computation())
                 .subscribe(new Consumer<List<Exercise>>() {
@@ -158,8 +157,9 @@ public class ExerciseListFragment extends Fragment {
     public void onPause() {
         Timber.d("onPause");
         super.onPause();
-        if (mDisposable != null && !mDisposable.isDisposed()) {
-            mDisposable.dispose();
+        CompositeDisposable disposable = mViewModel.getDisposable();
+        if (disposable != null && !disposable.isDisposed()) {
+            disposable.dispose();
         }
     }
 

@@ -12,6 +12,7 @@ import com.raizlabs.android.dbflow.structure.database.transaction.QueryTransacti
 
 import java.util.List;
 
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.subjects.BehaviorSubject;
 import timber.log.Timber;
 
@@ -22,6 +23,8 @@ import timber.log.Timber;
 public class ExerciseListViewModel {
 
     private Context mContext;
+    private CompositeDisposable mDisposable;
+
     private ExerciseType mExerciseType;
     private boolean mIsEditMode;
 
@@ -30,6 +33,14 @@ public class ExerciseListViewModel {
     public ExerciseListViewModel(Context context) {
         mContext = context;
         mExerciseType = ExerciseSharedPref.getExerciseType(context);
+    }
+
+    public CompositeDisposable getDisposable() {
+        return mDisposable;
+    }
+
+    public void initDisposable() {
+        mDisposable = new CompositeDisposable();
     }
 
     public BehaviorSubject<List<Exercise>> getExercisesSubject() {
@@ -65,7 +76,6 @@ public class ExerciseListViewModel {
                 .queryListResultCallback(new QueryTransaction.QueryResultListCallback<Exercise>() {
                     @Override
                     public void onListQueryResult(QueryTransaction transaction, @android.support.annotation.NonNull List<Exercise> tResult) {
-                        Timber.d("triggerOnNext");
                         mExercisesSubject.onNext(tResult);
                     }
                 }).execute();

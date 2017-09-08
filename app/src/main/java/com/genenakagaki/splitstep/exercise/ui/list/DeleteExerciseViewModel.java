@@ -8,6 +8,7 @@ import io.reactivex.Completable;
 import io.reactivex.CompletableEmitter;
 import io.reactivex.CompletableOnSubscribe;
 import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.CompositeDisposable;
 
 /**
  * Created by gene on 9/7/17.
@@ -15,12 +16,22 @@ import io.reactivex.annotations.NonNull;
 
 public class DeleteExerciseViewModel {
 
+    private CompositeDisposable mDisposable;
+
     private long mExerciseId;
     private String mDeleteMessage;
 
     public DeleteExerciseViewModel(long exerciseId, String deleteMessage) {
         this.mExerciseId = exerciseId;
         this.mDeleteMessage = deleteMessage;
+    }
+
+    public CompositeDisposable getDisposable() {
+        return mDisposable;
+    }
+
+    public void initDisposable() {
+        mDisposable = new CompositeDisposable();
     }
 
     public String getDeleteMessage() {

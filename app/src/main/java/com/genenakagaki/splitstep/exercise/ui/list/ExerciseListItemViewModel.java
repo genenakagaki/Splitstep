@@ -12,6 +12,7 @@ import com.raizlabs.android.dbflow.structure.database.DatabaseWrapper;
 import com.raizlabs.android.dbflow.structure.database.transaction.ITransaction;
 import com.raizlabs.android.dbflow.structure.database.transaction.Transaction;
 
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.subjects.BehaviorSubject;
 
 /**
@@ -21,6 +22,7 @@ import io.reactivex.subjects.BehaviorSubject;
 public class ExerciseListItemViewModel {
 
     private Context mContext;
+    private CompositeDisposable mDisposable;
     private Exercise mExercise;
 
     private BehaviorSubject<Exercise> mExerciseSubject = BehaviorSubject.create();
@@ -29,6 +31,14 @@ public class ExerciseListItemViewModel {
         mContext = context;
         mExercise = exercise;
         mExerciseSubject.onNext(exercise);
+    }
+
+    public CompositeDisposable getDisposable() {
+        return mDisposable;
+    }
+
+    public void initDisposable() {
+        mDisposable = new CompositeDisposable();
     }
 
     public Exercise getExercise() {

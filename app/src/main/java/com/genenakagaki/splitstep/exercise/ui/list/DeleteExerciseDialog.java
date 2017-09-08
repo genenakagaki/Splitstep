@@ -34,7 +34,6 @@ public class DeleteExerciseDialog extends DialogFragment {
     }
 
     private DeleteExerciseViewModel mViewModel;
-    private CompositeDisposable mDisposable;
 
     public DeleteExerciseDialog() {}
 
@@ -64,7 +63,7 @@ public class DeleteExerciseDialog extends DialogFragment {
     }
 
     private void onDeleteButtonClick() {
-        mDisposable.add(mViewModel.deleteExercise()
+        mViewModel.getDisposable().add(mViewModel.deleteExercise()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.computation())
                 .subscribe(new Action() {
@@ -80,16 +79,16 @@ public class DeleteExerciseDialog extends DialogFragment {
     @Override
     public void onResume() {
         super.onResume();
-
-        mDisposable = new CompositeDisposable();
+        mViewModel.initDisposable();
     }
 
     @Override
     public void onPause() {
         super.onPause();
 
-        if (mDisposable != null && !mDisposable.isDisposed()) {
-            mDisposable.dispose();
+        CompositeDisposable disposable = mViewModel.getDisposable();
+        if (disposable != null && !disposable.isDisposed()) {
+            disposable.dispose();
         }
     }
 }
