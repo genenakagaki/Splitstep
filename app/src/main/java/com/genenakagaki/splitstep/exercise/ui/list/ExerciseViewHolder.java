@@ -29,12 +29,9 @@ import timber.log.Timber;
  */
 
 public class ExerciseViewHolder extends RecyclerView.ViewHolder {
-    @BindView(R.id.delete_button)
-    ImageButton mDeleteButton;
-    @BindView(R.id.favorite_imageswitcher)
-    ImageSwitcher mFavoriteImageSwitcher;
-    @BindView(R.id.exercise_textview)
-    TextView mExerciseTextButton;
+    @BindView(R.id.delete_button) ImageButton mDeleteButton;
+    @BindView(R.id.favorite_imageswitcher) ImageSwitcher mFavoriteImageSwitcher;
+    @BindView(R.id.exercise_textview) TextView mExerciseTextButton;
 
     private Context mContext;
     private ExerciseListItemViewModel mListItemViewModel;
@@ -58,7 +55,11 @@ public class ExerciseViewHolder extends RecyclerView.ViewHolder {
     public void setExercise(Exercise exercise) {
         mListItemViewModel = new ExerciseListItemViewModel(mContext, exercise);
 
-        mListItemViewModel.getExerciseSubject()
+        ExerciseActivity activity = (ExerciseActivity) mContext;
+        ExerciseListFragment fragment = (ExerciseListFragment) activity.getSupportFragmentManager()
+                .findFragmentByTag(ExerciseListFragment.class.getSimpleName());
+
+        fragment.getDisposable().add(mListItemViewModel.getExerciseSubject()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.computation())
                 .subscribe(new Consumer<Exercise>() {
@@ -70,7 +71,7 @@ public class ExerciseViewHolder extends RecyclerView.ViewHolder {
                             mFavoriteImageSwitcher.setImageResource(R.drawable.ic_star_border);
                         }
                     }
-                });
+                }));
     }
 
     @OnClick(R.id.delete_button)
@@ -96,21 +97,21 @@ public class ExerciseViewHolder extends RecyclerView.ViewHolder {
         ExerciseActivity activity = (ExerciseActivity) mContext;
         ExerciseSharedPref.setExerciseId(mContext, mListItemViewModel.getExercise().id);
 
-        switch (ExerciseSharedPref.getExerciseType(mContext)) {
-            case REPS:
-                activity.showFragment(new RepsExerciseDetailFragment(),
-                        RepsExerciseDetailFragment.class.getSimpleName(),
-                        true);
-                break;
-            case TIMED_SETS:
-                activity.showFragment(new TimedSetsExerciseDetailFragment(),
-                        TimedSetsExerciseDetailFragment.class.getSimpleName(),
-                        true);
-                break;
-            default:// REACTION:
-                activity.showFragment(new ReactionExerciseDetailFragment(),
-                        ReactionExerciseDetailFragment.class.getSimpleName(),
-                        true);
-        }
+//        switch (ExerciseSharedPref.getExerciseType(mContext)) {
+//            case REPS:
+//                activity.showFragment(new RepsExerciseDetailFragment(),
+//                        RepsExerciseDetailFragment.class.getSimpleName(),
+//                        true);
+//                break;
+//            case TIMED_SETS:
+//                activity.showFragment(new TimedSetsExerciseDetailFragment(),
+//                        TimedSetsExerciseDetailFragment.class.getSimpleName(),
+//                        true);
+//                break;
+//            default:// REACTION:
+//                activity.showFragment(new ReactionExerciseDetailFragment(),
+//                        ReactionExerciseDetailFragment.class.getSimpleName(),
+//                        true);
+//        }
     }
 }

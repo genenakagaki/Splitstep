@@ -22,18 +22,18 @@ import io.reactivex.annotations.NonNull;
 
 public class DeleteExerciseViewModel {
 
-    private long mExerciseId;
-    private ExerciseType mExerciseType;
-    private String mDeleteMessage;
+    private long exerciseId;
+    private ExerciseType exerciseType;
+    private String deleteMessage;
 
     public DeleteExerciseViewModel(long exerciseId, ExerciseType exerciseType, String deleteMessage) {
-        mExerciseId = exerciseId;
-        mExerciseType = exerciseType;
-        mDeleteMessage = deleteMessage;
+        this.exerciseId = exerciseId;
+        this.exerciseType = exerciseType;
+        this.deleteMessage = deleteMessage;
     }
 
     public String getDeleteMessage() {
-        return mDeleteMessage;
+        return deleteMessage;
     }
 
     public Completable deleteExerciseCompletable() {
@@ -41,23 +41,23 @@ public class DeleteExerciseViewModel {
             @Override
             public void subscribe(@NonNull CompletableEmitter e) throws Exception {
                 SQLite.delete(Exercise.class)
-                        .where(Exercise_Table.id.eq(mExerciseId))
+                        .where(Exercise_Table.id.eq(exerciseId))
                         .execute();
 
-                switch (mExerciseType) {
+                switch (exerciseType) {
                     case REPS:
                         SQLite.delete(RepsExercise.class)
-                                .where(RepsExercise_Table.id.eq(mExerciseId))
+                                .where(RepsExercise_Table.id.eq(exerciseId))
                                 .execute();
                         break;
                     case TIMED_SETS:
                         SQLite.delete(TimedSetsExercise.class)
-                                .where(TimedSetsExercise_Table.id.eq(mExerciseId))
+                                .where(TimedSetsExercise_Table.id.eq(exerciseId))
                                 .execute();
                         break;
                     default: // REACTION
                         SQLite.delete(ReactionExercise.class)
-                                .where(ReactionExercise_Table.id.eq(mExerciseId))
+                                .where(ReactionExercise_Table.id.eq(exerciseId))
                                 .execute();
                 }
 

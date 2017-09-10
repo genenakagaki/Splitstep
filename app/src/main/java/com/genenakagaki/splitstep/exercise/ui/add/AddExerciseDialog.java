@@ -15,8 +15,10 @@ import android.widget.Button;
 
 import com.genenakagaki.splitstep.R;
 import com.genenakagaki.splitstep.exercise.data.ExerciseSharedPref;
+import com.genenakagaki.splitstep.exercise.data.exception.ExerciseAlreadyExistsException;
+import com.genenakagaki.splitstep.exercise.data.exception.InvalidExerciseColumnException;
 import com.genenakagaki.splitstep.exercise.ui.list.ExerciseListFragment;
-import com.genenakagaki.splitstep.exercise.ui.model.ValidationModel;
+import com.genenakagaki.splitstep.exercise.ui.model.ErrorMessage;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -78,7 +80,7 @@ public class AddExerciseDialog extends DialogFragment {
                     Timber.d("OnClick BUTTON_POSITIVE");
 
                     enableSaveButton(false);
-                    validateExerciseName();
+                    onSaveButtonClick();
                 }
             });
         }
@@ -88,6 +90,18 @@ public class AddExerciseDialog extends DialogFragment {
     public void onResume() {
         super.onResume();
         mDisposable = new CompositeDisposable();
+
+        mDisposable.add(mViewModel.getErrorMessageSubject()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Consumer<ErrorMessage>() {
+                    @Override
+                    public void accept(ErrorMessage errorMessage) throws Exception {
+                        if (!errorMessage.isValid()) {
+                            mExerciseNameInputLayout.setError(errorMessage.getErrorMessage());
+                        }
+                    }
+                }));
     }
 
     @Override
@@ -104,46 +118,36 @@ public class AddExerciseDialog extends DialogFragment {
         mUnbinder.unbind();
     }
 
-    public void validateExerciseName() {
+    public void onSaveButtonClick() {
         final String exerciseName = mExerciseNameInput.getText().toString();
 
-        mDisposable.add(mViewModel.validateExerciseNameSingle(exerciseName)
+        mDisposable.add(mViewModel.insertExercise(exerciseName)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.computation())
-                .subscribe(new Consumer<ValidationModel>() {
+                .subscribe(new Action() {
                     @Override
-                    public void accept(ValidationModel validationModel) throws Exception {
-                        if (validationModel.isValid()) {
-                            insertExercise(exerciseName);
-                        } else {
-                            mExerciseNameInputLayout.setError(validationModel.getErrorMessage());
-                            enableSaveButton(true);
+                    public void run() throws Exception {
+                        onExerciseInserted();
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        if (throwable instanceof InvalidExerciseColumnException) {
+                            mViewModel.setEmptyExerciseNameError();
+                        } else if (throwable instanceof ExerciseAlreadyExistsException) {
+                            mViewModel.setExerciseAlreadyExistsError();
                         }
+
+                        enableSaveButton(true);
                     }
                 }));
     }
 
-    public void insertExercise(String exerciseName) {
-        mDisposable.add(mViewModel.insertExerciseCompletable(exerciseName)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe(new Action() {
-                    @Override
-                    public void run() throws Exception {
-                        ExerciseListFragment fragment = (ExerciseListFragment) getFragmentManager()
-                                .findFragmentByTag(ExerciseListFragment.class.getSimpleName());
-                        fragment.getViewModel().getExerciseList()
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribeOn(Schedulers.computation())
-                                .subscribe(new Action() {
-                                    @Override
-                                    public void run() throws Exception {
-                                        getDialog().dismiss();
-                                    }
-                                });
-
-                    }
-                }));
+    public void onExerciseInserted() {
+        ExerciseListFragment fragment = (ExerciseListFragment) getFragmentManager()
+                .findFragmentByTag(ExerciseListFragment.class.getSimpleName());
+        fragment.getExerciseList();
+        getDialog().dismiss();
     }
 
     public void enableSaveButton(boolean enable) {

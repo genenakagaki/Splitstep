@@ -40,4 +40,5 @@ public class NumberInputViewModelTest {
         assertEquals(20, result);
     }
 
+
 }

@@ -71,7 +71,7 @@ public class ExerciseTypeFragment extends Fragment {
                 Timber.d("onClick on timed sets exercise");
                 ExerciseSharedPref.setExerciseType(getActivity(), ExerciseType.TIMED_SETS);
                 break;
-            default: //R.id.reaction_exercise_button:
+            default: //TimedExerciseDao.id.reaction_exercise_button:
                 Timber.d("onClick on reaction exercise");
                 ExerciseSharedPref.setExerciseType(getActivity(), ExerciseType.REACTION);
         }

@@ -8,7 +8,17 @@
     <string name="delete">Delete</string>
     <string name="cancel">Cancel</string>
 
-    <!-- Exercise Type -->
+    <!-- Generic words -->
+    <string name="minutes">Minutes</string>
+    <string name="seconds">Seconds</string>
+    <string name="sets">Sets</string>
+    <string name="reps">Reps</string>
+    <string name="set_duration">Set duration</string>
+    <string name="rest_duration">Rest duration</string>
+
+    <!--++++++++++++++++++++++++++++++++++++++++
+            Exercise Type
+    +++++++++++++++++++++++++++++++++++++++++-->
     <string name="reps_exercise">Exercise with Reps</string>
     <string name="reps_exercise_short">with Reps</string>
     <string name="timed_sets_exercise">Exercise with Timed Sets</string>
@@ -16,18 +26,32 @@
     <string name="reaction_exercise">Reaction Exercise</string>
     <string name="reaction_exercise_short">Reaction</string>
 
-    <!-- Exercise List -->
+    <!--++++++++++++++++++++++++++++++++++++++++
+            Exercise List
+    +++++++++++++++++++++++++++++++++++++++++-->
     <string name="exercise_list_empty">No exercises created yet.</string>
     <string name="delete_exercise_title">Delete this Exercise?</string>
     
     <!-- Add Exercise -->
     <string name="add_exercise_title">Add New Exercise</string>
 
+    <!--++++++++++++++++++++++++++++++++++++++++
+            Exercise Detail
+    +++++++++++++++++++++++++++++++++++++++++-->
+    <string name="duration_value">%1$d minutes %2$d seconds</string>
+    <string name="duration_value_seconds">%d seconds</string>
+    <!-- Duration Picker -->
+
+
+    <!-- Coach -->
+    <string name="sets_remaining">sets remaining</string>
+    <string name="reps_count">%d reps</string>
+
     <!-- Input Hint -->
     <string name="hint_exercise_name">Exercise Name</string>
 
     <!-- Error -->
     <string name="error_empty_exercise_name">Enter an exercise name.</string>
-    <string name="error_exercise_name_duplicate">An exercise with the same name already exists.</string>
+    <string name="error_exercise_already_exists">An exercise with the same name already exists.</string>
     <string name="error_zero_duration">Must be more than 0 seconds</string>
 </resources>

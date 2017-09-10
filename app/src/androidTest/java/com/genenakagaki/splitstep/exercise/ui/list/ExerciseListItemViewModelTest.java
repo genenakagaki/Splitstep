@@ -55,7 +55,7 @@ public class ExerciseListItemViewModelTest {
 
         viewModel.toggleExerciseFavorite()
                 .test()
-                .awaitTerminalEvent();
+                .assertComplete();
 
         Exercise updatedExercise = SQLite.select()
                 .from(Exercise.class)
@@ -74,7 +74,7 @@ public class ExerciseListItemViewModelTest {
 
         viewModel.toggleExerciseFavorite()
                 .test()
-                .awaitTerminalEvent();
+                .assertComplete();
 
         Exercise updatedExercise = SQLite.select()
                 .from(Exercise.class)
@@ -93,7 +93,7 @@ public class ExerciseListItemViewModelTest {
 
         viewModel.toggleExerciseFavorite()
                 .test()
-                .awaitTerminalEvent();
+                .assertComplete();
 
         viewModel.getExerciseSubject()
                 .test()

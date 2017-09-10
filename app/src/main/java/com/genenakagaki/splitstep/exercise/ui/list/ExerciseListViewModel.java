@@ -3,17 +3,18 @@ package com.genenakagaki.splitstep.exercise.ui.list;
 import android.content.Context;
 
 import com.genenakagaki.splitstep.R;
+import com.genenakagaki.splitstep.exercise.data.ExerciseDao;
 import com.genenakagaki.splitstep.exercise.data.entity.Exercise;
 import com.genenakagaki.splitstep.exercise.data.entity.ExerciseType;
-import com.genenakagaki.splitstep.exercise.data.entity.Exercise_Table;
-import com.raizlabs.android.dbflow.sql.language.SQLite;
 
 import java.util.List;
 
 import io.reactivex.Completable;
 import io.reactivex.CompletableEmitter;
 import io.reactivex.CompletableOnSubscribe;
+import io.reactivex.CompletableSource;
 import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Function;
 import io.reactivex.subjects.BehaviorSubject;
 import timber.log.Timber;
 
@@ -24,55 +25,54 @@ import timber.log.Timber;
 
 public class ExerciseListViewModel {
 
-    private Context mContext;
+    private Context context;
 
-    private ExerciseType mExerciseType;
-    private boolean mIsEditMode;
+    private ExerciseType exerciseType;
+    private boolean isEditMode;
 
-    private BehaviorSubject<List<Exercise>> mExercisesSubject = BehaviorSubject.create();
+    private BehaviorSubject<List<Exercise>> exercisesSubject = BehaviorSubject.create();
 
     public ExerciseListViewModel(Context context, ExerciseType exerciseType) {
-        mContext = context;
-        mExerciseType = exerciseType;
+        this.context = context;
+        this.exerciseType = exerciseType;
     }
 
     public BehaviorSubject<List<Exercise>> getExercisesSubject() {
-        return mExercisesSubject;
+        return exercisesSubject;
     }
 
     public void setEditMode(boolean isEditMode) {
-        mIsEditMode = isEditMode;
+        this.isEditMode = isEditMode;
     }
 
     public boolean isEditMode() {
-        return mIsEditMode;
+        return isEditMode;
     }
 
     public String getTitle() {
-        switch (mExerciseType) {
+        switch (exerciseType) {
             case REPS:
-                return mContext.getString(R.string.reps_exercise);
+                return context.getString(R.string.reps_exercise);
             case TIMED_SETS:
-                return mContext.getString(R.string.timed_sets_exercise);
+                return context.getString(R.string.timed_sets_exercise);
             default: // REACTION:
-                return mContext.getString(R.string.reaction_exercise);
+                return context.getString(R.string.reaction_exercise);
         }
     }
 
     public Completable getExerciseList() {
         Timber.d("getExerciseList");
 
-        return Completable.create(new CompletableOnSubscribe() {
+        return ExerciseDao.getInstance().findByType(exerciseType).flatMapCompletable(new Function<List<Exercise>, CompletableSource>() {
             @Override
-            public void subscribe(@NonNull CompletableEmitter e) throws Exception {
-                List<Exercise> exercises = SQLite.select()
-                        .from(Exercise.class)
-                        .where(Exercise_Table.type.eq(mExerciseType.getValue()))
-                        .queryList();
-
-                mExercisesSubject.onNext(exercises);
-
-                e.onComplete();
+            public CompletableSource apply(@NonNull final List<Exercise> exercises) throws Exception {
+                return Completable.create(new CompletableOnSubscribe() {
+                    @Override
+                    public void subscribe(@NonNull CompletableEmitter e) throws Exception {
+                        exercisesSubject.onNext(exercises);
+                        e.onComplete();
+                    }
+                });
             }
         });
     }

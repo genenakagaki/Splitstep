@@ -1,5 +1,7 @@
 package com.genenakagaki.splitstep.exercise.ui.view;
 
+import io.reactivex.subjects.BehaviorSubject;
+
 /**
  * Created by Gene on 9/8/2017.
  */
@@ -9,8 +11,11 @@ public class NumberInputViewModel {
     public static final int MAX_DEFAULT = 999;
     public static final int MIN_DEFAULT = 0;
 
+    private BehaviorSubject<Integer> subject = BehaviorSubject.create();
+
     private int max = MAX_DEFAULT;
     private int min = MIN_DEFAULT;
+    private int number;
 
     public NumberInputViewModel() {}
 
@@ -22,21 +27,22 @@ public class NumberInputViewModel {
         this.min = min;
     }
 
-    public int incrementNumber(int number) {
+    public int getNumber() {
+        return number;
+    }
+
+    public void setNumber(int number) {
+        this.number = number;
+    }
+
+    public int incrementNumber() {
         if (number < max) number++;
         return number;
     }
 
-    public int decrementNumber(int number) {
+    public int decrementNumber() {
         if (number > min) number--;
         return number;
     }
 
-    public int getInputValue(String inputString) {
-        if (inputString.length() > 0) {
-            return Integer.parseInt(inputString);
-        } else {
-            return 0;
-        }
-    }
 }

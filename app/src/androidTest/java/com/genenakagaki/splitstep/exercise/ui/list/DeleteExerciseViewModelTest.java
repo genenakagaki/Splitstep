@@ -74,7 +74,7 @@ public class DeleteExerciseViewModelTest {
     }
 
     @Test
-    public void testDeleteExercise_WithTimdSetsExercise_ShouldBeDeleted() {
+    public void testDeleteExercise_WithTimedSetsExercise_ShouldBeDeleted() {
         Exercise exercise = new Exercise(ExerciseType.TIMED_SETS_VALUE, "TimedSets exercise", false);
         exercise.insert();
 

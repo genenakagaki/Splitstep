@@ -1,15 +1,16 @@
 package com.genenakagaki.splitstep.exercise.ui.detail;
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.genenakagaki.splitstep.R;
+import com.genenakagaki.splitstep.exercise.data.ExerciseSharedPref;
 import com.genenakagaki.splitstep.exercise.ui.view.NumberInput;
 
 import butterknife.BindView;
@@ -43,7 +44,7 @@ public class ExerciseDetailFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mViewModel = new ExerciseDetailViewModel(getActivity());
+        mViewModel = new ExerciseDetailViewModel(getActivity(), ExerciseSharedPref.getExerciseId(getActivity()));
     }
 
     @Nullable
@@ -51,24 +52,6 @@ public class ExerciseDetailFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_exercise_detail, container, false);
         mUnbinder = ButterKnife.bind(this, view);
-
-        mExerciseNameTextView = ButterKnife.findById(view, R.id.exercise_name_textview);
-        mSetDurationLayout    = ButterKnife.findById(view, R.id.set_duration_layout);
-        mSetDurationTextView  = ButterKnife.findById(view, R.id.set_duration_textview);
-        mRestDurationLayout   = ButterKnife.findById(view, R.id.rest_duration_layout);
-        mRestDurationTextView = ButterKnife.findById(view, R.id.rest_duration_textview);
-
-        MainActivity activity = (MainActivity) getActivity();
-
-        activity.getFab().setVisibility(View.GONE);
-        FrameLayout startExerciseLayout = activity.getStartExerciseLayout();
-        startExerciseLayout.setVisibility(View.VISIBLE);
-        startExerciseLayout.getChildAt(0).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startCoachFragment();
-            }
-        });
 
         mExerciseNameTextView.setText(mViewModel.getExercise().name);
 
@@ -86,20 +69,20 @@ public class ExerciseDetailFragment extends Fragment {
         int duration;
         int durationType;
 
-        switch (view.getId()) {
-            case R.id.rest_duration_layout:
-                duration = mViewModel.getDuration(mSetDurationTextView.getText().toString());
-                durationType = DurationPickerDialog.REST_DURATION;
-                break;
-            default: // R.id.set_duration_layout:
-                duration = mViewModel.getDuration(mRestDurationTextView.getText().toString());
-                durationType = DurationPickerDialog.SET_DURATION;
-        }
+//        switch (view.getId()) {
+//            case R.id.rest_duration_layout:
+//                duration = mViewModel.getDuration(mSetDurationTextView.getText().toString());
+//                durationType = DurationPickerDialog.REST_DURATION;
+//                break;
+//            default: // TimedExerciseDao.id.set_duration_layout:
+//                duration = mViewModel.getDuration(mRestDurationTextView.getText().toString());
+//                durationType = DurationPickerDialog.SET_DURATION;
+//        }
 
-        DurationPickerDialog fragment =
-                DurationPickerDialog.newInstance(
-                        getString(R.string.rest_duration), durationType, duration);
-        fragment.show(getFragmentManager(), DurationPickerDialog.class.getSimpleName());
+//        DurationPickerDialog fragment =
+//                DurationPickerDialog.newInstance(
+//                        getString(R.string.rest_duration), durationType, duration);
+//        fragment.show(getFragmentManager(), DurationPickerDialog.class.getSimpleName());
     }
 
     public void setSetDuration(int minutes, int seconds) {
@@ -122,5 +105,5 @@ public class ExerciseDetailFragment extends Fragment {
         return mViewModel;
     }
 
-    public abstract void startCoachFragment();
+//    public abstract void startCoachFragment();
 }

@@ -63,6 +63,7 @@ public class ExerciseListFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        Timber.d("onCreateOptionsMenu");
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.menu_exercise_list, menu);
 
@@ -152,10 +153,7 @@ public class ExerciseListFragment extends Fragment {
                     }
                 }));
 
-        mDisposable.add(mViewModel.getExerciseList()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.computation())
-                .subscribe());
+        getExerciseList();
     }
 
     @Override
@@ -180,7 +178,14 @@ public class ExerciseListFragment extends Fragment {
         fragment.show(getFragmentManager(), AddExerciseDialog.class.getSimpleName());
     }
 
-    public ExerciseListViewModel getViewModel() {
-        return mViewModel;
+    public void getExerciseList() {
+        mDisposable.add(mViewModel.getExerciseList()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.computation())
+                .subscribe());
+    }
+
+    public CompositeDisposable getDisposable() {
+        return mDisposable;
     }
 }

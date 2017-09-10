@@ -49,17 +49,6 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseViewHolder> {
         Exercise exercise = mExercises.get(position);
         holder.setExercise(exercise);
         holder.mExerciseTextButton.setText(exercise.name);
-
-//        if (exercise.favorite) {
-//            holder.mFavoriteImageSwitcher.setImageResource(R.drawable.ic_star);
-//        } else {
-//            holder.mFavoriteImageSwitcher.setImageResource(R.drawable.ic_star_border);
-//        }
-//        Animation animationOut = AnimationUtils.loadAnimation(this, android.R.anim.slide_out_right);
-//        Animation animationIn = AnimationUtils.loadAnimation(this, android.R.anim.slide_in_left);
-//
-//        myImageSwitcher.setOutAnimation(animationOut);
-//        myImageSwitcher.setInAnimation(animationIn);
     }
 
     @Override

@@ -8,15 +8,10 @@ import com.genenakagaki.splitstep.R;
 import com.genenakagaki.splitstep.exercise.data.ExerciseDatabase;
 import com.genenakagaki.splitstep.exercise.data.entity.Exercise;
 import com.genenakagaki.splitstep.exercise.data.entity.ExerciseType;
-import com.genenakagaki.splitstep.exercise.data.entity.ReactionExercise;
-import com.genenakagaki.splitstep.exercise.data.entity.RepsExercise;
-import com.genenakagaki.splitstep.exercise.data.entity.TimedSetsExercise;
-import com.genenakagaki.splitstep.exercise.ui.model.ValidationModel;
-import com.genenakagaki.splitstep.exercise.utils.DatabaseUtils;
+import com.genenakagaki.splitstep.exercise.ui.model.ErrorMessage;
 import com.raizlabs.android.dbflow.config.DatabaseConfig;
 import com.raizlabs.android.dbflow.config.FlowConfig;
 import com.raizlabs.android.dbflow.config.FlowManager;
-import com.raizlabs.android.dbflow.sql.language.SQLite;
 
 import org.junit.After;
 import org.junit.Before;
@@ -25,9 +20,6 @@ import org.junit.runner.RunWith;
 
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Predicate;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Created by Gene on 9/6/2017.
@@ -55,145 +47,185 @@ public class AddExerciseViewModelTest {
     }
 
     @Test
-    public void testValidateExerciseName_WithEmptyString_ShouldBeInvalid() {
+    public void testSetExerciseAlreadyExistsError_ShouldShowErrorCorrectly() {
         AddExerciseViewModel viewModel = new AddExerciseViewModel(mContext, ExerciseType.REPS);
 
-        viewModel.validateExerciseNameSingle("")
+        viewModel.setExerciseAlreadyExistsError();
+
+        viewModel.getErrorMessageSubject()
                 .test()
-                .assertValue(new Predicate<ValidationModel>() {
+                .assertValue(new Predicate<ErrorMessage>() {
                     @Override
-                    public boolean test(@NonNull ValidationModel validationModel) throws Exception {
-                        String errorMessage = mContext.getString(R.string.error_exercise_name_duplicate);
-                        return validationModel.isValid() == false;
+                    public boolean test(@NonNull ErrorMessage errorMessage) throws Exception {
+                        return errorMessage.isValid() == false
+                                && errorMessage.getErrorMessage().equals(mContext.getString(R.string.error_exercise_already_exists));
                     }
                 });
     }
 
     @Test
-    public void testValidateExerciseName_WithExistingNameAndType_ShouldBeInvalid() {
+    public void testSetEmptyExerciseNameError_ShouldShowErrorCorrectly() {
         AddExerciseViewModel viewModel = new AddExerciseViewModel(mContext, ExerciseType.REPS);
 
-        String[] exerciseNames = new String[] {
-                "Exercise1",
-                "Exercise2",
-                "Exercise3"
-        };
+        viewModel.setEmptyExerciseNameError();
 
-        DatabaseUtils.insertExercises(exerciseNames, ExerciseType.REPS_VALUE, false);
-
-        viewModel.validateExerciseNameSingle("Exercise1")
+        viewModel.getErrorMessageSubject()
                 .test()
-                .assertValue(new Predicate<ValidationModel>() {
+                .assertValue(new Predicate<ErrorMessage>() {
                     @Override
-                    public boolean test(@NonNull ValidationModel validationModel) throws Exception {
-                        String errorMessage = mContext.getString(R.string.error_exercise_name_duplicate);
-                        return validationModel.isValid() == false
-                                && validationModel.getErrorMessage().equals(errorMessage);
+                    public boolean test(@NonNull ErrorMessage errorMessage) throws Exception {
+                        return errorMessage.isValid() == false
+                                && errorMessage.getErrorMessage().equals(mContext.getString(R.string.error_empty_exercise_name));
                     }
                 });
     }
 
-    @Test
-    public void testValidateExerciseName_WithUniqueName_ShouldBeValid() {
-        AddExerciseViewModel viewModel = new AddExerciseViewModel(mContext, ExerciseType.REPS);
-
-        viewModel.validateExerciseNameSingle("Exercise1")
-                .test()
-                .assertValue(new Predicate<ValidationModel>() {
-                    @Override
-                    public boolean test(@NonNull ValidationModel validationModel) throws Exception {
-                        return validationModel.isValid() == true;
-                    }
-                });
-    }
-
-    @Test
-    public void testValidExerciseName_WithExistingNameOfDifferentType_ShouldBeValid() {
-        AddExerciseViewModel viewModel = new AddExerciseViewModel(mContext, ExerciseType.REPS);
-
-        String[] exerciseNames = new String[] {
-                "Exercise1",
-                "Exercise2",
-                "Exercise3"
-        };
-
-        DatabaseUtils.insertExercises(exerciseNames, ExerciseType.TIMED_SETS_VALUE, false);
-
-        viewModel.validateExerciseNameSingle("Exercise1")
-                .test()
-                .assertValue(new Predicate<ValidationModel>() {
-                    @Override
-                    public boolean test(@NonNull ValidationModel validationModel) throws Exception {
-                        String errorMessage = mContext.getString(R.string.error_exercise_name_duplicate);
-                        return validationModel.isValid() == true;
-                    }
-                });
-    }
-
-    @Test
-    public void testInsertExercise_WithRepsExercise_ShouldBeInserted() {
-        AddExerciseViewModel viewModel = new AddExerciseViewModel(mContext, ExerciseType.REPS);
-
-        String newName = "Exercise1";
-        viewModel.insertExerciseCompletable(newName)
-                .test()
-                .awaitTerminalEvent();
-
-        Exercise exercise = SQLite.select()
-                .from(Exercise.class)
-                .queryList().get(0);
-
-        RepsExercise repsExercise = SQLite.select()
-                .from(RepsExercise.class)
-                .queryList().get(0);
-
-        assertEquals(newName, exercise.name);
-        assertEquals(ExerciseType.REPS_VALUE, exercise.type);
-        assertEquals(exercise.id, repsExercise.id);
-    }
-
-    @Test
-    public void testInsertExercise_WithTimedSetsExercise_ShouldBeInserted() {
-        AddExerciseViewModel viewModel = new AddExerciseViewModel(mContext, ExerciseType.TIMED_SETS);
-
-        String newName = "Exercise1";
-        viewModel.insertExerciseCompletable(newName)
-                .test()
-                .awaitTerminalEvent();
-
-        Exercise exercise = SQLite.select()
-                .from(Exercise.class)
-                .queryList().get(0);
-
-        TimedSetsExercise repsExercise = SQLite.select()
-                .from(TimedSetsExercise.class)
-                .queryList().get(0);
-
-        assertTrue(exercise.name.equals(newName)
-                && exercise.type == ExerciseType.TIMED_SETS_VALUE
-                && repsExercise.id == exercise.id);
-    }
-
-    @Test
-    public void testInsertExercise_WithReactionExercise_ShouldBeInserted() {
-        AddExerciseViewModel viewModel = new AddExerciseViewModel(mContext, ExerciseType.REACTION);
-
-        String newName = "Exercise1";
-        viewModel.insertExerciseCompletable(newName)
-                .test()
-                .awaitTerminalEvent();
-
-        Exercise exercise = SQLite.select()
-                .from(Exercise.class)
-                .queryList().get(0);
-
-        ReactionExercise repsExercise = SQLite.select()
-                .from(ReactionExercise.class)
-                .queryList().get(0);
-
-        assertTrue(exercise.name.equals(newName)
-                && exercise.type == ExerciseType.REACTION_VALUE
-                && repsExercise.id == exercise.id);
-    }
+//    @Test
+//
+//    public void setEmptyExerciseNameError() {
+//
+//    }
+//
+//    @Test
+//    public void testValidateExerciseName_WithEmptyString_ShouldBeInvalid() {
+//        AddExerciseViewModel viewModel = new AddExerciseViewModel(mContext, ExerciseType.REPS);
+//
+//        viewModel.validateExerciseNameSingle("")
+//                .test()
+//                .assertValue(new Predicate<ValidationModel>() {
+//                    @Override
+//                    public boolean test(@NonNull ValidationModel validationModel) throws Exception {
+//                        String errorMessage = mContext.getString(R.string.error_exercise_name_duplicate);
+//                        return validationModel.isValid() == false;
+//                    }
+//                });
+//    }
+//
+//    @Test
+//    public void testValidateExerciseName_WithExistingNameAndType_ShouldBeInvalid() {
+//        AddExerciseViewModel viewModel = new AddExerciseViewModel(mContext, ExerciseType.REPS);
+//
+//        String[] exerciseNames = new String[] {
+//                "Exercise1",
+//                "Exercise2",
+//                "Exercise3"
+//        };
+//
+//        DatabaseUtils.insertExercises(exerciseNames, ExerciseType.REPS_VALUE, false);
+//
+//        viewModel.validateExerciseNameSingle("Exercise1")
+//                .test()
+//                .assertValue(new Predicate<ValidationModel>() {
+//                    @Override
+//                    public boolean test(@NonNull ValidationModel validationModel) throws Exception {
+//                        String errorMessage = mContext.getString(R.string.error_exercise_name_duplicate);
+//                        return validationModel.isValid() == false
+//                                && validationModel.getErrorMessage().equals(errorMessage);
+//                    }
+//                });
+//    }
+//
+//    @Test
+//    public void testValidateExerciseName_WithUniqueName_ShouldBeValid() {
+//        AddExerciseViewModel viewModel = new AddExerciseViewModel(mContext, ExerciseType.REPS);
+//
+//        viewModel.validateExerciseNameSingle("Exercise1")
+//                .test()
+//                .assertValue(new Predicate<ValidationModel>() {
+//                    @Override
+//                    public boolean test(@NonNull ValidationModel validationModel) throws Exception {
+//                        return validationModel.isValid() == true;
+//                    }
+//                });
+//    }
+//
+//    @Test
+//    public void testValidExerciseName_WithExistingNameOfDifferentType_ShouldBeValid() {
+//        AddExerciseViewModel viewModel = new AddExerciseViewModel(mContext, ExerciseType.REPS);
+//
+//        String[] exerciseNames = new String[] {
+//                "Exercise1",
+//                "Exercise2",
+//                "Exercise3"
+//        };
+//
+//        DatabaseUtils.insertExercises(exerciseNames, ExerciseType.TIMED_SETS_VALUE, false);
+//
+//        viewModel.validateExerciseNameSingle("Exercise1")
+//                .test()
+//                .assertValue(new Predicate<ValidationModel>() {
+//                    @Override
+//                    public boolean test(@NonNull ValidationModel validationModel) throws Exception {
+//                        String errorMessage = mContext.getString(R.string.error_exercise_name_duplicate);
+//                        return validationModel.isValid() == true;
+//                    }
+//                });
+//    }
+//
+//    @Test
+//    public void testInsertExercise_WithRepsExercise_ShouldBeInserted() {
+//        AddExerciseViewModel viewModel = new AddExerciseViewModel(mContext, ExerciseType.REPS);
+//
+//        String newName = "Exercise1";
+//        viewModel.insertExerciseCompletable(newName)
+//                .test()
+//                .awaitTerminalEvent();
+//
+//        Exercise exercise = SQLite.select()
+//                .from(Exercise.class)
+//                .queryList().get(0);
+//
+//        RepsExercise repsExercise = SQLite.select()
+//                .from(RepsExercise.class)
+//                .queryList().get(0);
+//
+//        assertEquals(newName, exercise.name);
+//        assertEquals(ExerciseType.REPS_VALUE, exercise.type);
+//        assertEquals(exercise.id, repsExercise.id);
+//    }
+//
+//    @Test
+//    public void testInsertExercise_WithTimedSetsExercise_ShouldBeInserted() {
+//        AddExerciseViewModel viewModel = new AddExerciseViewModel(mContext, ExerciseType.TIMED_SETS);
+//
+//        String newName = "Exercise1";
+//        viewModel.insertExerciseCompletable(newName)
+//                .test()
+//                .awaitTerminalEvent();
+//
+//        Exercise exercise = SQLite.select()
+//                .from(Exercise.class)
+//                .queryList().get(0);
+//
+//        TimedSetsExercise repsExercise = SQLite.select()
+//                .from(TimedSetsExercise.class)
+//                .queryList().get(0);
+//
+//        assertTrue(exercise.name.equals(newName)
+//                && exercise.type == ExerciseType.TIMED_SETS_VALUE
+//                && repsExercise.id == exercise.id);
+//    }
+//
+//    @Test
+//    public void testInsertExercise_WithReactionExercise_ShouldBeInserted() {
+//        AddExerciseViewModel viewModel = new AddExerciseViewModel(mContext, ExerciseType.REACTION);
+//
+//        String newName = "Exercise1";
+//        viewModel.insertExerciseCompletable(newName)
+//                .test()
+//                .awaitTerminalEvent();
+//
+//        Exercise exercise = SQLite.select()
+//                .from(Exercise.class)
+//                .queryList().get(0);
+//
+//        ReactionExercise repsExercise = SQLite.select()
+//                .from(ReactionExercise.class)
+//                .queryList().get(0);
+//
+//        assertTrue(exercise.name.equals(newName)
+//                && exercise.type == ExerciseType.REACTION_VALUE
+//                && repsExercise.id == exercise.id);
+//    }
 
 }

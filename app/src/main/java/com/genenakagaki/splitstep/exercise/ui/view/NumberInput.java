@@ -28,14 +28,10 @@ public class NumberInput extends FrameLayout {
     private Unbinder mUnbinder;
     private NumberInputViewModel mViewModel;
 
-    public NumberInput(Context context) {
-        super(context);
-
-        mViewModel = new NumberInputViewModel();
-    }
-
     public NumberInput(Context context, AttributeSet attrs) {
         super(context, attrs);
+        mViewModel = new NumberInputViewModel();
+
         LayoutInflater.from(context).inflate(R.layout.number_input, this);
         mUnbinder = ButterKnife.bind(this);
 
@@ -50,7 +46,13 @@ public class NumberInput extends FrameLayout {
         mViewModel.setMin(min);
 
         typedArray.recycle();
+
+//        ExerciseActivity activity = (ExerciseActivity) context;
+//        activity.getSupportFragmentManager().findFragmentByTag(ExerciseDetailFragment.class.getSimpleName())
+//                .getdisposable
     }
+
+
 
     @Override
     protected void onDetachedFromWindow() {
@@ -60,24 +62,22 @@ public class NumberInput extends FrameLayout {
 
     @OnClick(R.id.plus_button)
     public void onClickPlusButton() {
-        int input = getInputText();
-        int newValue = mViewModel.incrementNumber(input);
-        mInput.setText(Integer.toString(newValue));
+        int number = mViewModel.incrementNumber();
+        mInput.setText(Integer.toString(number));
     }
 
     @OnClick(R.id.minus_button)
     public void onClickMinusButton() {
-        int input = getInputText();
-        int newValue = mViewModel.decrementNumber(input);
-        mInput.setText(Integer.toString(newValue));
+        int number = mViewModel.decrementNumber();
+        mInput.setText(Integer.toString(number));
     }
 
-    public int getInputText() {
-        String inputString = mInput.getText().toString();
-        return mViewModel.getInputValue(inputString);
+    public int getNumber() {
+        return mViewModel.getNumber();
     }
 
     public void setNumber(int number) {
+        mViewModel.setNumber(number);
         mInput.setText(Integer.toString(number));
     }
 }

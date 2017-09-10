@@ -82,7 +82,7 @@ public class ExerciseListViewModelTest {
 
         viewModel.getExerciseList()
                 .test()
-                .awaitTerminalEvent();
+                .assertComplete();
 
         viewModel.getExercisesSubject()
                 .test()
@@ -108,7 +108,7 @@ public class ExerciseListViewModelTest {
 
         viewModel.getExerciseList()
                 .test()
-                .awaitTerminalEvent();
+                .assertComplete();
 
         viewModel.getExercisesSubject()
                 .test()
@@ -134,7 +134,7 @@ public class ExerciseListViewModelTest {
 
         viewModel.getExerciseList()
                 .test()
-                .awaitTerminalEvent();
+                .assertComplete();
 
         viewModel.getExercisesSubject()
                 .test()
@@ -160,7 +160,7 @@ public class ExerciseListViewModelTest {
 
         viewModel.getExerciseList()
                 .test()
-                .awaitTerminalEvent();
+                .assertComplete();
 
         viewModel.getExercisesSubject()
                 .test()
