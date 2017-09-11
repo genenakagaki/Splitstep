@@ -13,10 +13,18 @@ import android.widget.NumberPicker;
 import android.widget.TextView;
 
 import com.genenakagaki.splitstep.R;
+import com.genenakagaki.splitstep.exercise.ui.model.DurationDisplayable;
+import com.genenakagaki.splitstep.exercise.ui.model.ErrorMessage;
+
+import java.io.Serializable;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 /**
@@ -25,27 +33,25 @@ import timber.log.Timber;
 
 public class DurationPickerDialog extends DialogFragment {
 
-    public static final int SET_DURATION = 0;
-    public static final int REST_DURATION = 1;
+    private static final String ARG_DURATION_DISPLAYABLE = "ARG_DURATION_DISPLAYABLE";
 
-    private static final String ARG_DURATION_TYPE = "ARG_DURATION_TYPE";
-    private static final String ARG_DURATION = "ARG_DURATION";
-    private static final String ARG_TITLE = "ARG_TITLE";
-
-    @BindView(R.id.colon_picker) NumberPicker mColonPicker;
-    @BindView(R.id.minutes_picker) NumberPicker mMinutesPicker;
-    @BindView(R.id.seconds_picker) NumberPicker mSecondsPicker;
-    @BindView(R.id.error_textview) TextView mErrorTextView;
+    @BindView(R.id.colon_picker)
+    NumberPicker mColonPicker;
+    @BindView(R.id.minutes_picker)
+    NumberPicker mMinutesPicker;
+    @BindView(R.id.seconds_picker)
+    NumberPicker mSecondsPicker;
+    @BindView(R.id.error_textview)
+    TextView mErrorTextView;
 
     private Unbinder mUnbinder;
+    private CompositeDisposable mDisposable;
     private DurationPickerViewModel mViewModel;
 
-    public static DurationPickerDialog newInstance(String title, int durationType, int duration) {
+    public static DurationPickerDialog newInstance(DurationDisplayable durationDisplayable) {
         DurationPickerDialog dialog = new DurationPickerDialog();
         Bundle args = new Bundle();
-        args.putString(ARG_TITLE, title);
-        args.putInt(ARG_DURATION, duration);
-        args.putInt(ARG_DURATION_TYPE, durationType);
+        args.putSerializable(ARG_DURATION_DISPLAYABLE, (Serializable) durationDisplayable);
         dialog.setArguments(args);
         return dialog;
     }
@@ -57,11 +63,10 @@ public class DurationPickerDialog extends DialogFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        String title = getArguments().getString(ARG_TITLE);
-        int durationType = getArguments().getInt(ARG_DURATION_TYPE);
-        int duration = getArguments().getInt(ARG_DURATION);
+        DurationDisplayable durationDisplayable =
+                (DurationDisplayable) getArguments().getSerializable(ARG_DURATION_DISPLAYABLE);
 
-        mViewModel = new DurationPickerViewModel(getActivity(), title, duration, durationType);
+        mViewModel = new DurationPickerViewModel(getActivity(), durationDisplayable);
     }
 
     @NonNull
@@ -75,11 +80,12 @@ public class DurationPickerDialog extends DialogFragment {
         mSecondsPicker.setMaxValue(59);
         mMinutesPicker.setDisplayedValues(mViewModel.PICKER_DISPLAY_VALUE);
         mSecondsPicker.setDisplayedValues(mViewModel.PICKER_DISPLAY_VALUE);
-        mMinutesPicker.setValue(mViewModel.getMinutes());
-        mSecondsPicker.setValue(mViewModel.getSeconds());
+        DurationDisplayable durationDisplayable = mViewModel.getDurationDisplayable();
+        mMinutesPicker.setValue(durationDisplayable.getMinutes());
+        mSecondsPicker.setValue(durationDisplayable.getSeconds());
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle(mViewModel.getTitle())
+        builder.setTitle(durationDisplayable.getTitle())
                 .setView(view)
                 .setPositiveButton(R.string.save, null)
                 .setNegativeButton(R.string.cancel, null);
@@ -98,21 +104,7 @@ public class DurationPickerDialog extends DialogFragment {
                 public void onClick(View v) {
                     Timber.d("OnClick BUTTON_POSITIVE");
 
-//                    if (mSecondsPicker.getValue() == 0 && mMinutesPicker.getValue() == 0) {
-//                        mErrorTextView.setVisibility(View.VISIBLE);
-//                    } else {
-//                        ExerciseType exerciseType = ((MainActivity) getActivity()).getExerciseType();
-//                        switch (exerciseType) {
-//                            case REPS:
-//                                setDuration(RepsExerciseDetailFragment.class.getSimpleName());
-//                                break;
-//                            case TIMED_SETS:
-//                                setDuration(TimedSetsExerciseDetailFragment.class.getSimpleName());
-//                                break;
-//                        }
-//
-//                        dialog.dismiss();
-//                    }
+                    mViewModel.validate(mMinutesPicker.getValue(), mSecondsPicker.getValue());
                 }
             });
         }
@@ -124,19 +116,31 @@ public class DurationPickerDialog extends DialogFragment {
         mUnbinder.unbind();
     }
 
-    private void setDuration(String fragmentTag) {
-//        switch (mDurationType) {
-//            case SET_DURATION:
-//                ExerciseDetailFragment fragment = (ExerciseDetailFragment) getFragmentManager()
-//                        .findFragmentByTag(fragmentTag);
-//                fragment.setSetDuration(mMinutesPicker.getValue(), mSecondsPicker.getValue());
-//                break;
-//            case REST_DURATION:
-//                fragment = (ExerciseDetailFragment) getFragmentManager()
-//                        .findFragmentByTag(fragmentTag);
-//                fragment.setRestDuration(mMinutesPicker.getValue(), mSecondsPicker.getValue());
-//                break;
-//        }
+    @Override
+    public void onResume() {
+        super.onResume();
+        mDisposable = new CompositeDisposable();
+
+        mDisposable.add(mViewModel.getErrorMessageSubject()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Consumer<ErrorMessage>() {
+                    @Override
+                    public void accept(ErrorMessage errorMessage) throws Exception {
+                        if (errorMessage.isValid()) {
+                            setDuration();
+                            dismiss();
+                        } else {
+                            mErrorTextView.setText(errorMessage.getErrorMessage());
+                        }
+                    }
+                }));
+    }
+
+    private void setDuration() {
+        ExerciseDetailFragment fragment = (ExerciseDetailFragment) getFragmentManager()
+                .findFragmentByTag(ExerciseDetailFragment.class.getSimpleName());
+        fragment.setDuration(mViewModel.getDurationDisplayable());
     }
 
 }

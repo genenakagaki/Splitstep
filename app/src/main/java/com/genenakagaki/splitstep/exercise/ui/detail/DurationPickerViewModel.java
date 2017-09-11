@@ -3,6 +3,10 @@ package com.genenakagaki.splitstep.exercise.ui.detail;
 import android.content.Context;
 
 import com.genenakagaki.splitstep.R;
+import com.genenakagaki.splitstep.exercise.ui.model.DurationDisplayable;
+import com.genenakagaki.splitstep.exercise.ui.model.ErrorMessage;
+
+import io.reactivex.subjects.BehaviorSubject;
 
 /**
  * Created by gene on 9/8/17.
@@ -22,61 +26,35 @@ public class DurationPickerViewModel {
         return pickerDisplayValues;
     }
 
-    private Context mContext;
-    private String title;
-    private int duration;
-    private int durationType;
+    private Context context;
+    private DurationDisplayable durationDisplayable;
 
-    public DurationPickerViewModel(Context context, String title, int duration, int durationType) {
-        this.mContext = context;
-        this.title = title;
-        this.duration = duration;
-        this.durationType = durationType;
+    private BehaviorSubject<ErrorMessage> errorMessageSubject = BehaviorSubject.create();
+
+    public DurationPickerViewModel(Context context, DurationDisplayable durationDisplayable) {
+        this.context = context;
+        this.durationDisplayable = durationDisplayable;
     }
 
-    public String getTitle() {
-        return title;
+    public BehaviorSubject<ErrorMessage> getErrorMessageSubject() {
+        return errorMessageSubject;
     }
 
-    public int getDuration() {
-        return duration;
+    public DurationDisplayable getDurationDisplayable() {
+        return durationDisplayable;
     }
 
-    public int getDurationType() {
-        return durationType;
-    }
+    public void validate(int minutes, int seconds) {
+        durationDisplayable.setMinutes(minutes);
+        durationDisplayable.setSeconds(seconds);
 
-    public String getDisplayableDuration() {
-        int minutes = duration / 60;
-        int seconds = duration - minutes * 60;
-
-        if (minutes == 0) {
-            return mContext.getString(R.string.duration_value_seconds, seconds);
+        ErrorMessage errorMessage = new ErrorMessage();
+        if (minutes == 0 && seconds == 0) {
+            errorMessage.setValid(false);
+            errorMessage.setErrorMessage(context.getString(R.string.error_zero_duration));
         } else {
-            return mContext.getString(R.string.duration_value, minutes, seconds);
+            errorMessage.setValid(true);
         }
-    }
-
-    public int getDuration(String durationString) {
-        String[] split = durationString.split(" ");
-
-        int minutes = 0;
-        int seconds;
-        if (split.length == 2) {
-            seconds = Integer.parseInt(split[0]);
-        } else {
-            minutes = Integer.parseInt(split[0]);
-            seconds = Integer.parseInt(split[2]);
-        }
-
-        return seconds + minutes * 60;
-    }
-
-    public int getMinutes() {
-        return duration / 60;
-    }
-
-    public int getSeconds() {
-        return duration % 60;
+        errorMessageSubject.onNext(errorMessage);
     }
 }

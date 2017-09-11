@@ -96,7 +96,7 @@ public class AddExerciseViewModelTest {
 //                    @Override
 //                    public boolean test(@NonNull ValidationModel validationModel) throws Exception {
 //                        String errorMessage = mContext.getString(R.string.error_exercise_name_duplicate);
-//                        return validationModel.isValid() == false;
+//                        return validationModel.validate() == false;
 //                    }
 //                });
 //    }
@@ -119,7 +119,7 @@ public class AddExerciseViewModelTest {
 //                    @Override
 //                    public boolean test(@NonNull ValidationModel validationModel) throws Exception {
 //                        String errorMessage = mContext.getString(R.string.error_exercise_name_duplicate);
-//                        return validationModel.isValid() == false
+//                        return validationModel.validate() == false
 //                                && validationModel.getErrorMessage().equals(errorMessage);
 //                    }
 //                });
@@ -134,7 +134,7 @@ public class AddExerciseViewModelTest {
 //                .assertValue(new Predicate<ValidationModel>() {
 //                    @Override
 //                    public boolean test(@NonNull ValidationModel validationModel) throws Exception {
-//                        return validationModel.isValid() == true;
+//                        return validationModel.validate() == true;
 //                    }
 //                });
 //    }
@@ -157,7 +157,7 @@ public class AddExerciseViewModelTest {
 //                    @Override
 //                    public boolean test(@NonNull ValidationModel validationModel) throws Exception {
 //                        String errorMessage = mContext.getString(R.string.error_exercise_name_duplicate);
-//                        return validationModel.isValid() == true;
+//                        return validationModel.validate() == true;
 //                    }
 //                });
 //    }

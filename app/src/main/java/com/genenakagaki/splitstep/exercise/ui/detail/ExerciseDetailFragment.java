@@ -10,7 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.genenakagaki.splitstep.R;
-import com.genenakagaki.splitstep.exercise.data.ExerciseSharedPref;
+import com.genenakagaki.splitstep.exercise.ui.model.DurationDisplayable;
 import com.genenakagaki.splitstep.exercise.ui.view.NumberInput;
 
 import butterknife.BindView;
@@ -22,7 +22,7 @@ import butterknife.Unbinder;
  * Created by Gene on 9/8/2017.
  */
 
-public class ExerciseDetailFragment extends Fragment {
+public abstract class ExerciseDetailFragment extends Fragment {
 
     @BindView(R.id.exercise_name_textview)
     TextView mExerciseNameTextView;
@@ -36,24 +36,14 @@ public class ExerciseDetailFragment extends Fragment {
     @BindView(R.id.rest_duration_textview) TextView mRestDurationTextView;
 
     private Unbinder mUnbinder;
-    private ExerciseDetailViewModel mViewModel;
 
     public ExerciseDetailFragment() {}
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        mViewModel = new ExerciseDetailViewModel(getActivity(), ExerciseSharedPref.getExerciseId(getActivity()));
-    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_exercise_detail, container, false);
         mUnbinder = ButterKnife.bind(this, view);
-
-        mExerciseNameTextView.setText(mViewModel.getExercise().name);
 
         return view;
     }
@@ -85,25 +75,7 @@ public class ExerciseDetailFragment extends Fragment {
 //        fragment.show(getFragmentManager(), DurationPickerDialog.class.getSimpleName());
     }
 
-    public void setSetDuration(int minutes, int seconds) {
-        if (minutes == 0) {
-            mSetDurationTextView.setText(getString(R.string.duration_value_seconds, seconds));
-        } else {
-            mSetDurationTextView.setText(getString(R.string.duration_value, minutes, seconds));
-        }
-    }
+    public abstract void setDuration(DurationDisplayable durationDisplayable);
 
-    public void setRestDuration(int minutes, int seconds) {
-        if (minutes == 0) {
-            mRestDurationTextView.setText(getString(R.string.duration_value_seconds, seconds));
-        } else {
-            mRestDurationTextView.setText(getString(R.string.duration_value, minutes, seconds));
-        }
-    }
-
-    public ExerciseDetailViewModel getViewModel() {
-        return mViewModel;
-    }
-
-//    public abstract void startCoachFragment();
+    public abstract void startCoachFragment();
 }
