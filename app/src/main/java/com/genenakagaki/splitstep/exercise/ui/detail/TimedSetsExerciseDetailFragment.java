@@ -31,7 +31,7 @@ public class TimedSetsExerciseDetailFragment extends ExerciseDetailFragment {
 //                    @Override
 //                    public void accept(TimedSetsExercise timedSetsExercise) throws Exception {
 //                        mSetsNumberInput.setNumber(timedSetsExercise.sets);
-//                        mSetDurationTextView.setText(getViewModel().getDisplayableDuration(timedSetsExercise.setDuration));
+//                        mSetDurationTextView.setText(getViewModel().getDisplayableDuration(timedSetsExercise.setRestDuration));
 //                        mRestDurationTextView.setText(getViewModel().getDisplayableDuration(timedSetsExercise.restDuration));
 //                    }
 //                }));
@@ -46,10 +46,15 @@ public class TimedSetsExerciseDetailFragment extends ExerciseDetailFragment {
     }
 
     @Override
+    public void createViewModel(long exerciseId) {
+
+    }
+
+    @Override
     public void startCoachFragment() {
 //        TimedSetsExercise timedSetsExercise = new TimedSetsExercise(getViewModel().getExercise().id);
 //        timedSetsExercise.sets = mSetsNumberInput.getInputText();
-//        timedSetsExercise.setDuration = getViewModel().getDuration(mSetDurationTextView.getText().toString());
+//        timedSetsExercise.setRestDuration = getViewModel().getDuration(mSetDurationTextView.getText().toString());
 //        timedSetsExercise.restDuration = getViewModel().getDuration(mRestDurationTextView.getText().toString());
 //
 //        mDisposable.add(getViewModel().updateTimedSetsExercise(timedSetsExercise)
@@ -62,5 +67,10 @@ public class TimedSetsExerciseDetailFragment extends ExerciseDetailFragment {
 //                                new TimedSetsCoachFragment(), TimedSetsCoachFragment.class.getSimpleName(), true);
 //                    }
 //                }));
+    }
+
+    @Override
+    public void onBackPressed() {
+
     }
 }

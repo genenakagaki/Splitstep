@@ -11,11 +11,10 @@ public class NumberInputViewModel {
     public static final int MAX_DEFAULT = 999;
     public static final int MIN_DEFAULT = 0;
 
-    private BehaviorSubject<Integer> subject = BehaviorSubject.create();
-
     private int max = MAX_DEFAULT;
     private int min = MIN_DEFAULT;
     private int number;
+    private BehaviorSubject<Integer> numberSubject = BehaviorSubject.create();
 
     public NumberInputViewModel() {}
 
@@ -33,16 +32,21 @@ public class NumberInputViewModel {
 
     public void setNumber(int number) {
         this.number = number;
+        numberSubject.onNext(number);
     }
 
-    public int incrementNumber() {
+    public BehaviorSubject<Integer> getNumberSubject() {
+        return numberSubject;
+    }
+
+    public void incrementNumber() {
         if (number < max) number++;
-        return number;
+        numberSubject.onNext(number);
     }
 
-    public int decrementNumber() {
+    public void decrementNumber() {
         if (number > min) number--;
-        return number;
+        numberSubject.onNext(number);
     }
 
 }

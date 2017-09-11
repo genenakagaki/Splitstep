@@ -2,6 +2,7 @@ package com.genenakagaki.splitstep.exercise.ui.detail;
 
 import android.app.Dialog;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
@@ -16,7 +17,7 @@ import com.genenakagaki.splitstep.R;
 import com.genenakagaki.splitstep.exercise.ui.model.DurationDisplayable;
 import com.genenakagaki.splitstep.exercise.ui.model.ErrorMessage;
 
-import java.io.Serializable;
+import org.parceler.Parcels;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -51,7 +52,7 @@ public class DurationPickerDialog extends DialogFragment {
     public static DurationPickerDialog newInstance(DurationDisplayable durationDisplayable) {
         DurationPickerDialog dialog = new DurationPickerDialog();
         Bundle args = new Bundle();
-        args.putSerializable(ARG_DURATION_DISPLAYABLE, (Serializable) durationDisplayable);
+        args.putParcelable(ARG_DURATION_DISPLAYABLE, Parcels.wrap(durationDisplayable));
         dialog.setArguments(args);
         return dialog;
     }
@@ -63,8 +64,8 @@ public class DurationPickerDialog extends DialogFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        DurationDisplayable durationDisplayable =
-                (DurationDisplayable) getArguments().getSerializable(ARG_DURATION_DISPLAYABLE);
+        Parcelable parcelable = getArguments().getParcelable(ARG_DURATION_DISPLAYABLE);
+        DurationDisplayable durationDisplayable = Parcels.unwrap(parcelable);
 
         mViewModel = new DurationPickerViewModel(getActivity(), durationDisplayable);
     }
@@ -76,8 +77,8 @@ public class DurationPickerDialog extends DialogFragment {
         mUnbinder = ButterKnife.bind(this, view);
 
         mColonPicker.setDisplayedValues(mViewModel.COLON_PICKER_DISPLAY_VALUES);
-        mMinutesPicker.setMaxValue(59);
-        mSecondsPicker.setMaxValue(59);
+        mMinutesPicker.setMaxValue(mViewModel.PICKER_MAX_VALUE);
+        mSecondsPicker.setMaxValue(mViewModel.PICKER_MAX_VALUE);
         mMinutesPicker.setDisplayedValues(mViewModel.PICKER_DISPLAY_VALUE);
         mSecondsPicker.setDisplayedValues(mViewModel.PICKER_DISPLAY_VALUE);
         DurationDisplayable durationDisplayable = mViewModel.getDurationDisplayable();
@@ -128,19 +129,15 @@ public class DurationPickerDialog extends DialogFragment {
                     @Override
                     public void accept(ErrorMessage errorMessage) throws Exception {
                         if (errorMessage.isValid()) {
-                            setDuration();
+                            ExerciseDetailFragment fragment = (ExerciseDetailFragment) getFragmentManager()
+                                    .findFragmentByTag(ExerciseDetailFragment.class.getSimpleName());
+                            fragment.setDuration(mViewModel.getDurationDisplayable());
                             dismiss();
                         } else {
                             mErrorTextView.setText(errorMessage.getErrorMessage());
                         }
                     }
                 }));
-    }
-
-    private void setDuration() {
-        ExerciseDetailFragment fragment = (ExerciseDetailFragment) getFragmentManager()
-                .findFragmentByTag(ExerciseDetailFragment.class.getSimpleName());
-        fragment.setDuration(mViewModel.getDurationDisplayable());
     }
 
 }

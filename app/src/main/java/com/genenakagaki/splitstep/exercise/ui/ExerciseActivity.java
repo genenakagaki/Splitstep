@@ -17,7 +17,12 @@ import timber.log.Timber;
 
 public class ExerciseActivity extends AppCompatActivity {
 
+    public interface OnBackPressedListener {
+        public void onBackPressed();
+    }
+
     private Toolbar mToolbar;
+    private OnBackPressedListener mOnBackPressedListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +40,11 @@ public class ExerciseActivity extends AppCompatActivity {
 
         // TODO: remove
         ButterKnife.setDebug(true);
+    }
+
+    @Override
+    public void setTitle(CharSequence title) {
+        getSupportActionBar().setTitle(title);
     }
 
     @Override
@@ -64,6 +74,10 @@ public class ExerciseActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
 
+        if (mOnBackPressedListener != null) {
+            mOnBackPressedListener.onBackPressed();
+        }
+
         // get current fragment tag
         FragmentManager fragmentManager = getSupportFragmentManager();
         if (fragmentManager.getBackStackEntryCount() > 0) {
@@ -85,9 +99,8 @@ public class ExerciseActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public void setTitle(CharSequence title) {
-        getSupportActionBar().setTitle(title);
+    public void setOnBackPressedListener(OnBackPressedListener onBackPressedListener) {
+        this.mOnBackPressedListener = onBackPressedListener;
     }
 
     public void showFragment(Fragment fragment, String tag, boolean addToBackStack) {

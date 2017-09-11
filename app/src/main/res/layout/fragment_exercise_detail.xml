@@ -19,13 +19,13 @@
             android:layout_height="wrap_content"
             android:textSize="24sp"/>
 
-        <com.genenakagaki.myhandycoach.view.NumberInput
+        <com.genenakagaki.splitstep.exercise.ui.view.NumberInput
             android:id="@+id/sets_numberinput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:label="@string/sets"/>
 
-        <com.genenakagaki.myhandycoach.view.NumberInput
+        <com.genenakagaki.splitstep.exercise.ui.view.NumberInput
             android:id="@+id/reps_numberinput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -16,6 +16,7 @@ public class DurationPickerViewModel {
 
     protected static final String[] COLON_PICKER_DISPLAY_VALUES = new String[] {":"};
     protected static final String[] PICKER_DISPLAY_VALUE = buildPickerDisplayValues();
+    protected static final int PICKER_MAX_VALUE = 59;
 
     private static String[] buildPickerDisplayValues() {
         String[] pickerDisplayValues = new String[60];

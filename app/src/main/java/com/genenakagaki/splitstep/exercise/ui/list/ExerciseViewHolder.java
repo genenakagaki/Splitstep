@@ -15,6 +15,10 @@ import com.genenakagaki.splitstep.R;
 import com.genenakagaki.splitstep.exercise.data.ExerciseSharedPref;
 import com.genenakagaki.splitstep.exercise.data.entity.Exercise;
 import com.genenakagaki.splitstep.exercise.ui.ExerciseActivity;
+import com.genenakagaki.splitstep.exercise.ui.detail.ExerciseDetailFragment;
+import com.genenakagaki.splitstep.exercise.ui.detail.ReactionExerciseDetailFragment;
+import com.genenakagaki.splitstep.exercise.ui.detail.RepsExerciseDetailFragment;
+import com.genenakagaki.splitstep.exercise.ui.detail.TimedSetsExerciseDetailFragment;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -97,21 +101,21 @@ public class ExerciseViewHolder extends RecyclerView.ViewHolder {
         ExerciseActivity activity = (ExerciseActivity) mContext;
         ExerciseSharedPref.setExerciseId(mContext, mListItemViewModel.getExercise().id);
 
-//        switch (ExerciseSharedPref.getExerciseType(mContext)) {
-//            case REPS:
-//                activity.showFragment(new RepsExerciseDetailFragment(),
-//                        RepsExerciseDetailFragment.class.getSimpleName(),
-//                        true);
-//                break;
-//            case TIMED_SETS:
-//                activity.showFragment(new TimedSetsExerciseDetailFragment(),
-//                        TimedSetsExerciseDetailFragment.class.getSimpleName(),
-//                        true);
-//                break;
-//            default:// REACTION:
-//                activity.showFragment(new ReactionExerciseDetailFragment(),
-//                        ReactionExerciseDetailFragment.class.getSimpleName(),
-//                        true);
-//        }
+        switch (ExerciseSharedPref.getExerciseType(mContext)) {
+            case REPS:
+                activity.showFragment(new RepsExerciseDetailFragment(),
+                        ExerciseDetailFragment.class.getSimpleName(),
+                        true);
+                break;
+            case TIMED_SETS:
+                activity.showFragment(new TimedSetsExerciseDetailFragment(),
+                        ExerciseDetailFragment.class.getSimpleName(),
+                        true);
+                break;
+            default:// REACTION: 6
+                activity.showFragment(new ReactionExerciseDetailFragment(),
+                        ExerciseDetailFragment.class.getSimpleName(),
+                        true);
+        }
     }
 }

@@ -32,6 +32,7 @@ ext {
     dbFlowVersion = "4.1.1"
     timberVersion = "4.5.1"
     butterknifeVersion = "8.8.1"
+    parcelerVersion = "1.1.9"
 }
 
 task clean(type: Delete) {

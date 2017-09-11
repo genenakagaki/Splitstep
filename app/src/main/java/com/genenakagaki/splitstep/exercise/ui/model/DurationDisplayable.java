@@ -1,18 +1,37 @@
 package com.genenakagaki.splitstep.exercise.ui.model;
 
+
+import org.parceler.Parcel;
+
 /**
  * Created by gene on 9/10/17.
  */
 
+@Parcel
 public class DurationDisplayable {
 
-    private String title;
-    private int minutes;
-    private int seconds;
+    public static final int TYPE_REST_DURATION = 1;
+    public static final int TYPE_SET_DURATION = 2;
 
-    public DurationDisplayable(String title, int duration) {
-        this.title = title;
+    int type;
+    String title;
+    String display;
+    int minutes;
+    int seconds;
+
+    public DurationDisplayable() {}
+
+    public DurationDisplayable(int type, int duration) {
+        this.type = type;
         setDuration(duration);
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 
     public String getTitle() {
@@ -21,6 +40,14 @@ public class DurationDisplayable {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getDisplay() {
+        return display;
+    }
+
+    public void setDisplay(String display) {
+        this.display = display;
     }
 
     public int getDuration() {

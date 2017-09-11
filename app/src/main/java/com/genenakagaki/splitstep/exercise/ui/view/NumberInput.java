@@ -14,6 +14,10 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 /**
@@ -22,11 +26,23 @@ import timber.log.Timber;
 
 public class NumberInput extends FrameLayout {
 
-    @BindView(R.id.input) EditText mInput;
-    @BindView(R.id.label_textview) TextView mLabelTextView;
+    @BindView(R.id.input)
+    EditText mInput;
+    @BindView(R.id.label_textview)
+    TextView mLabelTextView;
 
     private Unbinder mUnbinder;
+    private CompositeDisposable mDisposable;
     private NumberInputViewModel mViewModel;
+
+    public NumberInput(Context context) {
+        super(context);
+
+        mViewModel = new NumberInputViewModel();
+
+        LayoutInflater.from(context).inflate(R.layout.number_input, this);
+        mUnbinder = ButterKnife.bind(this);
+    }
 
     public NumberInput(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -46,30 +62,42 @@ public class NumberInput extends FrameLayout {
         mViewModel.setMin(min);
 
         typedArray.recycle();
-
-//        ExerciseActivity activity = (ExerciseActivity) context;
-//        activity.getSupportFragmentManager().findFragmentByTag(ExerciseDetailFragment.class.getSimpleName())
-//                .getdisposable
     }
 
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        mDisposable = new CompositeDisposable();
 
+        mDisposable.add(mViewModel.getNumberSubject()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Consumer<Integer>() {
+                    @Override
+                    public void accept(Integer integer) throws Exception {
+                        mInput.setText(Integer.toString(integer));
+                    }
+                }));
+    }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
+        if (mDisposable != null && !mDisposable.isDisposed()) {
+            mDisposable.dispose();
+        }
+
         mUnbinder.unbind();
     }
 
     @OnClick(R.id.plus_button)
     public void onClickPlusButton() {
-        int number = mViewModel.incrementNumber();
-        mInput.setText(Integer.toString(number));
+        mViewModel.incrementNumber();
     }
 
     @OnClick(R.id.minus_button)
     public void onClickMinusButton() {
-        int number = mViewModel.decrementNumber();
-        mInput.setText(Integer.toString(number));
+        mViewModel.decrementNumber();
     }
 
     public int getNumber() {
@@ -78,6 +106,5 @@ public class NumberInput extends FrameLayout {
 
     public void setNumber(int number) {
         mViewModel.setNumber(number);
-        mInput.setText(Integer.toString(number));
     }
 }
