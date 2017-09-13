@@ -47,7 +47,7 @@ public class ExerciseListViewModelTest {
     }
 
     @Test
-    public void testGetTitle_WithRepsExercise_ShouldReturnCorrectTitle() {
+    public void testGetTitle_WithRegularExercise_ShouldReturnCorrectTitle() {
         ExerciseListViewModel viewModel = new ExerciseListViewModel(mContext, ExerciseType.REGULAR);
 
         String title = viewModel.getTitle();
@@ -85,16 +85,16 @@ public class ExerciseListViewModelTest {
     }
 
     @Test
-    public void testGetExerciseList_WithRepsExercise_SubjectShouldEmitRepsExercises() {
+    public void testGetExerciseList_WithRegularExercise_SubjectShouldEmitRegularExercises() {
         ExerciseListViewModel viewModel = new ExerciseListViewModel(mContext, ExerciseType.REGULAR);
 
-        String[] repsExerciseNames = {
+        String[] regularExerciseNames = {
                 "repsExercise1",
                 "repsExercise2",
                 "repsExercise3"
         };
 
-        DatabaseUtils.insertExercises(repsExerciseNames, ExerciseType.REGULAR_VALUE);
+        DatabaseUtils.insertExercises(regularExerciseNames, ExerciseType.REGULAR_VALUE);
 
         viewModel.getExerciseList()
                 .test()

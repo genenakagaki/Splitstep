@@ -17,7 +17,6 @@ import com.genenakagaki.splitstep.exercise.data.entity.Exercise;
 import com.genenakagaki.splitstep.exercise.ui.ExerciseActivity;
 import com.genenakagaki.splitstep.exercise.ui.detail.ExerciseDetailFragment;
 import com.genenakagaki.splitstep.exercise.ui.detail.ReactionExerciseDetailFragment;
-import com.genenakagaki.splitstep.exercise.ui.detail.RepsExerciseDetailFragment;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -34,7 +33,7 @@ import timber.log.Timber;
 public class ExerciseViewHolder extends RecyclerView.ViewHolder {
     @BindView(R.id.delete_button) ImageButton mDeleteButton;
     @BindView(R.id.favorite_imageswitcher) ImageSwitcher mFavoriteImageSwitcher;
-    @BindView(R.id.exercise_textview) TextView mExerciseTextButton;
+    @BindView(R.id.name_textview) TextView mNameTextButton;
 
     private Context mContext;
     private ExerciseListItemViewModel mListItemViewModel;
@@ -58,6 +57,8 @@ public class ExerciseViewHolder extends RecyclerView.ViewHolder {
     public void setExercise(Exercise exercise) {
         mListItemViewModel = new ExerciseListItemViewModel(mContext, exercise);
 
+        mNameTextButton.setText(mListItemViewModel.getExerciseDisplayable());
+
         ExerciseActivity activity = (ExerciseActivity) mContext;
         ExerciseListFragment fragment = (ExerciseListFragment) activity.getSupportFragmentManager()
                 .findFragmentByTag(ExerciseListFragment.class.getSimpleName());
@@ -80,7 +81,7 @@ public class ExerciseViewHolder extends RecyclerView.ViewHolder {
     @OnClick(R.id.delete_button)
     public void onDeleteButtonClick() {
         DeleteExerciseDialog dialog = DeleteExerciseDialog.newInstance(
-                mListItemViewModel.getExercise().id, mListItemViewModel.getDeleteMessage());
+                mListItemViewModel.getExercise().id, mListItemViewModel.getExerciseDisplayable());
         AppCompatActivity activity = (AppCompatActivity) mContext;
         dialog.show(activity.getSupportFragmentManager(), DeleteExerciseDialog.class.getSimpleName());
     }
@@ -94,7 +95,7 @@ public class ExerciseViewHolder extends RecyclerView.ViewHolder {
                 .subscribe();
     }
 
-    @OnClick(R.id.exercise_textview)
+    @OnClick(R.id.name_textview)
     public void onExerciseClick() {
         Timber.d("onExerciseClick");
         ExerciseActivity activity = (ExerciseActivity) mContext;

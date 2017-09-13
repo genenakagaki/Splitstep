@@ -4,7 +4,7 @@ import android.content.Context;
 
 import com.genenakagaki.splitstep.R;
 import com.genenakagaki.splitstep.exercise.data.entity.Exercise;
-import com.genenakagaki.splitstep.exercise.data.entity.ExerciseType;
+import com.genenakagaki.splitstep.exercise.data.entity.ExerciseSubType;
 
 import io.reactivex.Completable;
 import io.reactivex.CompletableEmitter;
@@ -48,15 +48,15 @@ public class ExerciseListItemViewModel {
         });
     }
 
-    public String getDeleteMessage() {
+    public String getExerciseDisplayable() {
         String exerciseTypeString;
 
-        switch (mExercise.type) {
-            case ExerciseType.REGULAR_VALUE:
-                exerciseTypeString = mContext.getString(R.string.exercise_short);
+        switch (ExerciseSubType.fromValue(mExercise.subType)) {
+            case REPS:
+                exerciseTypeString = mContext.getString(R.string.reps_subtype);
                 break;
-            default: // REACTION:
-                exerciseTypeString = mContext.getString(R.string.reaction_exercise_short);
+            default: // TIMED_SETS:
+                exerciseTypeString = mContext.getString(R.string.timed_sets_subtype);
         }
 
         return mExercise.name + " (" + exerciseTypeString + ")";

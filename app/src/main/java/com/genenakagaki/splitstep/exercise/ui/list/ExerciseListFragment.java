@@ -21,7 +21,6 @@ import android.widget.TextView;
 import com.genenakagaki.splitstep.R;
 import com.genenakagaki.splitstep.exercise.data.ExerciseSharedPref;
 import com.genenakagaki.splitstep.exercise.data.entity.Exercise;
-import com.genenakagaki.splitstep.exercise.ui.add.AddExerciseDialog;
 
 import java.util.List;
 

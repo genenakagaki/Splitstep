@@ -1,9 +1,11 @@
-package com.genenakagaki.splitstep.exercise.ui.add;
+package com.genenakagaki.splitstep.exercise.ui.list;
 
 import android.content.Context;
 
 import com.genenakagaki.splitstep.R;
 import com.genenakagaki.splitstep.exercise.data.ExerciseDao;
+import com.genenakagaki.splitstep.exercise.data.entity.Exercise;
+import com.genenakagaki.splitstep.exercise.data.entity.ExerciseSubType;
 import com.genenakagaki.splitstep.exercise.data.entity.ExerciseType;
 import com.genenakagaki.splitstep.exercise.ui.model.ErrorMessage;
 
@@ -18,6 +20,7 @@ public class AddExerciseViewModel {
 
     private Context context;
     private ExerciseType exerciseType;
+    private ExerciseSubType exerciseSubType;
 
     private ErrorMessage errorMessage;
     private BehaviorSubject<ErrorMessage> errorMessageSubject = BehaviorSubject.create();
@@ -25,6 +28,7 @@ public class AddExerciseViewModel {
     public AddExerciseViewModel(Context context, ExerciseType exerciseType) {
         this.context = context;
         this.exerciseType = exerciseType;
+        this.exerciseSubType = ExerciseSubType.REPS;
         errorMessage = new ErrorMessage();
     }
 
@@ -32,8 +36,13 @@ public class AddExerciseViewModel {
         return errorMessageSubject;
     }
 
+    public void setExerciseSubType(ExerciseSubType subType) {
+        exerciseSubType = subType;
+    }
+
     public Completable insertExercise(final String name) {
-        return ExerciseDao.getInstance().insert(name, exerciseType);
+        return ExerciseDao.getInstance().insert(
+                new Exercise(exerciseType.getValue(), exerciseSubType.getValue(), name));
     }
 
     public void setExerciseAlreadyExistsError() {

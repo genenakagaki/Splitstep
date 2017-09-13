@@ -8,6 +8,7 @@ import com.genenakagaki.splitstep.R;
 import com.genenakagaki.splitstep.exercise.data.ExerciseDatabase;
 import com.genenakagaki.splitstep.exercise.data.entity.Exercise;
 import com.genenakagaki.splitstep.exercise.data.entity.ExerciseType;
+import com.genenakagaki.splitstep.exercise.ui.list.AddExerciseViewModel;
 import com.genenakagaki.splitstep.exercise.ui.model.ErrorMessage;
 import com.raizlabs.android.dbflow.config.DatabaseConfig;
 import com.raizlabs.android.dbflow.config.FlowConfig;

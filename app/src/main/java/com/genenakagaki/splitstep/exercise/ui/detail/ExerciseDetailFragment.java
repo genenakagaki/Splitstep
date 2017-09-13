@@ -15,11 +15,13 @@ import android.widget.ViewSwitcher;
 import com.genenakagaki.splitstep.R;
 import com.genenakagaki.splitstep.exercise.data.ExerciseSharedPref;
 import com.genenakagaki.splitstep.exercise.data.entity.Exercise;
+import com.genenakagaki.splitstep.exercise.data.entity.ExerciseSubType;
 import com.genenakagaki.splitstep.exercise.ui.model.DurationDisplayable;
 import com.genenakagaki.splitstep.exercise.ui.view.NumberInput;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -40,12 +42,18 @@ public class ExerciseDetailFragment extends Fragment
     ImageSwitcher mFavoriteImageSwitcher;
     @BindView(R.id.sets_numberinput)
     NumberInput mSetsNumberInput;
-    @BindView(R.id.reps_numberinput) NumberInput mRepsNumberInput;
+    @BindView(R.id.reps_numberinput)
+    NumberInput mRepsNumberInput;
+    @BindView(R.id.cones_numberinput)
+    NumberInput mConesNumberInput;
     @BindView(R.id.set_duration_layout)
     LinearLayout mSetDurationLayout;
-    @BindView(R.id.set_duration_textview) TextView mSetDurationTextView;
-    @BindView(R.id.rest_duration_layout) LinearLayout mRestDurationLayout;
-    @BindView(R.id.rest_duration_textview) TextView mRestDurationTextView;
+    @BindView(R.id.set_duration_textview)
+    TextView mSetDurationTextView;
+    @BindView(R.id.rest_duration_layout)
+    LinearLayout mRestDurationLayout;
+    @BindView(R.id.rest_duration_textview)
+    TextView mRestDurationTextView;
 
     private Unbinder mUnbinder;
     private CompositeDisposable mDisposable;
@@ -67,6 +75,8 @@ public class ExerciseDetailFragment extends Fragment
         Timber.d("onCreateView");
         View view = inflater.inflate(R.layout.fragment_exercise_detail, container, false);
         mUnbinder = ButterKnife.bind(this, view);
+
+        mConesNumberInput.setVisibility(View.GONE);
 
         mFavoriteImageSwitcher.setFactory(new ViewSwitcher.ViewFactory() {
             @Override
@@ -99,8 +109,41 @@ public class ExerciseDetailFragment extends Fragment
                         } else {
                             mFavoriteImageSwitcher.setImageResource(R.drawable.ic_star_border);
                         }
+
+                        mSetsNumberInput.setNumber(exercise.sets);
+
+                        switch (ExerciseSubType.fromValue(exercise.subType)) {
+                            case REPS:
+                                mSetDurationLayout.setVisibility(View.GONE);
+                                mRepsNumberInput.setNumber(exercise.reps);
+                                break;
+                            case TIMED_SETS:
+                                mRepsNumberInput.setVisibility(View.GONE);
+                                break;
+                        }
                     }
                 }));
+
+        mDisposable.add(mViewModel.getSetDurationSubject()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.computation())
+                .subscribe(new Consumer<DurationDisplayable>() {
+                    @Override
+                    public void accept(DurationDisplayable durationDisplayable) throws Exception {
+                        mSetDurationTextView.setText(durationDisplayable.getDisplay());
+                    }
+                }));
+
+        mDisposable.add(mViewModel.getRestDurationSubject()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.computation())
+                .subscribe(new Consumer<DurationDisplayable>() {
+                    @Override
+                    public void accept(DurationDisplayable durationDisplayable) throws Exception {
+                        mRestDurationTextView.setText(durationDisplayable.getDisplay());
+                    }
+                }));
+
         mDisposable.add(mViewModel.setExercise()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.computation())
@@ -138,6 +181,20 @@ public class ExerciseDetailFragment extends Fragment
                     .subscribeOn(Schedulers.computation())
                     .subscribe();
         }
+    }
+
+    @OnClick(R.id.rest_duration_layout)
+    public void onClickRestDuration() {
+        DurationPickerDialog fragment =
+                DurationPickerDialog.newInstance(mViewModel.getRestDuration());
+        fragment.show(getFragmentManager(), DurationPickerDialog.class.getSimpleName());
+    }
+
+    @OnClick(R.id.set_duration_layout)
+    public void onClickSetDuration() {
+        DurationPickerDialog fragment =
+                DurationPickerDialog.newInstance(mViewModel.getRestDuration());
+        fragment.show(getFragmentManager(), DurationPickerDialog.class.getSimpleName());
     }
 
     public CompositeDisposable getDisposable() {

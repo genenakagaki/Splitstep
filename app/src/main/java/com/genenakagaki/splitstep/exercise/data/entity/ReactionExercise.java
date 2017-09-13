@@ -21,13 +21,15 @@ public class ReactionExercise extends BaseModel {
             references = {@ForeignKeyReference(columnName = "id", foreignKeyColumnName = "id")})
     public long id;
 
-    @Column(defaultValue = "1") public int cones;
-    @Column(defaultValue = "1") public int repDuration;
+    @Column public int cones;
+    @Column public int repDuration;
 
     public ReactionExercise() {}
 
     public ReactionExercise(long id) {
         this.id = id;
+        this.cones = 2;
+        this.repDuration = 10;
     }
 
     public ReactionExercise(long id, int cones, int repDuration) {

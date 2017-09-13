@@ -27,16 +27,15 @@ public class ExerciseDetailViewModel {
     private Exercise exercise;
     private BehaviorSubject<Exercise> exerciseSubject = BehaviorSubject.create();
 
-    private DurationDisplayable restDurationDisplayable;
+    private DurationDisplayable restDuration;
     private BehaviorSubject<DurationDisplayable> restDurationSubject = BehaviorSubject.create();
+
+    private DurationDisplayable setDuration;
+    private BehaviorSubject<DurationDisplayable> setDurationSubject = BehaviorSubject.create();
 
     public ExerciseDetailViewModel(Context context, long exerciseId) {
         this.context = context;
         this.exerciseId = exerciseId;
-    }
-
-    protected long getExerciseId() {
-        return exerciseId;
     }
 
     public BehaviorSubject<Exercise> getExerciseSubject() {
@@ -53,12 +52,16 @@ public class ExerciseDetailViewModel {
                         ExerciseDetailViewModel.this.exercise = exercise;
                         exerciseSubject.onNext(exercise);
 
-                        restDurationDisplayable = new DurationDisplayable(
+                        restDuration = new DurationDisplayable(
                                 DurationDisplayable.TYPE_REST_DURATION, exercise.restDuration);
-                        restDurationDisplayable.setTitle(context.getString(R.string.rest_duration));
+                        restDuration.setTitle(context.getString(R.string.rest_duration));
+
+                        setDuration = new DurationDisplayable(
+                                DurationDisplayable.TYPE_SET_DURATION, exercise.setDuration);
+                        setDuration.setTitle(context.getString(R.string.set_duration));
                         e.onComplete();
                     }
-                }).andThen(setRestDuration(restDurationDisplayable));
+                }).andThen(setRestDuration(restDuration)).andThen(setSetDuration(setDuration));
             }
         });
     }
@@ -83,8 +86,8 @@ public class ExerciseDetailViewModel {
         });
     }
 
-    public DurationDisplayable getRestDurationDisplayable() {
-        return restDurationDisplayable;
+    public DurationDisplayable getRestDuration() {
+        return restDuration;
     }
 
     public BehaviorSubject<DurationDisplayable> getRestDurationSubject() {
@@ -96,27 +99,58 @@ public class ExerciseDetailViewModel {
             @Override
             public void subscribe(@NonNull CompletableEmitter e) throws Exception {
                 if (durationDisplayable != null) {
-                    restDurationDisplayable = durationDisplayable;
+                    restDuration = durationDisplayable;
                 }
 
-                String display;
-                int minutes = restDurationDisplayable.getMinutes();
-                int seconds = restDurationDisplayable.getSeconds();
+                setDurationDisplay(restDuration);
 
-                if (minutes == 0) {
-                    display = context.getString(R.string.duration_value_seconds, seconds);
-                } else {
-                    display = context.getString(R.string.duration_value, minutes, seconds);
-                }
-                restDurationDisplayable.setDisplay(display);
-
-                exercise.restDuration = restDurationDisplayable.getDuration();
+                exercise.restDuration = restDuration.getDuration();
                 exercise.update();
 
-                getRestDurationSubject().onNext(restDurationDisplayable);
+                restDurationSubject.onNext(restDuration);
                 e.onComplete();
             }
         });
+    }
+
+    public DurationDisplayable getSetDuration() {
+        return setDuration;
+    }
+
+    public BehaviorSubject<DurationDisplayable> getSetDurationSubject() {
+        return setDurationSubject;
+    }
+
+    public Completable setSetDuration(final DurationDisplayable durationDisplayable) {
+        return Completable.create(new CompletableOnSubscribe() {
+            @Override
+            public void subscribe(@NonNull CompletableEmitter e) throws Exception {
+                if (durationDisplayable != null) {
+                    setDuration = durationDisplayable;
+                }
+
+                setDurationDisplay(setDuration);
+
+                exercise.setDuration = setDuration.getDuration();
+                exercise.update();
+
+                setDurationSubject.onNext(setDuration);
+                e.onComplete();
+            }
+        });
+    }
+
+    public void setDurationDisplay(DurationDisplayable durationDisplay) {
+        String display;
+        int minutes = durationDisplay.getMinutes();
+        int seconds = durationDisplay.getSeconds();
+
+        if (minutes == 0) {
+            display = context.getString(R.string.duration_value_seconds, seconds);
+        } else {
+            display = context.getString(R.string.duration_value, minutes, seconds);
+        }
+        durationDisplay.setDisplay(display);
     }
 
 

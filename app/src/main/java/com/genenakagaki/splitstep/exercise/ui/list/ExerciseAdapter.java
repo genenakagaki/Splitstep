@@ -48,7 +48,6 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseViewHolder> {
 
         Exercise exercise = mExercises.get(position);
         holder.setExercise(exercise);
-        holder.mExerciseTextButton.setText(exercise.name);
     }
 
     @Override

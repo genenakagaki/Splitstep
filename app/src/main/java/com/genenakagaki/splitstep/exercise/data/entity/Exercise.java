@@ -18,12 +18,12 @@ public class Exercise extends BaseModel {
 
     @Column public int type;
     @Column public String name;
-    @Column(defaultValue = "1") public int subType;
-    @Column(defaultValue = "1") public int reps;
-    @Column(defaultValue = "1") public int sets;
-    @Column(defaultValue = "1") public int setDuration;
-    @Column(defaultValue = "1") public int restDuration;
-    @Column(defaultValue = "0") public boolean favorite;
+    @Column public int subType;
+    @Column public int sets;
+    @Column public int reps;
+    @Column public int setDuration;
+    @Column public int restDuration;
+    @Column public boolean favorite;
     @Column public String notes;
 
     public Exercise() {}
@@ -31,5 +31,22 @@ public class Exercise extends BaseModel {
     public Exercise(int type, String name) {
         this.type = type;
         this.name = name;
+        subType = 1;
+        sets = 3;
+        reps = 10;
+        setDuration = 30;
+        restDuration = 60;
+        favorite = false;
+    }
+
+    public Exercise(int type, int subType, String name) {
+        this.type = type;
+        this.subType = subType;
+        this.name = name;
+        sets = 3;
+        reps = 10;
+        setDuration = 30;
+        restDuration = 60;
+        favorite = false;
     }
 }

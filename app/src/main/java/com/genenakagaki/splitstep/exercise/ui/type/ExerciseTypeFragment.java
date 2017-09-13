@@ -27,7 +27,6 @@ import timber.log.Timber;
 public class ExerciseTypeFragment extends Fragment {
 
     @BindView(R.id.reps_exercise_button)  Button mRepsButton;
-    @BindView(R.id.timed_sets_exercise_button) Button mTimedSetsButton;
     @BindView(R.id.reaction_exercise_button) Button mReactionButton;
 
     private Unbinder mUnbinder;

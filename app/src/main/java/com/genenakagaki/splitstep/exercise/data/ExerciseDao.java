@@ -42,20 +42,23 @@ public class ExerciseDao {
     }
 
     public Completable insert(final String name, final ExerciseType exerciseType) {
+        return insert(new Exercise(exerciseType.getValue(), name));
+    }
+
+    public Completable insert(final Exercise exercise) {
         return Completable.create(new CompletableOnSubscribe() {
             @Override
             public void subscribe(@NonNull CompletableEmitter e) throws Exception {
-                if (name.length() < 1) {
+                if (exercise.name.length() < 1) {
                     Timber.d("InvalidExerciseNameException");
                     e.onError(new InvalidExerciseNameException());
-                } else if (!isNameAndTypeValid(name, exerciseType)) {
+                } else if (!isNameAndTypeValid(exercise.name, exercise.type)) {
                     Timber.d("ExerciseAlreadyExistsException");
                     e.onError(new ExerciseAlreadyExistsException());
                 } else {
-                    Exercise exercise = new Exercise(exerciseType.getValue(), name);
                     long exerciseId = exercise.insert();
 
-                    if (exerciseType == ExerciseType.REACTION) {
+                    if (exercise.type == ExerciseType.REACTION.getValue()) {
                         new ReactionExercise(exerciseId).insert();
                     }
 
@@ -65,11 +68,11 @@ public class ExerciseDao {
         });
     }
 
-    public boolean isNameAndTypeValid(final String name, final ExerciseType exerciseType) {
+    public boolean isNameAndTypeValid(final String name, final int exerciseType) {
         Exercise exercise = SQLite.select()
                 .from(Exercise.class)
                 .where(Exercise_Table.name.eq(name))
-                .and(Exercise_Table.type.eq(exerciseType.getValue()))
+                .and(Exercise_Table.type.eq(exerciseType))
                 .querySingle();
 
         return exercise == null;
@@ -122,9 +125,7 @@ public class ExerciseDao {
     }
 
     public boolean isColumnsValid(Exercise exercise) {
-        if (exercise.sets < 1) {
-            return false;
-        } else if (exercise.sets == 1 && exercise.restDuration < 1) {
+        if (exercise.sets < 1 || exercise.restDuration < 1) {
             return false;
         }
         switch (ExerciseSubType.fromValue(exercise.subType)) {
@@ -139,7 +140,6 @@ public class ExerciseDao {
                 }
                 break;
         }
-
         return true;
     }
 

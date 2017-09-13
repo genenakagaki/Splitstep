@@ -1,4 +1,4 @@
-package com.genenakagaki.splitstep.exercise.ui.add;
+package com.genenakagaki.splitstep.exercise.ui.list;
 
 
 import android.app.Dialog;
@@ -12,16 +12,18 @@ import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RadioButton;
 
 import com.genenakagaki.splitstep.R;
 import com.genenakagaki.splitstep.exercise.data.ExerciseSharedPref;
+import com.genenakagaki.splitstep.exercise.data.entity.ExerciseSubType;
 import com.genenakagaki.splitstep.exercise.data.exception.ExerciseAlreadyExistsException;
 import com.genenakagaki.splitstep.exercise.data.exception.InvalidExerciseNameException;
-import com.genenakagaki.splitstep.exercise.ui.list.ExerciseListFragment;
 import com.genenakagaki.splitstep.exercise.ui.model.ErrorMessage;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -38,6 +40,8 @@ public class AddExerciseDialog extends DialogFragment {
 
     @BindView(R.id.name_input) TextInputEditText mExerciseNameInput;
     @BindView(R.id.name_inputlayout) TextInputLayout mExerciseNameInputLayout;
+    @BindView(R.id.reps_radiobutton) RadioButton mRepsRadioButton;
+    @BindView(R.id.timed_sets_radiobutton) RadioButton mTimedSetsRadioButton;
 
     private Unbinder mUnbinder;
     private CompositeDisposable mDisposable;
@@ -116,6 +120,18 @@ public class AddExerciseDialog extends DialogFragment {
     public void onDestroyView() {
         super.onDestroyView();
         mUnbinder.unbind();
+    }
+
+    @OnClick(R.id.reps_radiobutton)
+    public void onClickRepsRadioButton() {
+        mRepsRadioButton.setChecked(true);
+        mViewModel.setExerciseSubType(ExerciseSubType.REPS);
+    }
+
+    @OnClick(R.id.timed_sets_radiobutton)
+    public void onClickTimedSetsButton() {
+        mTimedSetsRadioButton.setChecked(true);
+        mViewModel.setExerciseSubType(ExerciseSubType.TIMED_SETS);
     }
 
     public void onSaveButtonClick() {

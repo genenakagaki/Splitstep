@@ -13,6 +13,7 @@
     <string name="seconds">Seconds</string>
     <string name="sets">Sets</string>
     <string name="reps">Reps</string>
+    <string name="cones">Cones</string>
     <string name="rep_duration"></string>
     <string name="set_duration">Set duration</string>
     <string name="rest_duration">Rest duration</string>
@@ -32,6 +33,8 @@
     +++++++++++++++++++++++++++++++++++++++++-->
     <string name="exercise_list_empty">No exercises created yet.</string>
     <string name="delete_exercise_title">Delete this Exercise?</string>
+    <string name="reps_subtype">with Reps</string>
+    <string name="timed_sets_subtype">with Timed Sets</string>
     
     <!-- Add Exercise -->
     <string name="add_exercise_title">Add New Exercise</string>
