@@ -51,10 +51,8 @@ public class ExerciseListViewModel {
 
     public String getTitle() {
         switch (exerciseType) {
-            case REPS:
-                return context.getString(R.string.reps_exercise);
-            case TIMED_SETS:
-                return context.getString(R.string.timed_sets_exercise);
+            case REGULAR:
+                return context.getString(R.string.exercise);
             default: // REACTION:
                 return context.getString(R.string.reaction_exercise);
         }

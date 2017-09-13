@@ -35,19 +35,19 @@ public class ExerciseSharedPrefTest {
 
     @Test
     public void testSetAndGetExerciseType_ShouldReturnSetValue() {
-        ExerciseSharedPref.setExerciseType(mContext, ExerciseType.REPS);
+        ExerciseSharedPref.setExerciseType(mContext, ExerciseType.REGULAR);
 
         ExerciseType exerciseType = ExerciseSharedPref.getExerciseType(mContext);
-        assertEquals(ExerciseType.REPS, exerciseType);
+        assertEquals(ExerciseType.REGULAR, exerciseType);
     }
 
     @Test
     public void testSetExerciseType_WithSetValueReplaced_ShouldReturnNewValue() {
-        ExerciseSharedPref.setExerciseType(mContext, ExerciseType.REPS);
-        ExerciseSharedPref.setExerciseType(mContext, ExerciseType.TIMED_SETS);
+        ExerciseSharedPref.setExerciseType(mContext, ExerciseType.REGULAR);
+        ExerciseSharedPref.setExerciseType(mContext, ExerciseType.REACTION);
 
         ExerciseType exerciseType = ExerciseSharedPref.getExerciseType(mContext);
-        assertEquals(ExerciseType.TIMED_SETS, exerciseType);
+        assertEquals(ExerciseType.REACTION, exerciseType);
     }
 
     @Test

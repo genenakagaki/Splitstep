@@ -28,7 +28,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class ExerciseListViewModelTest {
 
-    private static final Exercise EXERCISE = new Exercise(1, "test", false);
+    private static final Exercise EXERCISE = new Exercise(1, "test");
 
     private Context mContext = InstrumentationRegistry.getTargetContext();
 
@@ -48,20 +48,10 @@ public class ExerciseListViewModelTest {
 
     @Test
     public void testGetTitle_WithRepsExercise_ShouldReturnCorrectTitle() {
-        ExerciseListViewModel viewModel = new ExerciseListViewModel(mContext, ExerciseType.REPS);
+        ExerciseListViewModel viewModel = new ExerciseListViewModel(mContext, ExerciseType.REGULAR);
 
         String title = viewModel.getTitle();
-        String expectedTitle = mContext.getString(R.string.reps_exercise);
-
-        assertEquals(expectedTitle, title);
-    }
-
-    @Test
-    public void testGetTitle_WithTimedSetsExercise_ShouldReturnCorrectTitle() {
-        ExerciseListViewModel viewModel = new ExerciseListViewModel(mContext, ExerciseType.TIMED_SETS);
-
-        String title = viewModel.getTitle();
-        String expectedTitle = mContext.getString(R.string.timed_sets_exercise);
+        String expectedTitle = mContext.getString(R.string.exercise);
 
         assertEquals(expectedTitle, title);
     }
@@ -78,7 +68,7 @@ public class ExerciseListViewModelTest {
 
     @Test
     public void testGetExerciseList_WithNoExercise_SubjectShouldEmitEmptyList() {
-        ExerciseListViewModel viewModel = new ExerciseListViewModel(mContext, ExerciseType.REPS);
+        ExerciseListViewModel viewModel = new ExerciseListViewModel(mContext, ExerciseType.REGULAR);
 
         viewModel.getExerciseList()
                 .test()
@@ -96,7 +86,7 @@ public class ExerciseListViewModelTest {
 
     @Test
     public void testGetExerciseList_WithRepsExercise_SubjectShouldEmitRepsExercises() {
-        ExerciseListViewModel viewModel = new ExerciseListViewModel(mContext, ExerciseType.REPS);
+        ExerciseListViewModel viewModel = new ExerciseListViewModel(mContext, ExerciseType.REGULAR);
 
         String[] repsExerciseNames = {
                 "repsExercise1",
@@ -104,33 +94,7 @@ public class ExerciseListViewModelTest {
                 "repsExercise3"
         };
 
-        DatabaseUtils.insertExercises(repsExerciseNames, ExerciseType.REPS_VALUE, false);
-
-        viewModel.getExerciseList()
-                .test()
-                .assertComplete();
-
-        viewModel.getExercisesSubject()
-                .test()
-                .assertValue(new Predicate<List<Exercise>>() {
-                    @Override
-                    public boolean test(@NonNull List<Exercise> exercises) throws Exception {
-                        return exercises.size() == 3;
-                    }
-                });
-    }
-
-    @Test
-    public void testGetExerciseList_WithTimedSetsExercise_SubjectShouldEmitTimedSetsExercises() {
-        ExerciseListViewModel viewModel = new ExerciseListViewModel(mContext, ExerciseType.TIMED_SETS);
-
-        String[] timedSetsExerciseNames = {
-                "timedSetsExercise1",
-                "timedSetsExercise2",
-                "timedSetsExercise3"
-        };
-
-        DatabaseUtils.insertExercises(timedSetsExerciseNames, ExerciseType.TIMED_SETS_VALUE, false);
+        DatabaseUtils.insertExercises(repsExerciseNames, ExerciseType.REGULAR_VALUE);
 
         viewModel.getExerciseList()
                 .test()
@@ -156,7 +120,7 @@ public class ExerciseListViewModelTest {
                 "reactionExercise3"
         };
 
-        DatabaseUtils.insertExercises(reactionExerciseNames, ExerciseType.REACTION_VALUE, false);
+        DatabaseUtils.insertExercises(reactionExerciseNames, ExerciseType.REACTION_VALUE);
 
         viewModel.getExerciseList()
                 .test()

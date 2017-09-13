@@ -42,7 +42,7 @@ public class AddExerciseViewModel {
         errorMessageSubject.onNext(errorMessage);
     }
 
-    public void setEmptyExerciseNameError() {
+    public void setInvalidExerciseNameError() {
         errorMessage.setValid(false);
         errorMessage.setErrorMessage(context.getString(R.string.error_empty_exercise_name));
         errorMessageSubject.onNext(errorMessage);

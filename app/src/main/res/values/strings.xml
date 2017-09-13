@@ -13,14 +13,15 @@
     <string name="seconds">Seconds</string>
     <string name="sets">Sets</string>
     <string name="reps">Reps</string>
+    <string name="rep_duration"></string>
     <string name="set_duration">Set duration</string>
     <string name="rest_duration">Rest duration</string>
 
     <!--++++++++++++++++++++++++++++++++++++++++
             Exercise Type
     +++++++++++++++++++++++++++++++++++++++++-->
-    <string name="reps_exercise">Exercise with Reps</string>
-    <string name="reps_exercise_short">with Reps</string>
+    <string name="exercise">Regular Exercise</string>
+    <string name="exercise_short">Regular</string>
     <string name="timed_sets_exercise">Exercise with Timed Sets</string>
     <string name="timed_sets_exercise_short">with Timed Sets</string>
     <string name="reaction_exercise">Reaction Exercise</string>

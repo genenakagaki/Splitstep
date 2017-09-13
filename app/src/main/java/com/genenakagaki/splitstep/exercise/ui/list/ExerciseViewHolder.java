@@ -18,7 +18,6 @@ import com.genenakagaki.splitstep.exercise.ui.ExerciseActivity;
 import com.genenakagaki.splitstep.exercise.ui.detail.ExerciseDetailFragment;
 import com.genenakagaki.splitstep.exercise.ui.detail.ReactionExerciseDetailFragment;
 import com.genenakagaki.splitstep.exercise.ui.detail.RepsExerciseDetailFragment;
-import com.genenakagaki.splitstep.exercise.ui.detail.TimedSetsExerciseDetailFragment;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -102,13 +101,8 @@ public class ExerciseViewHolder extends RecyclerView.ViewHolder {
         ExerciseSharedPref.setExerciseId(mContext, mListItemViewModel.getExercise().id);
 
         switch (ExerciseSharedPref.getExerciseType(mContext)) {
-            case REPS:
-                activity.showFragment(new RepsExerciseDetailFragment(),
-                        ExerciseDetailFragment.class.getSimpleName(),
-                        true);
-                break;
-            case TIMED_SETS:
-                activity.showFragment(new TimedSetsExerciseDetailFragment(),
+            case REGULAR:
+                activity.showFragment(new ExerciseDetailFragment(),
                         ExerciseDetailFragment.class.getSimpleName(),
                         true);
                 break;

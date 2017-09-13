@@ -31,7 +31,13 @@ public class NumberInputViewModel {
     }
 
     public void setNumber(int number) {
-        this.number = number;
+        if (number > max) {
+            number = max;
+        } else if (number < min) {
+            number = min;
+        } else {
+            this.number = number;
+        }
         numberSubject.onNext(number);
     }
 

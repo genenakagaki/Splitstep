@@ -27,7 +27,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(AndroidJUnit4.class)
 public class ExerciseTest {
 
-    private static final Exercise EXERCISE = new Exercise(1, "test", false);
+    private static final Exercise EXERCISE = new Exercise(ExerciseType.REGULAR_VALUE, "test");
 
     @Before
     public void setUp() throws Exception {
@@ -67,7 +67,7 @@ public class ExerciseTest {
 
     @Test
     public void testUpdateExercise_ShouldBeUpdated() {
-        final Exercise exerciseToUpdate = new Exercise(1, "test", false);
+        final Exercise exerciseToUpdate = new Exercise(1, "test");
         String newName = "new";
 
         exerciseToUpdate.insert();
@@ -96,8 +96,21 @@ public class ExerciseTest {
     }
 
     private boolean isExerciseEqual(Exercise e1, Exercise e2) {
+        if (e1.notes == null) {
+            if (e1.notes != e2.notes) {
+                return false;
+            }
+        } else if (e1.notes != null) {
+            if (e1.notes.equals(e2.notes));
+        }
+
         return e1.type == e2.type
                 && e1.favorite == e2.favorite
-                && e1.name.equals(e2.name);
+                && e1.name.equals(e2.name)
+                && e1.subType == e2.subType
+                && e1.sets == e2.sets
+                && e1.reps == e2.reps
+                && e1.setDuration == e2.setDuration
+                && e1.restDuration == e2.restDuration;
     }
 }

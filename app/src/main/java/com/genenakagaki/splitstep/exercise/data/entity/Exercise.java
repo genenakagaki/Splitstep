@@ -13,26 +13,23 @@ import com.raizlabs.android.dbflow.structure.BaseModel;
 @Table(database = ExerciseDatabase.class)
 public class Exercise extends BaseModel {
 
-    public static final String TABLE_NAME = "exercise";
-    public static final String COLUMN_ID = "id";
-    public static final String COLUMN_TYPE = "type";
-    public static final String COLUMN_NAME = "name";
-    public static final String COLUMN_FAVORITE = "favorite";
-
     @PrimaryKey(autoincrement = true)
     public long id;
 
     @Column public int type;
     @Column public String name;
-
-    @Column(defaultValue = "0")
-    public boolean favorite;
+    @Column(defaultValue = "1") public int subType;
+    @Column(defaultValue = "1") public int reps;
+    @Column(defaultValue = "1") public int sets;
+    @Column(defaultValue = "1") public int setDuration;
+    @Column(defaultValue = "1") public int restDuration;
+    @Column(defaultValue = "0") public boolean favorite;
+    @Column public String notes;
 
     public Exercise() {}
 
-    public Exercise(int type, String name, boolean favorite) {
+    public Exercise(int type, String name) {
         this.type = type;
         this.name = name;
-        this.favorite = favorite;
     }
 }

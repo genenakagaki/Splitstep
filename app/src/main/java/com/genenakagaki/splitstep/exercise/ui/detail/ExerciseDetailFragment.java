@@ -6,13 +6,15 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageSwitcher;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.ViewSwitcher;
 
 import com.genenakagaki.splitstep.R;
 import com.genenakagaki.splitstep.exercise.data.ExerciseSharedPref;
 import com.genenakagaki.splitstep.exercise.data.entity.Exercise;
-import com.genenakagaki.splitstep.exercise.ui.ExerciseActivity;
 import com.genenakagaki.splitstep.exercise.ui.model.DurationDisplayable;
 import com.genenakagaki.splitstep.exercise.ui.view.NumberInput;
 
@@ -29,10 +31,13 @@ import timber.log.Timber;
  * Created by Gene on 9/8/2017.
  */
 
-public abstract class ExerciseDetailFragment extends Fragment implements ExerciseActivity.OnBackPressedListener {
+public class ExerciseDetailFragment extends Fragment
+        implements NumberInput.OnInputChangedListener {
 
     @BindView(R.id.exercise_name_textview)
     TextView mExerciseNameTextView;
+    @BindView(R.id.favorite_imageswitcher)
+    ImageSwitcher mFavoriteImageSwitcher;
     @BindView(R.id.sets_numberinput)
     NumberInput mSetsNumberInput;
     @BindView(R.id.reps_numberinput) NumberInput mRepsNumberInput;
@@ -52,12 +57,8 @@ public abstract class ExerciseDetailFragment extends Fragment implements Exercis
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ExerciseActivity activity = (ExerciseActivity) getActivity();
-        activity.setOnBackPressedListener(this);
-
         long exerciseId = ExerciseSharedPref.getExerciseId(getActivity());
         mViewModel = new ExerciseDetailViewModel(getActivity(), exerciseId);
-        createViewModel(exerciseId);
     }
 
     @Nullable
@@ -67,11 +68,16 @@ public abstract class ExerciseDetailFragment extends Fragment implements Exercis
         View view = inflater.inflate(R.layout.fragment_exercise_detail, container, false);
         mUnbinder = ButterKnife.bind(this, view);
 
-        if (mRepsNumberInput == null) {
-            Timber.d("number input is null");
-        } else {
-            Timber.d("number input is not null");
-        }
+        mFavoriteImageSwitcher.setFactory(new ViewSwitcher.ViewFactory() {
+            @Override
+            public View makeView() {
+                ImageView switcherImageView = new ImageView(getActivity());
+                switcherImageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                switcherImageView.setLayoutParams(new ImageSwitcher.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+                return switcherImageView;
+            }
+        });
 
         return view;
     }
@@ -88,6 +94,11 @@ public abstract class ExerciseDetailFragment extends Fragment implements Exercis
                     @Override
                     public void accept(Exercise exercise) throws Exception {
                         mExerciseNameTextView.setText(exercise.name);
+                        if (exercise.favorite) {
+                            mFavoriteImageSwitcher.setImageResource(R.drawable.ic_star);
+                        } else {
+                            mFavoriteImageSwitcher.setImageResource(R.drawable.ic_star_border);
+                        }
                     }
                 }));
         mDisposable.add(mViewModel.setExercise()
@@ -111,11 +122,52 @@ public abstract class ExerciseDetailFragment extends Fragment implements Exercis
         mUnbinder.unbind();
     }
 
+    @Override
+    public void onInputChanged(View view, int number) {
+        Timber.d("onInputChanged " + number);
+        if (view.getId() == mRepsNumberInput.getId()) {
+            Timber.d("reps");
+            mViewModel.setReps(number)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.computation())
+                    .subscribe();
+        } else if (view.getId() == mSetsNumberInput.getId()) {
+            Timber.d("sets");
+            mViewModel.setSets(number)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.computation())
+                    .subscribe();
+        }
+    }
+
     public CompositeDisposable getDisposable() {
         return mDisposable;
     }
 
-    public abstract void createViewModel(long exerciseId);
-    public abstract void setDuration(DurationDisplayable durationDisplayable);
-    public abstract void startCoachFragment();
+    public void setDuration(DurationDisplayable durationDisplayable) {
+        mDisposable.add(mViewModel.setRestDuration(durationDisplayable)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.computation())
+                .subscribe());
+    }
+
+    public void startCoachFragment() {
+//        RegularExercise repsExercise = new RegularExercise(mViewModel.getExerciseId());
+//        repsExercise.reps = mRepsNumberInput.getNumber();
+//        repsExercise.sets = mSetsNumberInput.getNumber();
+//        repsExercise.restDuration = mViewModel.getDuration(mRestDurationTextView.getText().toString());
+
+//        mDisposable.add(getViewModel().updateRepsExercise(repsExercise)
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribeOn(Schedulers.computation())
+//                .subscribe(new Action() {
+//                    @Override
+//                    public void run() throws Exception {
+//                        ((MainActivity)getActivity()).showFragment(
+//                                new RepsCoachFragment(), RepsCoachFragment.class.getSimpleName(), true);
+//                    }
+//                }));
+    }
+
+
 }

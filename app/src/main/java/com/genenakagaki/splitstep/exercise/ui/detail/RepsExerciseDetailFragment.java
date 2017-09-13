@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.genenakagaki.splitstep.R;
-import com.genenakagaki.splitstep.exercise.data.entity.RepsExercise;
+import com.genenakagaki.splitstep.exercise.data.entity.RegularExercise;
 import com.genenakagaki.splitstep.exercise.ui.model.DurationDisplayable;
 
 import butterknife.OnClick;
@@ -27,10 +27,10 @@ public class RepsExerciseDetailFragment extends ExerciseDetailFragment {
     public RepsExerciseDetailFragment() {
     }
 
-    @Override
-    public void createViewModel(long exerciseId) {
-        mViewModel = new RepsExerciseDetailViewModel(getActivity(), exerciseId);
-    }
+//    @Override
+//    public void createViewModel(long exerciseId) {
+//        mViewModel = new RepsExerciseDetailViewModel(getActivity(), exerciseId);
+//    }
 
     @Nullable
     @Override
@@ -40,6 +40,9 @@ public class RepsExerciseDetailFragment extends ExerciseDetailFragment {
 
         mSetDurationLayout.setVisibility(View.GONE);
 
+        mRepsNumberInput.setOnInputChangedListener(this);
+        mSetsNumberInput.setOnInputChangedListener(this);
+
         return view;
     }
 
@@ -48,12 +51,12 @@ public class RepsExerciseDetailFragment extends ExerciseDetailFragment {
         super.onResume();
         getDisposable().add(mViewModel.getRepsExerciseSubject()
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.computation())
-                .subscribe(new Consumer<RepsExercise>() {
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Consumer<RegularExercise>() {
                     @Override
-                    public void accept(RepsExercise repsExercise) throws Exception {
-                        mSetsNumberInput.setNumber(repsExercise.sets);
-                        mRepsNumberInput.setNumber(repsExercise.reps);
+                    public void accept(RegularExercise regularExercise) throws Exception {
+                        mSetsNumberInput.setNumber(regularExercise.sets);
+                        mRepsNumberInput.setNumber(regularExercise.reps);
                     }
                 }));
 
@@ -82,12 +85,15 @@ public class RepsExerciseDetailFragment extends ExerciseDetailFragment {
 
     @Override
     public void setDuration(DurationDisplayable durationDisplayable) {
-        mViewModel.setRestDuration(durationDisplayable);
+        mViewModel.setRestDuration(durationDisplayable)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.computation())
+                .subscribe();
     }
 
     @Override
     public void startCoachFragment() {
-//        RepsExercise repsExercise = new RepsExercise(mViewModel.getExerciseId());
+//        RegularExercise repsExercise = new RegularExercise(mViewModel.getExerciseId());
 //        repsExercise.reps = mRepsNumberInput.getNumber();
 //        repsExercise.sets = mSetsNumberInput.getNumber();
 //        repsExercise.restDuration = mViewModel.getDuration(mRestDurationTextView.getText().toString());
@@ -105,16 +111,20 @@ public class RepsExerciseDetailFragment extends ExerciseDetailFragment {
     }
 
     @Override
-    public void onBackPressed() {
-        Timber.d("onBackPressed");
-
-        RepsExercise repsExercise = new RepsExercise();
-        repsExercise.reps = mRepsNumberInput.getNumber();
-        repsExercise.sets = mSetsNumberInput.getNumber();
-        repsExercise.restDuration = mViewModel.getRestDurationDisplayable().getDuration();
-        getDisposable().add(mViewModel.setRepsExercise(repsExercise)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.computation())
-                .subscribe());
+    public void onInputChanged(View view, int number) {
+        Timber.d("onInputChanged " + number);
+        if (view.getId() == mRepsNumberInput.getId()) {
+            Timber.d("reps");
+            mViewModel.setReps(number)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.computation())
+                    .subscribe();
+        } else if (view.getId() == mSetsNumberInput.getId()) {
+            Timber.d("sets");
+            mViewModel.setSets(number)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.computation())
+                    .subscribe();
+        }
     }
 }

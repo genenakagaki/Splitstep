@@ -16,7 +16,7 @@ import android.widget.Button;
 import com.genenakagaki.splitstep.R;
 import com.genenakagaki.splitstep.exercise.data.ExerciseSharedPref;
 import com.genenakagaki.splitstep.exercise.data.exception.ExerciseAlreadyExistsException;
-import com.genenakagaki.splitstep.exercise.data.exception.InvalidExerciseColumnException;
+import com.genenakagaki.splitstep.exercise.data.exception.InvalidExerciseNameException;
 import com.genenakagaki.splitstep.exercise.ui.list.ExerciseListFragment;
 import com.genenakagaki.splitstep.exercise.ui.model.ErrorMessage;
 
@@ -132,8 +132,8 @@ public class AddExerciseDialog extends DialogFragment {
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
-                        if (throwable instanceof InvalidExerciseColumnException) {
-                            mViewModel.setEmptyExerciseNameError();
+                        if (throwable instanceof InvalidExerciseNameException) {
+                            mViewModel.setInvalidExerciseNameError();
                         } else if (throwable instanceof ExerciseAlreadyExistsException) {
                             mViewModel.setExerciseAlreadyExistsError();
                         }

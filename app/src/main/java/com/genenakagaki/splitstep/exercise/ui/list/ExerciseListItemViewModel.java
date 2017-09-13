@@ -52,17 +52,15 @@ public class ExerciseListItemViewModel {
         String exerciseTypeString;
 
         switch (mExercise.type) {
-            case ExerciseType.REPS_VALUE:
-                exerciseTypeString = mContext.getString(R.string.reps_exercise_short);
-                break;
-            case ExerciseType.TIMED_SETS_VALUE:
-                exerciseTypeString = mContext.getString(R.string.timed_sets_exercise_short);
+            case ExerciseType.REGULAR_VALUE:
+                exerciseTypeString = mContext.getString(R.string.exercise_short);
                 break;
             default: // REACTION:
                 exerciseTypeString = mContext.getString(R.string.reaction_exercise_short);
         }
 
         return mExercise.name + " (" + exerciseTypeString + ")";
+
     }
 
 }

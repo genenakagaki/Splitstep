@@ -48,7 +48,7 @@ public class ExerciseListItemViewModelTest {
 
     @Test
     public void testToggleExerciseFavorite_WithNonFavoriteExercise_ShouldBecomeFavorite() {
-        Exercise exercise = new Exercise(ExerciseType.REPS_VALUE, "exercise", false);
+        Exercise exercise = new Exercise(ExerciseType.REGULAR_VALUE, "exercise");
         exercise.insert();
 
         ExerciseListItemViewModel viewModel = new ExerciseListItemViewModel(mContext, exercise);
@@ -67,7 +67,8 @@ public class ExerciseListItemViewModelTest {
 
     @Test
     public void testToggleExerciseFavorite_WithFavoriteExercise_ShouldBecomeNonFavorite() {
-        Exercise exercise = new Exercise(ExerciseType.REPS_VALUE, "exercise", true);
+        Exercise exercise = new Exercise(ExerciseType.REGULAR_VALUE, "exercise");
+        exercise.favorite = true;
         exercise.insert();
 
         ExerciseListItemViewModel viewModel = new ExerciseListItemViewModel(mContext, exercise);
@@ -86,7 +87,8 @@ public class ExerciseListItemViewModelTest {
 
     @Test
     public void testExerciseSubject_ShouldEmitOnToggleExerciseFavorite() {
-        final Exercise exercise = new Exercise(ExerciseType.REPS_VALUE, "exercise", true);
+        final Exercise exercise = new Exercise(ExerciseType.REGULAR_VALUE, "exercise");
+        exercise.favorite = true;
         exercise.insert();
 
         ExerciseListItemViewModel viewModel = new ExerciseListItemViewModel(mContext, exercise);
@@ -110,7 +112,7 @@ public class ExerciseListItemViewModelTest {
     @Test
     public void testGetDeleteMessage_WithRepsExercise_ShouldReturnCorrectMessage() {
         String exerciseName = "exercise name";
-        Exercise exercise = new Exercise(ExerciseType.REPS_VALUE, exerciseName, false);
+        Exercise exercise = new Exercise(ExerciseType.REGULAR_VALUE, exerciseName);
 
         ExerciseListItemViewModel viewModel = new ExerciseListItemViewModel(mContext, exercise);
 
@@ -121,22 +123,9 @@ public class ExerciseListItemViewModelTest {
     }
 
     @Test
-    public void testGetDeleteMessage_WithTimedSetsExercise_ShouldReturnCorrectMessage() {
-        String exerciseName = "exercise name";
-        Exercise exercise = new Exercise(ExerciseType.TIMED_SETS_VALUE, exerciseName, false);
-
-        ExerciseListItemViewModel viewModel = new ExerciseListItemViewModel(mContext, exercise);
-
-        String deleteMessage = viewModel.getDeleteMessage();
-        String expectedMessage = "exercise name (with Timed Sets)";
-
-        assertEquals(expectedMessage, deleteMessage);
-    }
-
-    @Test
     public void testGetDeleteMessage_WithReactionExercise_ShouldReturnCorrectMessage() {
         String exerciseName = "exercise name";
-        Exercise exercise = new Exercise(ExerciseType.REACTION_VALUE, exerciseName, false);
+        Exercise exercise = new Exercise(ExerciseType.REACTION_VALUE, exerciseName);
 
         ExerciseListItemViewModel viewModel = new ExerciseListItemViewModel(mContext, exercise);
 

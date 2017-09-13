@@ -8,9 +8,9 @@ import com.genenakagaki.splitstep.exercise.data.entity.Exercise;
 
 public class DatabaseUtils {
 
-    public static void insertExercises(String[] names, int type, boolean favorite) {
+    public static void insertExercises(String[] names, int type) {
         for (String name: names) {
-            new Exercise(type, name, favorite).insert();
+            new Exercise(type, name).insert();
         }
     }
 }

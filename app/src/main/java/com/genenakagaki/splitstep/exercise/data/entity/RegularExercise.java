@@ -13,31 +13,27 @@ import com.raizlabs.android.dbflow.structure.BaseModel;
  */
 
 @Table(database = ExerciseDatabase.class)
-public class RepsExercise extends BaseModel {
-
-    public static final String TABLE_NAME = "reps_exercise";
-    public static final String COLUMN_ID = "id";
-    public static final String COLUMN_REPS = "reps";
-    public static final String COLUMN_SETS = "sets";
-    public static final String COLUMN_REST_DURATION = "rest_duration";
+public class RegularExercise extends BaseModel {
 
     @PrimaryKey
     @ForeignKey(tableClass = Exercise.class,
             references = {@ForeignKeyReference(columnName = "id", foreignKeyColumnName = "id")})
     public long id;
 
+    @Column(defaultValue = "1") public int subType;
     @Column(defaultValue = "1") public int reps;
     @Column(defaultValue = "1") public int sets;
     @Column(defaultValue = "1") public int restDuration;
 
-    public RepsExercise() {}
+    public RegularExercise() {}
 
-    public RepsExercise(long id) {
+    public RegularExercise(long id) {
         this.id = id;
     }
 
-    public RepsExercise(long id, int reps, int sets, int restDuration) {
+    public RegularExercise(long id, int subType, int reps, int sets, int restDuration) {
         this.id = id;
+        this.subType = subType;
         this.reps = reps;
         this.sets = sets;
         this.restDuration = restDuration;

@@ -1,5 +1,7 @@
 package com.genenakagaki.splitstep.exercise.ui.detail;
 
+import android.view.View;
+
 import com.genenakagaki.splitstep.exercise.ui.model.DurationDisplayable;
 
 import io.reactivex.disposables.CompositeDisposable;
@@ -45,10 +47,10 @@ public class TimedSetsExerciseDetailFragment extends ExerciseDetailFragment {
         }
     }
 
-    @Override
-    public void createViewModel(long exerciseId) {
-
-    }
+//    @Override
+//    public void createViewModel(long exerciseId) {
+//
+//    }
 
     @Override
     public void startCoachFragment() {
@@ -70,7 +72,7 @@ public class TimedSetsExerciseDetailFragment extends ExerciseDetailFragment {
     }
 
     @Override
-    public void onBackPressed() {
+    public void onInputChanged(View view, int number) {
 
     }
 }

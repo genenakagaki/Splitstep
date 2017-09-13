@@ -60,20 +60,14 @@ public class ExerciseTypeFragment extends Fragment {
         mUnbinder.unbind();
     }
 
-    @OnClick({ R.id.reps_exercise_button, R.id.timed_sets_exercise_button, R.id.reaction_exercise_button })
+    @OnClick({ R.id.reps_exercise_button, R.id.reaction_exercise_button })
     public void onButtonClick(View view) {
-        switch (view.getId()) {
-            case R.id.reps_exercise_button:
-                Timber.d("onClick on reps exercise");
-                ExerciseSharedPref.setExerciseType(getActivity(), ExerciseType.REPS);
-                break;
-            case R.id.timed_sets_exercise_button:
-                Timber.d("onClick on timed sets exercise");
-                ExerciseSharedPref.setExerciseType(getActivity(), ExerciseType.TIMED_SETS);
-                break;
-            default: //TimedExerciseDao.id.reaction_exercise_button:
-                Timber.d("onClick on reaction exercise");
-                ExerciseSharedPref.setExerciseType(getActivity(), ExerciseType.REACTION);
+        if (view.getId() == R.id.reps_exercise_button) {
+            Timber.d("onClick on reps exercise");
+            ExerciseSharedPref.setExerciseType(getActivity(), ExerciseType.REGULAR);
+        } else { // R.id.reaction_exercise_button
+            Timber.d("onClick on reaction exercise");
+            ExerciseSharedPref.setExerciseType(getActivity(), ExerciseType.REACTION);
         }
 
         ExerciseActivity activity = (ExerciseActivity) getActivity();

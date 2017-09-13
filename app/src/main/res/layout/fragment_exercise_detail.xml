@@ -13,11 +13,23 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/exercise_name_textview"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="24sp"/>
+            android:orientation="horizontal">
+
+            <ImageSwitcher
+                android:id="@+id/favorite_imageswitcher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingRight="@dimen/list_item_padding"/>
+
+            <TextView
+                android:id="@+id/exercise_name_textview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="24sp"/>
+        </LinearLayout>
 
         <com.genenakagaki.splitstep.exercise.ui.view.NumberInput
             android:id="@+id/sets_numberinput"
@@ -30,6 +42,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:label="@string/reps"/>
+
+        <com.genenakagaki.splitstep.exercise.ui.view.NumberInput
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:label="string/"/>
 
         <LinearLayout
             android:id="@+id/set_duration_layout"

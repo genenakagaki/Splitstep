@@ -16,24 +16,13 @@ import com.raizlabs.android.dbflow.structure.BaseModel;
 @Table(database = ExerciseDatabase.class)
 public class ReactionExercise extends BaseModel {
 
-    public static final String TABLE_NAME = "reaction_exercise";
-    public static final String COLUMN_ID = "id";
-    public static final String COLUMN_REPS = "reps";
-    public static final String COLUMN_SETS = "sets";
-    public static final String COLUMN_CONES = "cones";
-    public static final String COLUMN_REP_DURATION = "rep_duration";
-    public static final String COLUMN_REST_DURATION = "rest_duration";
-
     @PrimaryKey
     @ForeignKey(tableClass = Exercise.class,
             references = {@ForeignKeyReference(columnName = "id", foreignKeyColumnName = "id")})
     public long id;
 
-    @Column(defaultValue = "1") public int reps;
-    @Column(defaultValue = "1") public int sets;
     @Column(defaultValue = "1") public int cones;
     @Column(defaultValue = "1") public int repDuration;
-    @Column(defaultValue = "1") public int restDuration;
 
     public ReactionExercise() {}
 
@@ -41,13 +30,10 @@ public class ReactionExercise extends BaseModel {
         this.id = id;
     }
 
-    public ReactionExercise(long id, int reps, int sets, int cones, int repDuration, int restDuration) {
+    public ReactionExercise(long id, int cones, int repDuration) {
         this.id = id;
-        this.reps = reps;
-        this.sets = sets;
         this.cones = cones;
         this.repDuration = repDuration;
-        this.restDuration = restDuration;
     }
 }
 

@@ -28,7 +28,7 @@ import io.reactivex.functions.Predicate;
 @RunWith(AndroidJUnit4.class)
 public class AddExerciseViewModelTest {
 
-    private static final Exercise EXERCISE = new Exercise(1, "test", false);
+    private static final Exercise EXERCISE = new Exercise(1, "test");
 
     private Context mContext = InstrumentationRegistry.getTargetContext();
 
@@ -48,7 +48,7 @@ public class AddExerciseViewModelTest {
 
     @Test
     public void testSetExerciseAlreadyExistsError_ShouldShowErrorCorrectly() {
-        AddExerciseViewModel viewModel = new AddExerciseViewModel(mContext, ExerciseType.REPS);
+        AddExerciseViewModel viewModel = new AddExerciseViewModel(mContext, ExerciseType.REGULAR);
 
         viewModel.setExerciseAlreadyExistsError();
 
@@ -65,9 +65,9 @@ public class AddExerciseViewModelTest {
 
     @Test
     public void testSetEmptyExerciseNameError_ShouldShowErrorCorrectly() {
-        AddExerciseViewModel viewModel = new AddExerciseViewModel(mContext, ExerciseType.REPS);
+        AddExerciseViewModel viewModel = new AddExerciseViewModel(mContext, ExerciseType.REGULAR);
 
-        viewModel.setEmptyExerciseNameError();
+        viewModel.setInvalidExerciseNameError();
 
         viewModel.getErrorMessageSubject()
                 .test()
@@ -82,13 +82,13 @@ public class AddExerciseViewModelTest {
 
 //    @Test
 //
-//    public void setEmptyExerciseNameError() {
+//    public void setInvalidExerciseNameError() {
 //
 //    }
 //
 //    @Test
 //    public void testValidateExerciseName_WithEmptyString_ShouldBeInvalid() {
-//        AddExerciseViewModel viewModel = new AddExerciseViewModel(mContext, ExerciseType.REPS);
+//        AddExerciseViewModel viewModel = new AddExerciseViewModel(mContext, ExerciseType.REGULAR);
 //
 //        viewModel.validateExerciseNameSingle("")
 //                .test()
@@ -103,7 +103,7 @@ public class AddExerciseViewModelTest {
 //
 //    @Test
 //    public void testValidateExerciseName_WithExistingNameAndType_ShouldBeInvalid() {
-//        AddExerciseViewModel viewModel = new AddExerciseViewModel(mContext, ExerciseType.REPS);
+//        AddExerciseViewModel viewModel = new AddExerciseViewModel(mContext, ExerciseType.REGULAR);
 //
 //        String[] exerciseNames = new String[] {
 //                "Exercise1",
@@ -111,7 +111,7 @@ public class AddExerciseViewModelTest {
 //                "Exercise3"
 //        };
 //
-//        DatabaseUtils.insertExercises(exerciseNames, ExerciseType.REPS_VALUE, false);
+//        DatabaseUtils.insertExercises(exerciseNames, ExerciseType.REGULAR_VALUE, false);
 //
 //        viewModel.validateExerciseNameSingle("Exercise1")
 //                .test()
@@ -127,7 +127,7 @@ public class AddExerciseViewModelTest {
 //
 //    @Test
 //    public void testValidateExerciseName_WithUniqueName_ShouldBeValid() {
-//        AddExerciseViewModel viewModel = new AddExerciseViewModel(mContext, ExerciseType.REPS);
+//        AddExerciseViewModel viewModel = new AddExerciseViewModel(mContext, ExerciseType.REGULAR);
 //
 //        viewModel.validateExerciseNameSingle("Exercise1")
 //                .test()
@@ -141,7 +141,7 @@ public class AddExerciseViewModelTest {
 //
 //    @Test
 //    public void testValidExerciseName_WithExistingNameOfDifferentType_ShouldBeValid() {
-//        AddExerciseViewModel viewModel = new AddExerciseViewModel(mContext, ExerciseType.REPS);
+//        AddExerciseViewModel viewModel = new AddExerciseViewModel(mContext, ExerciseType.REGULAR);
 //
 //        String[] exerciseNames = new String[] {
 //                "Exercise1",
@@ -164,7 +164,7 @@ public class AddExerciseViewModelTest {
 //
 //    @Test
 //    public void testInsertExercise_WithRepsExercise_ShouldBeInserted() {
-//        AddExerciseViewModel viewModel = new AddExerciseViewModel(mContext, ExerciseType.REPS);
+//        AddExerciseViewModel viewModel = new AddExerciseViewModel(mContext, ExerciseType.REGULAR);
 //
 //        String newName = "Exercise1";
 //        viewModel.insertExerciseCompletable(newName)
@@ -175,12 +175,12 @@ public class AddExerciseViewModelTest {
 //                .from(Exercise.class)
 //                .queryList().get(0);
 //
-//        RepsExercise repsExercise = SQLite.select()
-//                .from(RepsExercise.class)
+//        RegularExercise repsExercise = SQLite.select()
+//                .from(RegularExercise.class)
 //                .queryList().get(0);
 //
 //        assertEquals(newName, exercise.name);
-//        assertEquals(ExerciseType.REPS_VALUE, exercise.type);
+//        assertEquals(ExerciseType.REGULAR_VALUE, exercise.type);
 //        assertEquals(exercise.id, repsExercise.id);
 //    }
 //

@@ -2,8 +2,11 @@ package com.genenakagaki.splitstep.exercise.ui.view;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -24,25 +27,19 @@ import timber.log.Timber;
  * Created by Gene on 9/8/2017.
  */
 
-public class NumberInput extends FrameLayout {
+public class NumberInput extends FrameLayout implements TextWatcher {
 
-    @BindView(R.id.input)
-    EditText mInput;
-    @BindView(R.id.label_textview)
-    TextView mLabelTextView;
+    public interface OnInputChangedListener {
+        void onInputChanged(View view, int number);
+    }
+
+    @BindView(R.id.input) EditText mInput;
+    @BindView(R.id.label_textview) TextView mLabelTextView;
 
     private Unbinder mUnbinder;
     private CompositeDisposable mDisposable;
     private NumberInputViewModel mViewModel;
-
-    public NumberInput(Context context) {
-        super(context);
-
-        mViewModel = new NumberInputViewModel();
-
-        LayoutInflater.from(context).inflate(R.layout.number_input, this);
-        mUnbinder = ButterKnife.bind(this);
-    }
+    private OnInputChangedListener mOnInputChangedListener;
 
     public NumberInput(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -50,6 +47,8 @@ public class NumberInput extends FrameLayout {
 
         LayoutInflater.from(context).inflate(R.layout.number_input, this);
         mUnbinder = ButterKnife.bind(this);
+
+        mInput.addTextChangedListener(this);
 
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.NumberInput);
         Timber.d(typedArray.getString(R.styleable.NumberInput_label));
@@ -90,6 +89,19 @@ public class NumberInput extends FrameLayout {
         mUnbinder.unbind();
     }
 
+    @Override
+    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+    @Override
+    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        if (mOnInputChangedListener != null) {
+            mOnInputChangedListener.onInputChanged(this, Integer.parseInt(charSequence.toString()));
+        }
+    }
+
+    @Override
+    public void afterTextChanged(Editable editable) {}
+
     @OnClick(R.id.plus_button)
     public void onClickPlusButton() {
         mViewModel.incrementNumber();
@@ -107,4 +119,10 @@ public class NumberInput extends FrameLayout {
     public void setNumber(int number) {
         mViewModel.setNumber(number);
     }
+
+    public void setOnInputChangedListener(OnInputChangedListener listener) {
+        mOnInputChangedListener = listener;
+    }
+
+
 }

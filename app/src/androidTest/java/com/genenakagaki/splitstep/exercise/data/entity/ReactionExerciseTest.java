@@ -27,7 +27,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(AndroidJUnit4.class)
 public class ReactionExerciseTest {
 
-    private static final ReactionExercise REACTION_EXERCISE = new ReactionExercise(1, 1, 1, 1, 1, 1);
+    private static final ReactionExercise REACTION_EXERCISE = new ReactionExercise(1, 1, 1);
 
     @Before
     public void setUp() throws Exception {
@@ -67,14 +67,11 @@ public class ReactionExerciseTest {
 
     @Test
     public void testUpdateReactionExercise_ShouldBeUpdated() {
-        final ReactionExercise exerciseToUpdate = new ReactionExercise(1, 1, 1, 1, 1, 1);
+        final ReactionExercise exerciseToUpdate = new ReactionExercise(1, 1, 1);
 
         exerciseToUpdate.insert();
-        exerciseToUpdate.reps = 2;
-        exerciseToUpdate.sets = 2;
         exerciseToUpdate.cones = 2;
         exerciseToUpdate.repDuration = 2;
-        exerciseToUpdate.restDuration = 2;
         exerciseToUpdate.update();
 
         List<ReactionExercise> exercises = SQLite.select()
@@ -97,11 +94,8 @@ public class ReactionExerciseTest {
     }
 
     private boolean isExerciseEqual(ReactionExercise r1, ReactionExercise r2) {
-        return r1.reps == r2.reps
-                && r1.sets == r2.sets
-                && r1.cones == r2.cones
-                && r1.repDuration == r2.repDuration
-                && r1.restDuration == r2.restDuration;
+        return r1.cones == r2.cones
+                && r1.repDuration == r2.repDuration;
     }
 
 }

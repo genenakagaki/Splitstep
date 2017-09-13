@@ -1,17 +1,15 @@
 package com.genenakagaki.splitstep.exercise.data;
 
 import com.genenakagaki.splitstep.exercise.data.entity.Exercise;
+import com.genenakagaki.splitstep.exercise.data.entity.ExerciseSubType;
 import com.genenakagaki.splitstep.exercise.data.entity.ExerciseType;
 import com.genenakagaki.splitstep.exercise.data.entity.Exercise_Table;
 import com.genenakagaki.splitstep.exercise.data.entity.ReactionExercise;
 import com.genenakagaki.splitstep.exercise.data.entity.ReactionExercise_Table;
-import com.genenakagaki.splitstep.exercise.data.entity.RepsExercise;
-import com.genenakagaki.splitstep.exercise.data.entity.RepsExercise_Table;
-import com.genenakagaki.splitstep.exercise.data.entity.TimedSetsExercise;
-import com.genenakagaki.splitstep.exercise.data.entity.TimedSetsExercise_Table;
 import com.genenakagaki.splitstep.exercise.data.exception.ExerciseAlreadyExistsException;
 import com.genenakagaki.splitstep.exercise.data.exception.ExerciseNotFoundException;
-import com.genenakagaki.splitstep.exercise.data.exception.InvalidExerciseColumnException;
+import com.genenakagaki.splitstep.exercise.data.exception.InvalidExerciseColumnsException;
+import com.genenakagaki.splitstep.exercise.data.exception.InvalidExerciseNameException;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 
 import java.util.List;
@@ -40,7 +38,42 @@ public class ExerciseDao {
         return instance;
     }
 
-    private ExerciseDao() {}
+    private ExerciseDao() {
+    }
+
+    public Completable insert(final String name, final ExerciseType exerciseType) {
+        return Completable.create(new CompletableOnSubscribe() {
+            @Override
+            public void subscribe(@NonNull CompletableEmitter e) throws Exception {
+                if (name.length() < 1) {
+                    Timber.d("InvalidExerciseNameException");
+                    e.onError(new InvalidExerciseNameException());
+                } else if (!isNameAndTypeValid(name, exerciseType)) {
+                    Timber.d("ExerciseAlreadyExistsException");
+                    e.onError(new ExerciseAlreadyExistsException());
+                } else {
+                    Exercise exercise = new Exercise(exerciseType.getValue(), name);
+                    long exerciseId = exercise.insert();
+
+                    if (exerciseType == ExerciseType.REACTION) {
+                        new ReactionExercise(exerciseId).insert();
+                    }
+
+                    e.onComplete();
+                }
+            }
+        });
+    }
+
+    public boolean isNameAndTypeValid(final String name, final ExerciseType exerciseType) {
+        Exercise exercise = SQLite.select()
+                .from(Exercise.class)
+                .where(Exercise_Table.name.eq(name))
+                .and(Exercise_Table.type.eq(exerciseType.getValue()))
+                .querySingle();
+
+        return exercise == null;
+    }
 
     public Single<Exercise> findById(final long exerciseId) {
         return Single.create(new SingleOnSubscribe<Exercise>() {
@@ -74,46 +107,40 @@ public class ExerciseDao {
         });
     }
 
-    public Completable insert(final String name, final ExerciseType exerciseType) {
+    public Completable update(final Exercise exercise) {
         return Completable.create(new CompletableOnSubscribe() {
             @Override
             public void subscribe(@NonNull CompletableEmitter e) throws Exception {
-                if (name.length() < 1) {
-                    Timber.d("InvalidExerciseColumnException");
-                    e.onError(new InvalidExerciseColumnException());
-                } else if (isConflict(name, exerciseType)) {
-                    Timber.d("ExerciseAlreadyExistsException");
-                    e.onError(new ExerciseAlreadyExistsException());
-                } else {
-                    Exercise exercise = new Exercise(exerciseType.getValue(), name, false);
-                    long exerciseId = exercise.insert();
-
-                    switch (exerciseType) {
-                        case REPS:
-                            new RepsExercise(exerciseId).insert();
-                            break;
-                        case TIMED_SETS:
-                            new TimedSetsExercise(exerciseId).insert();
-                            break;
-                        case REACTION:
-                            new ReactionExercise(exerciseId).insert();
-                            break;
-                    }
-
+                if (isColumnsValid(exercise)) {
+                    exercise.update();
                     e.onComplete();
+                } else {
+                    e.onError(new InvalidExerciseColumnsException());
                 }
             }
         });
     }
 
-    public boolean isConflict(final String name, final ExerciseType exerciseType) {
-        Exercise exercise = SQLite.select()
-                .from(Exercise.class)
-                .where(Exercise_Table.name.eq(name))
-                .and(Exercise_Table.type.eq(exerciseType.getValue()))
-                .querySingle();
+    public boolean isColumnsValid(Exercise exercise) {
+        if (exercise.sets < 1) {
+            return false;
+        } else if (exercise.sets == 1 && exercise.restDuration < 1) {
+            return false;
+        }
+        switch (ExerciseSubType.fromValue(exercise.subType)) {
+            case REPS:
+                if (exercise.reps < 1) {
+                    return false;
+                }
+                break;
+            case TIMED_SETS:
+                if (exercise.setDuration < 1) {
+                    return false;
+                }
+                break;
+        }
 
-        return exercise != null;
+        return true;
     }
 
     public Completable delete(final long exerciseId, final ExerciseType exerciseType) {
@@ -124,21 +151,10 @@ public class ExerciseDao {
                         .where(Exercise_Table.id.eq(exerciseId))
                         .execute();
 
-                switch (exerciseType) {
-                    case REPS:
-                        SQLite.delete(RepsExercise.class)
-                                .where(RepsExercise_Table.id.eq(exerciseId))
-                                .execute();
-                        break;
-                    case TIMED_SETS:
-                        SQLite.delete(TimedSetsExercise.class)
-                                .where(TimedSetsExercise_Table.id.eq(exerciseId))
-                                .execute();
-                        break;
-                    default: // REACTION
-                        SQLite.delete(ReactionExercise.class)
-                                .where(ReactionExercise_Table.id.eq(exerciseId))
-                                .execute();
+                if (exerciseType == ExerciseType.REACTION) {
+                    SQLite.delete(ReactionExercise.class)
+                            .where(ReactionExercise_Table.id.eq(exerciseId))
+                            .execute();
                 }
 
                 e.onComplete();

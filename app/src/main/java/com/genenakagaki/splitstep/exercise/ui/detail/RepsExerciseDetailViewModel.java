@@ -3,16 +3,13 @@ package com.genenakagaki.splitstep.exercise.ui.detail;
 import android.content.Context;
 
 import com.genenakagaki.splitstep.R;
-import com.genenakagaki.splitstep.exercise.data.RepsExerciseDao;
-import com.genenakagaki.splitstep.exercise.data.entity.RepsExercise;
+import com.genenakagaki.splitstep.exercise.data.entity.RegularExercise;
 import com.genenakagaki.splitstep.exercise.ui.model.DurationDisplayable;
 
 import io.reactivex.Completable;
 import io.reactivex.CompletableEmitter;
 import io.reactivex.CompletableOnSubscribe;
-import io.reactivex.CompletableSource;
 import io.reactivex.annotations.NonNull;
-import io.reactivex.functions.Function;
 import io.reactivex.subjects.BehaviorSubject;
 
 /**
@@ -24,7 +21,8 @@ public class RepsExerciseDetailViewModel {
     private Context context;
     private long exerciseId;
 
-    private BehaviorSubject<RepsExercise> repsExerciseSubject = BehaviorSubject.create();
+    private RegularExercise regularExercise;
+    private BehaviorSubject<RegularExercise> repsExerciseSubject = BehaviorSubject.create();
 
     private DurationDisplayable restDurationDisplayable;
     private BehaviorSubject<DurationDisplayable> restDurationSubject = BehaviorSubject.create();
@@ -34,36 +32,47 @@ public class RepsExerciseDetailViewModel {
         this.exerciseId = exerciseId;
     }
 
-    public BehaviorSubject<RepsExercise> getRepsExerciseSubject() {
+    public BehaviorSubject<RegularExercise> getRepsExerciseSubject() {
         return repsExerciseSubject;
     }
 
     public Completable setRepsExercise() {
-        return RepsExerciseDao.getInstance().findById(exerciseId).flatMapCompletable(new Function<RepsExercise, CompletableSource>() {
-            @Override
-            public CompletableSource apply(@NonNull final RepsExercise repsExercise) throws Exception {
-                return Completable.create(new CompletableOnSubscribe() {
-                    @Override
-                    public void subscribe(@NonNull CompletableEmitter e) throws Exception {
-                        repsExerciseSubject.onNext(repsExercise);
+//        return RepsExerciseDao.getInstance().findById(exerciseId).flatMapCompletable(new Function<RegularExercise, CompletableSource>() {
+//            @Override
+//            public CompletableSource apply(@NonNull final RegularExercise regularExercise) throws Exception {
+//                return Completable.create(new CompletableOnSubscribe() {
+//                    @Override
+//                    public void subscribe(@NonNull CompletableEmitter e) throws Exception {
+//                        RepsExerciseDetailViewModel.this.regularExercise = regularExercise;
+//                        repsExerciseSubject.onNext(regularExercise);
+//
+//                        restDurationDisplayable = new DurationDisplayable(
+//                                DurationDisplayable.TYPE_REST_DURATION, regularExercise.restDuration);
+//                        restDurationDisplayable.setTitle(context.getString(R.string.rest_duration));
+//                        e.onComplete();
+//                    }
+//                }).andThen(setRestDuration(restDurationDisplayable));
+//            }
+//        });
+        return null;
+    }
 
-                        restDurationDisplayable = new DurationDisplayable(
-                                DurationDisplayable.TYPE_REST_DURATION, repsExercise.restDuration);
-                        restDurationDisplayable.setTitle(context.getString(R.string.rest_duration));
-                        setRestDuration(restDurationDisplayable);
-                        e.onComplete();
-                    }
-                });
+    public Completable setReps(final int reps) {
+        return Completable.create(new CompletableOnSubscribe() {
+            @Override
+            public void subscribe(@NonNull CompletableEmitter e) throws Exception {
+                regularExercise.reps = reps;
+                regularExercise.update();
             }
         });
     }
 
-    public Completable setRepsExercise(final RepsExercise repsExercise) {
+    public Completable setSets(final int sets) {
         return Completable.create(new CompletableOnSubscribe() {
             @Override
             public void subscribe(@NonNull CompletableEmitter e) throws Exception {
-                repsExercise.id = exerciseId;
-                repsExercise.update();
+                regularExercise.sets = sets;
+                regularExercise.update();
             }
         });
     }
@@ -76,17 +85,32 @@ public class RepsExerciseDetailViewModel {
         return restDurationSubject;
     }
 
-    public void setRestDuration(final DurationDisplayable durationDisplayable) {
-        String display;
-        if (durationDisplayable.getMinutes() == 0) {
-            display = context.getString(R.string.duration_value_seconds, durationDisplayable.getSeconds());
-        } else {
-            display = context.getString(
-                    R.string.duration_value, durationDisplayable.getMinutes(), durationDisplayable.getSeconds());
-        }
-        durationDisplayable.setDisplay(display);
-        restDurationDisplayable = durationDisplayable;
-        restDurationSubject.onNext(restDurationDisplayable);
+    public Completable setRestDuration(final DurationDisplayable durationDisplayable) {
+        return Completable.create(new CompletableOnSubscribe() {
+            @Override
+            public void subscribe(@NonNull CompletableEmitter e) throws Exception {
+                if (durationDisplayable != null) {
+                    restDurationDisplayable = durationDisplayable;
+                }
+
+                String display;
+                int minutes = restDurationDisplayable.getMinutes();
+                int seconds = restDurationDisplayable.getSeconds();
+
+                if (minutes == 0) {
+                    display = context.getString(R.string.duration_value_seconds, seconds);
+                } else {
+                    display = context.getString(R.string.duration_value, minutes, seconds);
+                }
+                restDurationDisplayable.setDisplay(display);
+
+                regularExercise.restDuration = restDurationDisplayable.getDuration();
+                regularExercise.update();
+
+                getRestDurationSubject().onNext(restDurationDisplayable);
+                e.onComplete();
+            }
+        });
     }
 
 }
