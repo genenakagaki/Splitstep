@@ -31,10 +31,12 @@ public class NumberInputViewModel {
     }
 
     public void setNumber(int number) {
+        if (this.number == number) return;
+
         if (number > max) {
-            number = max;
+            this.number = max;
         } else if (number < min) {
-            number = min;
+            this.number = min;
         } else {
             this.number = number;
         }

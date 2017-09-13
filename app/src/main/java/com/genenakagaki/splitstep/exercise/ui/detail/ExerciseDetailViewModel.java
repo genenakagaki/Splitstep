@@ -67,23 +67,18 @@ public class ExerciseDetailViewModel {
     }
 
     public Completable setReps(final int reps) {
-        return Completable.create(new CompletableOnSubscribe() {
-            @Override
-            public void subscribe(@NonNull CompletableEmitter e) throws Exception {
-                exercise.reps = reps;
-                exercise.update();
-            }
-        });
+        exercise.reps = reps;
+        return ExerciseDao.getInstance().update(exercise);
     }
 
     public Completable setSets(final int sets) {
-        return Completable.create(new CompletableOnSubscribe() {
-            @Override
-            public void subscribe(@NonNull CompletableEmitter e) throws Exception {
-                exercise.sets = sets;
-                exercise.update();
-            }
-        });
+        exercise.sets = sets;
+        return ExerciseDao.getInstance().update(exercise);
+    }
+
+    public Completable setNotes(final String notes) {
+        exercise.notes = notes;
+        return ExerciseDao.getInstance().update(exercise);
     }
 
     public DurationDisplayable getRestDuration() {
@@ -152,6 +147,8 @@ public class ExerciseDetailViewModel {
         }
         durationDisplay.setDisplay(display);
     }
+
+
 
 
 }

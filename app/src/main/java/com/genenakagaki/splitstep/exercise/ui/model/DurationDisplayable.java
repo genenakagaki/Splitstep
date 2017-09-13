@@ -12,6 +12,7 @@ public class DurationDisplayable {
 
     public static final int TYPE_REST_DURATION = 1;
     public static final int TYPE_SET_DURATION = 2;
+    public static final int TYPE_REP_DURATION = 3;
 
     int type;
     String title;

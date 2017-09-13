@@ -2,7 +2,10 @@ package com.genenakagaki.splitstep.exercise.ui.detail;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +19,9 @@ import com.genenakagaki.splitstep.R;
 import com.genenakagaki.splitstep.exercise.data.ExerciseSharedPref;
 import com.genenakagaki.splitstep.exercise.data.entity.Exercise;
 import com.genenakagaki.splitstep.exercise.data.entity.ExerciseSubType;
+import com.genenakagaki.splitstep.exercise.ui.ExerciseActivity;
+import com.genenakagaki.splitstep.exercise.ui.coach.CoachFragment;
+import com.genenakagaki.splitstep.exercise.ui.coach.RegularCoachFragment;
 import com.genenakagaki.splitstep.exercise.ui.model.DurationDisplayable;
 import com.genenakagaki.splitstep.exercise.ui.view.NumberInput;
 
@@ -40,6 +46,8 @@ public class ExerciseDetailFragment extends Fragment
     TextView mExerciseNameTextView;
     @BindView(R.id.favorite_imageswitcher)
     ImageSwitcher mFavoriteImageSwitcher;
+    @BindView(R.id.notes_input)
+    TextInputEditText mNotesInput;
     @BindView(R.id.sets_numberinput)
     NumberInput mSetsNumberInput;
     @BindView(R.id.reps_numberinput)
@@ -50,6 +58,10 @@ public class ExerciseDetailFragment extends Fragment
     LinearLayout mSetDurationLayout;
     @BindView(R.id.set_duration_textview)
     TextView mSetDurationTextView;
+    @BindView(R.id.rep_duration_layout)
+    LinearLayout mRepDurationLayout;
+    @BindView(R.id.rep_duration_textview)
+    TextView mRepDurationTextView;
     @BindView(R.id.rest_duration_layout)
     LinearLayout mRestDurationLayout;
     @BindView(R.id.rest_duration_textview)
@@ -77,6 +89,25 @@ public class ExerciseDetailFragment extends Fragment
         mUnbinder = ButterKnife.bind(this, view);
 
         mConesNumberInput.setVisibility(View.GONE);
+        mRepDurationLayout.setVisibility(View.GONE);
+
+        mSetsNumberInput.setOnInputChangedListener(this);
+        mRepsNumberInput.setOnInputChangedListener(this);
+        mNotesInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                mDisposable.add(mViewModel.setNotes(charSequence.toString())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeOn(Schedulers.computation())
+                        .subscribe());
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {}
+        });
 
         mFavoriteImageSwitcher.setFactory(new ViewSwitcher.ViewFactory() {
             @Override
@@ -109,6 +140,8 @@ public class ExerciseDetailFragment extends Fragment
                         } else {
                             mFavoriteImageSwitcher.setImageResource(R.drawable.ic_star_border);
                         }
+
+                        mNotesInput.setText(exercise.notes);
 
                         mSetsNumberInput.setNumber(exercise.sets);
 
@@ -193,7 +226,7 @@ public class ExerciseDetailFragment extends Fragment
     @OnClick(R.id.set_duration_layout)
     public void onClickSetDuration() {
         DurationPickerDialog fragment =
-                DurationPickerDialog.newInstance(mViewModel.getRestDuration());
+                DurationPickerDialog.newInstance(mViewModel.getSetDuration());
         fragment.show(getFragmentManager(), DurationPickerDialog.class.getSimpleName());
     }
 
@@ -202,29 +235,27 @@ public class ExerciseDetailFragment extends Fragment
     }
 
     public void setDuration(DurationDisplayable durationDisplayable) {
-        mDisposable.add(mViewModel.setRestDuration(durationDisplayable)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.computation())
-                .subscribe());
+        switch (durationDisplayable.getType()) {
+            case DurationDisplayable.TYPE_REST_DURATION:
+                mDisposable.add(mViewModel.setRestDuration(durationDisplayable)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeOn(Schedulers.computation())
+                        .subscribe());
+                break;
+            case DurationDisplayable.TYPE_SET_DURATION:
+                mDisposable.add(mViewModel.setSetDuration(durationDisplayable)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeOn(Schedulers.computation())
+                        .subscribe());
+                break;
+        }
     }
 
-    public void startCoachFragment() {
-//        RegularExercise repsExercise = new RegularExercise(mViewModel.getExerciseId());
-//        repsExercise.reps = mRepsNumberInput.getNumber();
-//        repsExercise.sets = mSetsNumberInput.getNumber();
-//        repsExercise.restDuration = mViewModel.getDuration(mRestDurationTextView.getText().toString());
-
-//        mDisposable.add(getViewModel().updateRepsExercise(repsExercise)
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribeOn(Schedulers.computation())
-//                .subscribe(new Action() {
-//                    @Override
-//                    public void run() throws Exception {
-//                        ((MainActivity)getActivity()).showFragment(
-//                                new RepsCoachFragment(), RepsCoachFragment.class.getSimpleName(), true);
-//                    }
-//                }));
+    @OnClick(R.id.start_exercise_button)
+    public void onClickStartExercise() {
+        Timber.d("onClickStartExercise");
+        ExerciseActivity activity = (ExerciseActivity) getActivity();
+        activity.showFragment(new RegularCoachFragment(), CoachFragment.class.getSimpleName(), true);
     }
-
 
 }

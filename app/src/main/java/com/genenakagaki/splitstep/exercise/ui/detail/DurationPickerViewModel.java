@@ -45,7 +45,7 @@ public class DurationPickerViewModel {
         return durationDisplayable;
     }
 
-    public void validate(int minutes, int seconds) {
+    public void validateDuration(int minutes, int seconds) {
         durationDisplayable.setMinutes(minutes);
         durationDisplayable.setSeconds(seconds);
 

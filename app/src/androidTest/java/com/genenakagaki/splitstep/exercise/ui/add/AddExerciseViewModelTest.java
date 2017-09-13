@@ -97,7 +97,7 @@ public class AddExerciseViewModelTest {
 //                    @Override
 //                    public boolean test(@NonNull ValidationModel validationModel) throws Exception {
 //                        String errorMessage = mContext.getString(R.string.error_exercise_name_duplicate);
-//                        return validationModel.validate() == false;
+//                        return validationModel.validateDuration() == false;
 //                    }
 //                });
 //    }
@@ -120,7 +120,7 @@ public class AddExerciseViewModelTest {
 //                    @Override
 //                    public boolean test(@NonNull ValidationModel validationModel) throws Exception {
 //                        String errorMessage = mContext.getString(R.string.error_exercise_name_duplicate);
-//                        return validationModel.validate() == false
+//                        return validationModel.validateDuration() == false
 //                                && validationModel.getErrorMessage().equals(errorMessage);
 //                    }
 //                });
@@ -135,7 +135,7 @@ public class AddExerciseViewModelTest {
 //                .assertValue(new Predicate<ValidationModel>() {
 //                    @Override
 //                    public boolean test(@NonNull ValidationModel validationModel) throws Exception {
-//                        return validationModel.validate() == true;
+//                        return validationModel.validateDuration() == true;
 //                    }
 //                });
 //    }
@@ -158,7 +158,7 @@ public class AddExerciseViewModelTest {
 //                    @Override
 //                    public boolean test(@NonNull ValidationModel validationModel) throws Exception {
 //                        String errorMessage = mContext.getString(R.string.error_exercise_name_duplicate);
-//                        return validationModel.validate() == true;
+//                        return validationModel.validateDuration() == true;
 //                    }
 //                });
 //    }

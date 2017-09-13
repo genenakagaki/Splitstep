@@ -9,12 +9,13 @@
     <string name="cancel">Cancel</string>
 
     <!-- Generic words -->
+    <string name="notes">Notes</string>
     <string name="minutes">Minutes</string>
     <string name="seconds">Seconds</string>
     <string name="sets">Sets</string>
     <string name="reps">Reps</string>
     <string name="cones">Cones</string>
-    <string name="rep_duration"></string>
+    <string name="rep_duration">Rep duration</string>
     <string name="set_duration">Set duration</string>
     <string name="rest_duration">Rest duration</string>
 
@@ -44,12 +45,22 @@
     +++++++++++++++++++++++++++++++++++++++++-->
     <string name="duration_value">%1$d minutes %2$d seconds</string>
     <string name="duration_value_seconds">%d seconds</string>
+    <string name="start_exercise">Start Exercise</string>
     <!-- Duration Picker -->
 
 
-    <!-- Coach -->
+    <!--++++++++++++++++++++++++++++++++++++++++
+            Exercise Detail
+    +++++++++++++++++++++++++++++++++++++++++-->
     <string name="sets_remaining">sets remaining</string>
     <string name="reps_count">%d reps</string>
+    <string name="exercise_done_text">Done</string>
+    <string name="exercise_rest_text">Rest</string>
+    <string name="exercise_reps_text">%d reps</string>
+    <string name="exercise_sets_text">%d\nsets</string>
+    <string name="exercise_complete">Exercise Complete</string>
+    <string name="exercise_pause">Pause</string>
+    <string name="exercise_resume">Resume</string>
 
     <!-- Input Hint -->
     <string name="hint_exercise_name">Exercise Name</string>

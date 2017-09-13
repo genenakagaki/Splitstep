@@ -73,7 +73,7 @@ public class AddExerciseDialog extends DialogFragment {
 
     @Override
     public void onStart() {
-        // to validate input, prevent dialog to be dismissed right after button is pressed
+        // to validateDuration input, prevent dialog to be dismissed right after button is pressed
         super.onStart();
         final AlertDialog dialog = (AlertDialog) getDialog();
         if (dialog != null) {

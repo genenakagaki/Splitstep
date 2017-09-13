@@ -59,7 +59,7 @@ public class ExerciseListItemViewModel {
                 exerciseTypeString = mContext.getString(R.string.timed_sets_subtype);
         }
 
-        return mExercise.name + " (" + exerciseTypeString + ")";
+        return mExercise.name + "  (" + exerciseTypeString + ")";
 
     }
 

@@ -95,7 +95,7 @@ public class ExerciseViewHolder extends RecyclerView.ViewHolder {
                 .subscribe();
     }
 
-    @OnClick(R.id.name_textview)
+    @OnClick(R.id.content)
     public void onExerciseClick() {
         Timber.d("onExerciseClick");
         ExerciseActivity activity = (ExerciseActivity) mContext;

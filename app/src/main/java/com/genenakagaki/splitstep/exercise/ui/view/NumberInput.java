@@ -33,8 +33,10 @@ public class NumberInput extends FrameLayout implements TextWatcher {
         void onInputChanged(View view, int number);
     }
 
-    @BindView(R.id.input) EditText mInput;
-    @BindView(R.id.label_textview) TextView mLabelTextView;
+    @BindView(R.id.input)
+    EditText mInput;
+    @BindView(R.id.label_textview)
+    TextView mLabelTextView;
 
     private Unbinder mUnbinder;
     private CompositeDisposable mDisposable;
@@ -90,17 +92,21 @@ public class NumberInput extends FrameLayout implements TextWatcher {
     }
 
     @Override
-    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+    }
 
     @Override
     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-        if (mOnInputChangedListener != null) {
-            mOnInputChangedListener.onInputChanged(this, Integer.parseInt(charSequence.toString()));
+        if (mOnInputChangedListener != null && charSequence.length() > 0) {
+            int number = Integer.parseInt(charSequence.toString());
+            mViewModel.setNumber(number);
+            mOnInputChangedListener.onInputChanged(this, mViewModel.getNumber());
         }
     }
 
     @Override
-    public void afterTextChanged(Editable editable) {}
+    public void afterTextChanged(Editable editable) {
+    }
 
     @OnClick(R.id.plus_button)
     public void onClickPlusButton() {
