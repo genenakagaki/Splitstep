@@ -88,8 +88,10 @@ public class ExerciseDao {
                         .querySingle();
 
                 if (exercise == null) {
+                    Timber.d("ExerciseNotFoundException");
                     e.onError(new ExerciseNotFoundException());
                 } else {
+                    Timber.d("Exercise found");
                     e.onSuccess(exercise);
                 }
             }

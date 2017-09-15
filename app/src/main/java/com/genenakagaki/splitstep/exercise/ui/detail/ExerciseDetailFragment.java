@@ -21,7 +21,7 @@ import com.genenakagaki.splitstep.exercise.data.entity.Exercise;
 import com.genenakagaki.splitstep.exercise.data.entity.ExerciseSubType;
 import com.genenakagaki.splitstep.exercise.ui.ExerciseActivity;
 import com.genenakagaki.splitstep.exercise.ui.coach.CoachFragment;
-import com.genenakagaki.splitstep.exercise.ui.coach.RegularCoachFragment;
+import com.genenakagaki.splitstep.exercise.ui.coach.RegularRepsCoachFragment;
 import com.genenakagaki.splitstep.exercise.ui.model.DurationDisplayable;
 import com.genenakagaki.splitstep.exercise.ui.view.NumberInput;
 
@@ -230,7 +230,7 @@ public class ExerciseDetailFragment extends Fragment
     public void onClickStartExercise() {
         Timber.d("onClickStartExercise");
         ExerciseActivity activity = (ExerciseActivity) getActivity();
-        activity.showFragment(new RegularCoachFragment(), CoachFragment.class.getSimpleName(), true);
+        activity.showFragment(new RegularRepsCoachFragment(), CoachFragment.class.getSimpleName(), true);
     }
 
 }

@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,12 +24,14 @@ import android.widget.TextView;
 import com.genenakagaki.splitstep.R;
 import com.genenakagaki.splitstep.exercise.data.ExerciseSharedPref;
 import com.genenakagaki.splitstep.exercise.data.entity.Exercise;
-import com.genenakagaki.splitstep.exercise.data.entity.ExerciseSubType;
+import com.genenakagaki.splitstep.exercise.ui.model.DurationDisplayable;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 
 /**
@@ -67,6 +70,8 @@ public abstract class CoachFragment extends Fragment {
     private Unbinder mUnbinder;
     private CompositeDisposable mDisposable;
     private CoachViewModel mViewModel;
+    private ReversedProgressViewModel mSetsProgressViewModel;
+    private TimerViewModel mRestTimerViewModel;
 
     private Ringtone mAlarm;
 
@@ -89,12 +94,7 @@ public abstract class CoachFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_coach, container, false);
         mUnbinder = ButterKnife.bind(this, view);
 
-        mCompleteLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                getActivity().onBackPressed();
-            }
-        });
+        mOverlayTextView.setText(Integer.toString(3));
 
         mContentLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -134,41 +134,43 @@ public abstract class CoachFragment extends Fragment {
                 .subscribe(new Consumer<Long>() {
                     @Override
                     public void accept(Long aLong) throws Exception {
-                        if (aLong == 0) {
-                            mOverlay.setVisibility(View.GONE);
-                            startExerciseSet();
-                        } else {
-                            mOverlayTextView.setText(Long.toString(aLong));
-                        }
+                        mOverlayTextView.setText(Long.toString(aLong));
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                    }
+                }, new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        mOverlay.setVisibility(View.GONE);
+                        startExerciseSet();
                     }
                 }));
 
-        mDisposable.add(mViewModel.getExerciseSubject().subscribe(new Consumer<Exercise>() {
+        mDisposable.add(mViewModel.loadExercise().subscribe(new Consumer<Exercise>() {
             @Override
             public void accept(Exercise exercise) throws Exception {
                 mExerciseNameTextView.setText(exercise.name);
 
-                mSetsProgressText.setText(Integer.toString(exercise.sets));
-                setProgressMax(mSetsProgressBar, exercise.sets);
-                setProgressMax(mRestProgressBar, exercise.restDuration);
-                setProgress(mSetsProgressBar, 0, 0);
-                setProgress(mRestProgressBar, exercise.restDuration, 0);
+                mSetsProgressViewModel = new ReversedProgressViewModel(exercise.sets, 0);
+                mSetsProgressBar.setMax(mSetsProgressViewModel.getMax());
+                mDisposable.add(mSetsProgressViewModel.getProgress().subscribe(new Consumer<Integer>() {
+                    @Override
+                    public void accept(Integer integer) throws Exception {
+                        mSetsProgressText.setText(mSetsProgressViewModel.getDisplayProgress());
+                        animateProgress(mSetsProgressBar, integer, mSetsProgressViewModel.getAnimateDuration());
+                    }
+                }));
 
-                switch (ExerciseSubType.fromValue(exercise.subType)) {
-                    case REPS:
-                        mMainProgressTopText.setText(getString(R.string.reps_count, exercise.reps));
-                        mDoneButton.setVisibility(View.VISIBLE);
-                        break;
-                    case TIMED_SETS:
-                        mTimedSetProgressBar.setVisibility(View.VISIBLE);
-                        setProgressMax(mTimedSetProgressBar, exercise.setDuration);
-                        setProgress(mTimedSetProgressBar, mTimedSetProgressBar.getMax(), 100);
-                        break;
-                }
+                mRestTimerViewModel = new TimerViewModel(
+                        new DurationDisplayable(DurationDisplayable.TYPE_REST_DURATION, exercise.restDuration));
+                mRestProgressBar.setMax(mRestTimerViewModel.getMax());
+
+                setupExerciseSet(exercise);
+                startExerciseSet();
             }
         }));
-
-        mDisposable.add(mViewModel.setExercise().subscribe());
     }
 
     @Override
@@ -183,19 +185,54 @@ public abstract class CoachFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         mUnbinder.unbind();
-
-        cancelTimers();
     }
 
-    public void setProgressMax(ProgressBar progressBar, int max) {
-        progressBar.setMax(max * 100);
+    @OnClick(R.id.overlay)
+    public void onClickOverlay() {
+        // prevent clicks
+        return;
     }
 
-    public void setProgress(ProgressBar progressBar, int progress, long duration) {
-        if (duration == 0 || android.os.Build.VERSION.SDK_INT < 11) {
-            progressBar.setProgress(progress * 100);
+    @OnClick(R.id.complete_layout)
+    public void onClickComplete() {
+        FragmentManager fm = getFragmentManager();
+        FragmentManager.BackStackEntry stack = fm.getBackStackEntryAt(0);
+        fm.popBackStack(stack.getId(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
+    }
+
+    public void onFinishExerciseSet() {
+        mSetsProgressViewModel.incrementProgressBy(1);
+
+        if (mSetsProgressViewModel.isFinished()) {
+            mCompleteLayout.setVisibility(View.VISIBLE);
         } else {
-            ObjectAnimator animation = ObjectAnimator.ofInt(progressBar, "progress", progress * 100);
+            mRestProgressBar.setProgress(mRestTimerViewModel.getMax());
+            animateProgress(mRestProgressBar, 0, mRestTimerViewModel.getAnimateDuration());
+            mMainProgressText.setText(mRestTimerViewModel.getTimerDisplay());
+
+            mDisposable.add(mRestTimerViewModel.startTimer().subscribe(new Consumer<String>() {
+                @Override
+                public void accept(String s) throws Exception {
+                    mMainProgressText.setText(s);
+                }
+            }, new Consumer<Throwable>() {
+                @Override
+                public void accept(Throwable throwable) throws Exception {
+                }
+            }, new Action() {
+                @Override
+                public void run() throws Exception {
+                    startExerciseSet();
+                }
+            }));
+        }
+    }
+
+    public void animateProgress(ProgressBar progressBar, int progress, long duration) {
+        if (android.os.Build.VERSION.SDK_INT < 11) {
+            progressBar.setProgress(progress);
+        } else {
+            ObjectAnimator animation = ObjectAnimator.ofInt(progressBar, "progress", progress);
             animation.setDuration(duration);
             animation.setInterpolator(new LinearInterpolator());
             animation.start();
@@ -214,9 +251,6 @@ public abstract class CoachFragment extends Fragment {
         return mDisposable;
     }
 
+    public abstract void setupExerciseSet(Exercise exercise);
     public abstract void startExerciseSet();
-
-    public abstract void startRest();
-
-    public abstract void cancelTimers();
 }

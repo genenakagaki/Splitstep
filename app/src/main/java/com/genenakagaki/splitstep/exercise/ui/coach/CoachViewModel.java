@@ -8,17 +8,13 @@ import com.genenakagaki.splitstep.exercise.ui.model.DurationDisplayable;
 
 import java.util.concurrent.TimeUnit;
 
-import io.reactivex.Completable;
-import io.reactivex.CompletableEmitter;
-import io.reactivex.CompletableOnSubscribe;
-import io.reactivex.CompletableSource;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 import io.reactivex.schedulers.Schedulers;
-import io.reactivex.subjects.BehaviorSubject;
 
 /**
  * Created by Gene on 9/13/2017.
@@ -30,40 +26,25 @@ public class CoachViewModel {
 
     private Context context;
     private long exerciseId;
-    private int remainingSets;
-
     private Exercise exercise;
-    private BehaviorSubject<Exercise> exerciseSubject = BehaviorSubject.create();
 
     private DurationDisplayable restDuration;
+    private DurationDisplayable setDuration;
 
     public CoachViewModel(Context context, long exerciseId) {
         this.context = context;
         this.exerciseId = exerciseId;
     }
 
-    public Observable<Exercise> getExerciseSubject() {
-        return exerciseSubject
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io());
-    }
-
-    public Completable setExercise() {
-        return ExerciseDao.getInstance().findById(exerciseId).flatMapCompletable(new Function<Exercise, CompletableSource>() {
+    public Single<Exercise> loadExercise() {
+        return ExerciseDao.getInstance().findById(exerciseId).map(new Function<Exercise, Exercise>() {
             @Override
-            public CompletableSource apply(@NonNull final Exercise exercise) throws Exception {
-                return Completable.create(new CompletableOnSubscribe() {
-                    @Override
-                    public void subscribe(@NonNull CompletableEmitter e) throws Exception {
-                        CoachViewModel.this.exercise = exercise;
-                        remainingSets = exercise.sets;
-                        exerciseSubject.onNext(exercise);
+            public Exercise apply(@NonNull Exercise exercise) throws Exception {
+                CoachViewModel.this.exercise = exercise;
 
-                        restDuration = new DurationDisplayable(
-                                DurationDisplayable.TYPE_REST_DURATION, exercise.restDuration);
-                        e.onComplete();
-                    }
-                });
+                restDuration = new DurationDisplayable(
+                        DurationDisplayable.TYPE_REST_DURATION, exercise.restDuration);
+                return exercise;
             }
         }).observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.computation());
@@ -77,15 +58,14 @@ public class CoachViewModel {
         return Observable.interval(1, TimeUnit.SECONDS).takeWhile(new Predicate<Long>() {
             @Override
             public boolean test(@NonNull Long aLong) throws Exception {
-                return aLong <= START_COUNT_DOWN_TIME;
+                return aLong < START_COUNT_DOWN_TIME-1;
             }
         }).map(new Function<Long, Long>() {
             @Override
             public Long apply(@NonNull Long aLong) throws Exception {
-                return START_COUNT_DOWN_TIME - aLong;
+                return START_COUNT_DOWN_TIME - aLong -1;
             }
-        })
-                .observeOn(AndroidSchedulers.mainThread())
+        }).observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.computation());
     }
 
@@ -104,4 +84,5 @@ public class CoachViewModel {
         }).observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.computation());
     }
+
 }
