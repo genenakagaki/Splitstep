@@ -28,10 +28,8 @@ import com.genenakagaki.splitstep.exercise.data.entity.ExerciseSubType;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by Gene on 9/13/2017.
@@ -50,7 +48,7 @@ public abstract class CoachFragment extends Fragment {
     @BindView(R.id.timed_set_progressbar)
     ProgressBar mTimedSetProgressBar;
     @BindView(R.id.main_progressbar_container)
-    LinearLayout mRepsProgressBarContainer;
+    LinearLayout mMainProgressBarContainer;
     @BindView(R.id.sets_progress_text)
     TextView mSetsProgressText;
     @BindView(R.id.main_progress_text)
@@ -133,47 +131,44 @@ public abstract class CoachFragment extends Fragment {
         mDisposable = new CompositeDisposable();
 
         mDisposable.add(mViewModel.getStartCountDown()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
                 .subscribe(new Consumer<Long>() {
                     @Override
                     public void accept(Long aLong) throws Exception {
-                        int number = 3 - aLong.intValue();
-                        if (number == 0) {
+                        if (aLong == 0) {
                             mOverlay.setVisibility(View.GONE);
+                            startExerciseSet();
                         } else {
-                            mOverlayTextView.setText(Long.toString(number));
+                            mOverlayTextView.setText(Long.toString(aLong));
                         }
                     }
                 }));
 
-        mDisposable.add(mViewModel.getExerciseSubject()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.computation())
-                .subscribe(new Consumer<Exercise>() {
-                    @Override
-                    public void accept(Exercise exercise) throws Exception {
-                        mExerciseNameTextView.setText(exercise.name);
+        mDisposable.add(mViewModel.getExerciseSubject().subscribe(new Consumer<Exercise>() {
+            @Override
+            public void accept(Exercise exercise) throws Exception {
+                mExerciseNameTextView.setText(exercise.name);
 
-                        mSetsProgressText.setText(Integer.toString(exercise.sets));
-                        setProgressMax(mSetsProgressBar, exercise.sets);
-                        setProgressMax(mRestProgressBar, exercise.restDuration);
-                        setProgress(mSetsProgressBar, 0, 0);
-                        setProgress(mRestProgressBar, exercise.restDuration, 0);
+                mSetsProgressText.setText(Integer.toString(exercise.sets));
+                setProgressMax(mSetsProgressBar, exercise.sets);
+                setProgressMax(mRestProgressBar, exercise.restDuration);
+                setProgress(mSetsProgressBar, 0, 0);
+                setProgress(mRestProgressBar, exercise.restDuration, 0);
 
-                        switch (ExerciseSubType.fromValue(exercise.subType)) {
-                            case REPS:
-                                mMainProgressTopText.setText(getString(R.string.reps_count, exercise.reps));
-                                mDoneButton.setVisibility(View.VISIBLE);
-                                break;
-                            case TIMED_SETS:
-                                mTimedSetProgressBar.setVisibility(View.VISIBLE);
-                                setProgressMax(mTimedSetProgressBar, exercise.setDuration);
-                                setProgress(mTimedSetProgressBar, mTimedSetProgressBar.getMax(), 100);
-                                break;
-                        }
-                    }
-                }));
+                switch (ExerciseSubType.fromValue(exercise.subType)) {
+                    case REPS:
+                        mMainProgressTopText.setText(getString(R.string.reps_count, exercise.reps));
+                        mDoneButton.setVisibility(View.VISIBLE);
+                        break;
+                    case TIMED_SETS:
+                        mTimedSetProgressBar.setVisibility(View.VISIBLE);
+                        setProgressMax(mTimedSetProgressBar, exercise.setDuration);
+                        setProgress(mTimedSetProgressBar, mTimedSetProgressBar.getMax(), 100);
+                        break;
+                }
+            }
+        }));
+
+        mDisposable.add(mViewModel.setExercise().subscribe());
     }
 
     @Override
@@ -214,6 +209,14 @@ public abstract class CoachFragment extends Fragment {
     public CoachViewModel getViewModel() {
         return mViewModel;
     }
+
+    public CompositeDisposable getDisposable() {
+        return mDisposable;
+    }
+
+    public abstract void startExerciseSet();
+
+    public abstract void startRest();
 
     public abstract void cancelTimers();
 }

@@ -25,11 +25,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 /**
@@ -96,8 +94,6 @@ public class AddExerciseDialog extends DialogFragment {
         mDisposable = new CompositeDisposable();
 
         mDisposable.add(mViewModel.getErrorMessageSubject()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
                 .subscribe(new Consumer<ErrorMessage>() {
                     @Override
                     public void accept(ErrorMessage errorMessage) throws Exception {
@@ -138,8 +134,6 @@ public class AddExerciseDialog extends DialogFragment {
         final String exerciseName = mExerciseNameInput.getText().toString();
 
         mDisposable.add(mViewModel.insertExercise(exerciseName)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.computation())
                 .subscribe(new Action() {
                     @Override
                     public void run() throws Exception {

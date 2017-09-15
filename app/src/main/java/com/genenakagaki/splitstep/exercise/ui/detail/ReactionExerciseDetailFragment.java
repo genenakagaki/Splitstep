@@ -12,9 +12,7 @@ import com.genenakagaki.splitstep.exercise.data.entity.ReactionExercise;
 import com.genenakagaki.splitstep.exercise.ui.model.DurationDisplayable;
 
 import butterknife.OnClick;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 /**
@@ -50,8 +48,6 @@ public class ReactionExerciseDetailFragment extends ExerciseDetailFragment {
         super.onResume();
 
         getDisposable().add(mViewModel.getReactionExerciseSubject()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.computation())
                 .subscribe(new Consumer<ReactionExercise>() {
                     @Override
                     public void accept(ReactionExercise reactionExercise) throws Exception {
@@ -60,8 +56,6 @@ public class ReactionExerciseDetailFragment extends ExerciseDetailFragment {
                 }));
 
         getDisposable().add(mViewModel.getRestDurationSubject()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.computation())
                 .subscribe(new Consumer<DurationDisplayable>() {
                     @Override
                     public void accept(DurationDisplayable durationDisplayable) throws Exception {
@@ -69,10 +63,7 @@ public class ReactionExerciseDetailFragment extends ExerciseDetailFragment {
                     }
                 }));
 
-        getDisposable().add(mViewModel.setReactionExercise()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.computation())
-                .subscribe());
+        getDisposable().add(mViewModel.setReactionExercise().subscribe());
     }
 
     @Override
@@ -82,10 +73,7 @@ public class ReactionExerciseDetailFragment extends ExerciseDetailFragment {
         Timber.d("onInputChanged " + number);
         if (view.getId() == mConesNumberInput.getId()) {
             Timber.d("cones");
-            mViewModel.setCones(number)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeOn(Schedulers.computation())
-                    .subscribe();
+            mViewModel.setCones(number).subscribe();
         }
     }
 
@@ -101,10 +89,7 @@ public class ReactionExerciseDetailFragment extends ExerciseDetailFragment {
         super.setDuration(durationDisplayable);
 
         if (durationDisplayable.getType() == DurationDisplayable.TYPE_REP_DURATION) {
-            getDisposable().add(mViewModel.setRepDuration(durationDisplayable)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeOn(Schedulers.computation())
-                    .subscribe());
+            getDisposable().add(mViewModel.setRepDuration(durationDisplayable).subscribe());
         }
     }
 }

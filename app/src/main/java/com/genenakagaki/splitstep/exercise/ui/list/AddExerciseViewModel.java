@@ -10,6 +10,9 @@ import com.genenakagaki.splitstep.exercise.data.entity.ExerciseType;
 import com.genenakagaki.splitstep.exercise.ui.model.ErrorMessage;
 
 import io.reactivex.Completable;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 
 /**
@@ -32,8 +35,10 @@ public class AddExerciseViewModel {
         errorMessage = new ErrorMessage();
     }
 
-    public BehaviorSubject<ErrorMessage> getErrorMessageSubject() {
-        return errorMessageSubject;
+    public Observable<ErrorMessage> getErrorMessageSubject() {
+        return errorMessageSubject
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io());
     }
 
     public void setExerciseSubType(ExerciseSubType subType) {
@@ -42,7 +47,9 @@ public class AddExerciseViewModel {
 
     public Completable insertExercise(final String name) {
         return ExerciseDao.getInstance().insert(
-                new Exercise(exerciseType.getValue(), exerciseSubType.getValue(), name));
+                new Exercise(exerciseType.getValue(), exerciseSubType.getValue(), name))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.computation());
     }
 
     public void setExerciseAlreadyExistsError() {

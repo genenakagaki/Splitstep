@@ -11,10 +11,8 @@ import android.support.v7.app.AlertDialog;
 import com.genenakagaki.splitstep.R;
 import com.genenakagaki.splitstep.exercise.data.ExerciseSharedPref;
 
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Action;
-import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by gene on 9/7/17.
@@ -66,8 +64,6 @@ public class DeleteExerciseDialog extends DialogFragment {
 
     private void onDeleteButtonClick() {
         mDisposable.add(mViewModel.deleteExerciseCompletable()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.computation())
                 .subscribe(new Action() {
                     @Override
                     public void run() throws Exception {

@@ -28,10 +28,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 /**
@@ -134,8 +132,6 @@ public class ExerciseListFragment extends Fragment {
         mDisposable = new CompositeDisposable();
 
         mDisposable.add(mViewModel.getExercisesSubject()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.computation())
                 .subscribe(new Consumer<List<Exercise>>() {
                     @Override
                     public void accept(List<Exercise> exercises) throws Exception {
@@ -178,10 +174,7 @@ public class ExerciseListFragment extends Fragment {
     }
 
     public void getExerciseList() {
-        mDisposable.add(mViewModel.getExerciseList()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.computation())
-                .subscribe());
+        mDisposable.add(mViewModel.getExerciseList().subscribe());
     }
 
     public CompositeDisposable getDisposable() {

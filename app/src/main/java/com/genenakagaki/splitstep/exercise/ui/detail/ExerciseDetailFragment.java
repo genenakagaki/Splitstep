@@ -29,10 +29,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 /**
@@ -100,8 +98,6 @@ public class ExerciseDetailFragment extends Fragment
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 mDisposable.add(mViewModel.setNotes(charSequence.toString())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeOn(Schedulers.computation())
                         .subscribe());
             }
 
@@ -129,8 +125,6 @@ public class ExerciseDetailFragment extends Fragment
         mDisposable = new CompositeDisposable();
 
         mDisposable.add(mViewModel.getExerciseSubject()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.computation())
                 .subscribe(new Consumer<Exercise>() {
                     @Override
                     public void accept(Exercise exercise) throws Exception {
@@ -158,8 +152,6 @@ public class ExerciseDetailFragment extends Fragment
                 }));
 
         mDisposable.add(mViewModel.getSetDurationSubject()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.computation())
                 .subscribe(new Consumer<DurationDisplayable>() {
                     @Override
                     public void accept(DurationDisplayable durationDisplayable) throws Exception {
@@ -168,8 +160,6 @@ public class ExerciseDetailFragment extends Fragment
                 }));
 
         mDisposable.add(mViewModel.getRestDurationSubject()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.computation())
                 .subscribe(new Consumer<DurationDisplayable>() {
                     @Override
                     public void accept(DurationDisplayable durationDisplayable) throws Exception {
@@ -177,10 +167,7 @@ public class ExerciseDetailFragment extends Fragment
                     }
                 }));
 
-        mDisposable.add(mViewModel.setExercise()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.computation())
-                .subscribe());
+        mDisposable.add(mViewModel.setExercise().subscribe());
     }
 
     @Override
@@ -203,16 +190,10 @@ public class ExerciseDetailFragment extends Fragment
         Timber.d("onInputChanged " + number);
         if (view.getId() == mRepsNumberInput.getId()) {
             Timber.d("reps");
-            mViewModel.setReps(number)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeOn(Schedulers.computation())
-                    .subscribe();
+            mViewModel.setReps(number).subscribe();
         } else if (view.getId() == mSetsNumberInput.getId()) {
             Timber.d("sets");
-            mViewModel.setSets(number)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeOn(Schedulers.computation())
-                    .subscribe();
+            mViewModel.setSets(number).subscribe();
         }
     }
 
@@ -237,16 +218,10 @@ public class ExerciseDetailFragment extends Fragment
     public void setDuration(DurationDisplayable durationDisplayable) {
         switch (durationDisplayable.getType()) {
             case DurationDisplayable.TYPE_REST_DURATION:
-                mDisposable.add(mViewModel.setRestDuration(durationDisplayable)
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeOn(Schedulers.computation())
-                        .subscribe());
+                mDisposable.add(mViewModel.setRestDuration(durationDisplayable).subscribe());
                 break;
             case DurationDisplayable.TYPE_SET_DURATION:
-                mDisposable.add(mViewModel.setSetDuration(durationDisplayable)
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeOn(Schedulers.computation())
-                        .subscribe());
+                mDisposable.add(mViewModel.setSetDuration(durationDisplayable).subscribe());
                 break;
         }
     }

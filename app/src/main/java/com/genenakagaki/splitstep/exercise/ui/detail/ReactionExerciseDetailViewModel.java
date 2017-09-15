@@ -11,8 +11,11 @@ import io.reactivex.Completable;
 import io.reactivex.CompletableEmitter;
 import io.reactivex.CompletableOnSubscribe;
 import io.reactivex.CompletableSource;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 
 /**
@@ -35,8 +38,10 @@ public class ReactionExerciseDetailViewModel {
         this.exerciseId = exerciseId;
     }
 
-    public BehaviorSubject<ReactionExercise> getReactionExerciseSubject() {
-        return reactionExerciseSubject;
+    public Observable<ReactionExercise> getReactionExerciseSubject() {
+        return reactionExerciseSubject
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io());
     }
 
     public Completable setReactionExercise() {
@@ -57,20 +62,25 @@ public class ReactionExerciseDetailViewModel {
                     }
                 }).andThen(setRepDuration(repDuration));
             }
-        });
+        }).observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.computation());
     }
 
     public Completable setCones(int cones) {
         reactionExercise.cones = cones;
-        return ReactionExerciseDao.getInstance().update(reactionExercise);
+        return ReactionExerciseDao.getInstance().update(reactionExercise)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.computation());
     }
 
     public DurationDisplayable getRepDuration() {
         return repDuration;
     }
 
-    public BehaviorSubject<DurationDisplayable> getRestDurationSubject() {
-        return repDurationSubject;
+    public Observable<DurationDisplayable> getRestDurationSubject() {
+        return repDurationSubject
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io());
     }
 
     public Completable setRepDuration(final DurationDisplayable durationDisplayable) {
@@ -89,7 +99,8 @@ public class ReactionExerciseDetailViewModel {
                 repDurationSubject.onNext(repDuration);
                 e.onComplete();
             }
-        });
+        }).observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.computation());
     }
 
     public void setDurationDisplay(DurationDisplayable durationDisplay) {

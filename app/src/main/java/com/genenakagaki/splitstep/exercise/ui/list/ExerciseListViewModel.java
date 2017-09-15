@@ -13,8 +13,11 @@ import io.reactivex.Completable;
 import io.reactivex.CompletableEmitter;
 import io.reactivex.CompletableOnSubscribe;
 import io.reactivex.CompletableSource;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 import timber.log.Timber;
 
@@ -37,8 +40,10 @@ public class ExerciseListViewModel {
         this.exerciseType = exerciseType;
     }
 
-    public BehaviorSubject<List<Exercise>> getExercisesSubject() {
-        return exercisesSubject;
+    public Observable<List<Exercise>> getExercisesSubject() {
+        return exercisesSubject
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io());
     }
 
     public void setEditMode(boolean isEditMode) {
@@ -72,6 +77,7 @@ public class ExerciseListViewModel {
                     }
                 });
             }
-        });
+        }).observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.computation());
     }
 }

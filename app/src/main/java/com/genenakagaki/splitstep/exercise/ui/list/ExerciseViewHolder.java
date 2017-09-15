@@ -21,9 +21,7 @@ import com.genenakagaki.splitstep.exercise.ui.detail.ReactionExerciseDetailFragm
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 /**
@@ -64,8 +62,6 @@ public class ExerciseViewHolder extends RecyclerView.ViewHolder {
                 .findFragmentByTag(ExerciseListFragment.class.getSimpleName());
 
         fragment.getDisposable().add(mListItemViewModel.getExerciseSubject()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.computation())
                 .subscribe(new Consumer<Exercise>() {
                     @Override
                     public void accept(Exercise exercise) throws Exception {
@@ -89,10 +85,7 @@ public class ExerciseViewHolder extends RecyclerView.ViewHolder {
     @OnClick(R.id.favorite_imageswitcher)
     public void onFavoriteClick() {
         Timber.d("onFavoriteClick");
-        mListItemViewModel.toggleExerciseFavorite()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.computation())
-                .subscribe();
+        mListItemViewModel.toggleExerciseFavorite().subscribe();
     }
 
     @OnClick(R.id.content)

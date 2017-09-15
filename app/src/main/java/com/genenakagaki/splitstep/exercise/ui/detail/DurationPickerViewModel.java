@@ -6,6 +6,9 @@ import com.genenakagaki.splitstep.R;
 import com.genenakagaki.splitstep.exercise.ui.model.DurationDisplayable;
 import com.genenakagaki.splitstep.exercise.ui.model.ErrorMessage;
 
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 
 /**
@@ -37,8 +40,10 @@ public class DurationPickerViewModel {
         this.durationDisplayable = durationDisplayable;
     }
 
-    public BehaviorSubject<ErrorMessage> getErrorMessageSubject() {
-        return errorMessageSubject;
+    public Observable<ErrorMessage> getErrorMessageSubject() {
+        return errorMessageSubject
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io());
     }
 
     public DurationDisplayable getDurationDisplayable() {

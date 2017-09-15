@@ -11,8 +11,11 @@ import io.reactivex.Completable;
 import io.reactivex.CompletableEmitter;
 import io.reactivex.CompletableOnSubscribe;
 import io.reactivex.CompletableSource;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 
 /**
@@ -38,8 +41,10 @@ public class ExerciseDetailViewModel {
         this.exerciseId = exerciseId;
     }
 
-    public BehaviorSubject<Exercise> getExerciseSubject() {
-        return exerciseSubject;
+    public Observable<Exercise> getExerciseSubject() {
+        return exerciseSubject
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io());
     }
 
     public Completable setExercise() {
@@ -63,30 +68,39 @@ public class ExerciseDetailViewModel {
                     }
                 }).andThen(setRestDuration(restDuration)).andThen(setSetDuration(setDuration));
             }
-        });
+        }).observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.computation());
     }
 
     public Completable setReps(final int reps) {
         exercise.reps = reps;
-        return ExerciseDao.getInstance().update(exercise);
+        return ExerciseDao.getInstance().update(exercise)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.computation());
     }
 
     public Completable setSets(final int sets) {
         exercise.sets = sets;
-        return ExerciseDao.getInstance().update(exercise);
+        return ExerciseDao.getInstance().update(exercise)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.computation());
     }
 
     public Completable setNotes(final String notes) {
         exercise.notes = notes;
-        return ExerciseDao.getInstance().update(exercise);
+        return ExerciseDao.getInstance().update(exercise)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.computation());
     }
 
     public DurationDisplayable getRestDuration() {
         return restDuration;
     }
 
-    public BehaviorSubject<DurationDisplayable> getRestDurationSubject() {
-        return restDurationSubject;
+    public Observable<DurationDisplayable> getRestDurationSubject() {
+        return restDurationSubject
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io());
     }
 
     public Completable setRestDuration(final DurationDisplayable durationDisplayable) {
@@ -105,15 +119,18 @@ public class ExerciseDetailViewModel {
                 restDurationSubject.onNext(restDuration);
                 e.onComplete();
             }
-        });
+        }).observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.computation());
     }
 
     public DurationDisplayable getSetDuration() {
         return setDuration;
     }
 
-    public BehaviorSubject<DurationDisplayable> getSetDurationSubject() {
-        return setDurationSubject;
+    public Observable<DurationDisplayable> getSetDurationSubject() {
+        return setDurationSubject
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io());
     }
 
     public Completable setSetDuration(final DurationDisplayable durationDisplayable) {
@@ -132,7 +149,8 @@ public class ExerciseDetailViewModel {
                 setDurationSubject.onNext(setDuration);
                 e.onComplete();
             }
-        });
+        }).observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.computation());
     }
 
     public void setDurationDisplay(DurationDisplayable durationDisplay) {
@@ -147,8 +165,5 @@ public class ExerciseDetailViewModel {
         }
         durationDisplay.setDisplay(display);
     }
-
-
-
 
 }

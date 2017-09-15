@@ -9,6 +9,9 @@ import com.genenakagaki.splitstep.exercise.data.entity.ExerciseSubType;
 import io.reactivex.Completable;
 import io.reactivex.CompletableEmitter;
 import io.reactivex.CompletableOnSubscribe;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 
 /**
@@ -32,8 +35,10 @@ public class ExerciseListItemViewModel {
         return mExercise;
     }
 
-    public BehaviorSubject<Exercise> getExerciseSubject() {
-        return mExerciseSubject;
+    public Observable<Exercise> getExerciseSubject() {
+        return mExerciseSubject
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io());
     }
 
     public Completable toggleExerciseFavorite() {
@@ -45,7 +50,8 @@ public class ExerciseListItemViewModel {
                 mExerciseSubject.onNext(mExercise);
                 e.onComplete();
             }
-        });
+        }).observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.computation());
     }
 
     public String getExerciseDisplayable() {

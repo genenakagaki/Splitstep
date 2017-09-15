@@ -22,10 +22,8 @@ import org.parceler.Parcels;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 /**
@@ -123,8 +121,6 @@ public class DurationPickerDialog extends DialogFragment {
         mDisposable = new CompositeDisposable();
 
         mDisposable.add(mViewModel.getErrorMessageSubject()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
                 .subscribe(new Consumer<ErrorMessage>() {
                     @Override
                     public void accept(ErrorMessage errorMessage) throws Exception {

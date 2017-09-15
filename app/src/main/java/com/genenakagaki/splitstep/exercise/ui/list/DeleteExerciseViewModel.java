@@ -4,6 +4,8 @@ import com.genenakagaki.splitstep.exercise.data.ExerciseDao;
 import com.genenakagaki.splitstep.exercise.data.entity.ExerciseType;
 
 import io.reactivex.Completable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by gene on 9/7/17.
@@ -26,6 +28,8 @@ public class DeleteExerciseViewModel {
     }
 
     public Completable deleteExerciseCompletable() {
-        return ExerciseDao.getInstance().delete(exerciseId, exerciseType);
+        return ExerciseDao.getInstance().delete(exerciseId, exerciseType)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.computation());
     }
 }
