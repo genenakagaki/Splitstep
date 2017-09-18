@@ -39,15 +39,6 @@
                 android:layout_height="wrap_content">
 
                 <ProgressBar
-                    android:id="@+id/timed_set_progressbar"
-                    style="?android:attr/progressBarStyleHorizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:progressDrawable="@drawable/progress_bar_circular"
-                    android:progressTint="@color/repsProgressColor"
-                    android:visibility="invisible"/>
-
-                <ProgressBar
                     android:id="@+id/rest_progressbar"
                     style="?android:attr/progressBarStyleHorizontal"
                     android:layout_width="match_parent"
@@ -63,6 +54,15 @@
                     android:background="@drawable/done_button"
                     android:text="@string/exercise_done_text"
                     android:textColor="@android:color/white"
+                    android:visibility="invisible"/>
+
+                <ProgressBar
+                    android:id="@+id/timed_set_progressbar"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:progressDrawable="@drawable/progress_bar_circular"
+                    android:progressTint="@color/repsProgressColor"
                     android:visibility="invisible"/>
 
                 <TextView

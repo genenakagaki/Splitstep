@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.genenakagaki.splitstep.exercise.data.ExerciseDao;
 import com.genenakagaki.splitstep.exercise.data.entity.Exercise;
+import com.genenakagaki.splitstep.exercise.data.entity.ExerciseSubType;
 import com.genenakagaki.splitstep.exercise.ui.model.DurationDisplayable;
 
 import java.util.concurrent.TimeUnit;
@@ -27,6 +28,7 @@ public class CoachViewModel {
     private Context context;
     private long exerciseId;
     private Exercise exercise;
+    private ExerciseSubType exerciseSubType;
 
     private DurationDisplayable restDuration;
     private DurationDisplayable setDuration;
@@ -41,6 +43,7 @@ public class CoachViewModel {
             @Override
             public Exercise apply(@NonNull Exercise exercise) throws Exception {
                 CoachViewModel.this.exercise = exercise;
+                exerciseSubType = ExerciseSubType.fromValue(exercise.subType);
 
                 restDuration = new DurationDisplayable(
                         DurationDisplayable.TYPE_REST_DURATION, exercise.restDuration);
@@ -52,6 +55,10 @@ public class CoachViewModel {
 
     public Exercise getExercise() {
         return exercise;
+    }
+
+    public ExerciseSubType getExerciseSubType() {
+        return exerciseSubType;
     }
 
     public Observable<Long> getStartCountDown() {

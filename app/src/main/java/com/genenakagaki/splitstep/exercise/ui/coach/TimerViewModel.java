@@ -45,7 +45,7 @@ public class TimerViewModel {
         return Observable.interval(1, TimeUnit.SECONDS).takeWhile(new Predicate<Long>() {
             @Override
             public boolean test(@NonNull Long aLong) throws Exception {
-                if (aLong < max) {
+                if (aLong < max-1) {
                     duration.setDuration(max - aLong.intValue() -1);
                     return true;
                 } else {

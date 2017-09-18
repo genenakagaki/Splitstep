@@ -168,7 +168,6 @@ public abstract class CoachFragment extends Fragment {
                 mRestProgressBar.setMax(mRestTimerViewModel.getMax());
 
                 setupExerciseSet(exercise);
-                startExerciseSet();
             }
         }));
     }
