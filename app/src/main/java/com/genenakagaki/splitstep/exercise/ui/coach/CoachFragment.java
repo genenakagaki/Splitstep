@@ -167,7 +167,7 @@ public abstract class CoachFragment extends Fragment {
                         new DurationDisplayable(DurationDisplayable.TYPE_REST_DURATION, exercise.restDuration));
                 mRestProgressBar.setMax(mRestTimerViewModel.getMax());
 
-                setupExerciseSet(exercise);
+                setupExerciseSet();
             }
         }));
     }
@@ -250,6 +250,6 @@ public abstract class CoachFragment extends Fragment {
         return mDisposable;
     }
 
-    public abstract void setupExerciseSet(Exercise exercise);
+    public abstract void setupExerciseSet();
     public abstract void startExerciseSet();
 }

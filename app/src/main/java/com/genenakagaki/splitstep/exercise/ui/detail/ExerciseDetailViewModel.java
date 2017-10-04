@@ -47,7 +47,7 @@ public class ExerciseDetailViewModel {
                 .subscribeOn(Schedulers.io());
     }
 
-    public Completable setExercise() {
+    public Completable loadExercise() {
         return ExerciseDao.getInstance().findById(exerciseId).flatMapCompletable(new Function<Exercise, CompletableSource>() {
             @Override
             public CompletableSource apply(@NonNull final Exercise exercise) throws Exception {

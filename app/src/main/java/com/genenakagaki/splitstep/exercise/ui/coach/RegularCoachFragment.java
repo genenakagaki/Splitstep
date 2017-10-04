@@ -3,7 +3,6 @@ package com.genenakagaki.splitstep.exercise.ui.coach;
 import android.view.View;
 
 import com.genenakagaki.splitstep.R;
-import com.genenakagaki.splitstep.exercise.data.entity.Exercise;
 import com.genenakagaki.splitstep.exercise.ui.model.DurationDisplayable;
 
 import butterknife.OnClick;
@@ -19,14 +18,17 @@ public class RegularCoachFragment extends CoachFragment {
     private TimerViewModel mTimedSetsTimerViewModel;
 
     @Override
-    public void setupExerciseSet(Exercise exercise) {
+    public void setupExerciseSet() {
         switch (getViewModel().getExerciseSubType()) {
             case REPS:
-                mMainProgressTopText.setText(getString(R.string.reps_count, exercise.reps));
+                int reps = getViewModel().getExercise().reps;
+                mMainProgressTopText.setText(getString(R.string.reps_count, reps));
                 break;
             case TIMED_SETS:
+                int setDuration = getViewModel().getExercise().setDuration;
+
                 mTimedSetsTimerViewModel = new TimerViewModel(
-                        new DurationDisplayable(DurationDisplayable.TYPE_SET_DURATION, exercise.setDuration));
+                        new DurationDisplayable(DurationDisplayable.TYPE_SET_DURATION, setDuration));
                 mTimedSetProgressBar.setMax(mTimedSetsTimerViewModel.getMax());
                 break;
         }

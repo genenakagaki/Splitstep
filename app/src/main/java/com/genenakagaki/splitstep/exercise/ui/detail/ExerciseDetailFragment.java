@@ -167,7 +167,7 @@ public class ExerciseDetailFragment extends Fragment
                     }
                 }));
 
-        mDisposable.add(mViewModel.setExercise().subscribe());
+        mDisposable.add(mViewModel.loadExercise().subscribe());
     }
 
     @Override

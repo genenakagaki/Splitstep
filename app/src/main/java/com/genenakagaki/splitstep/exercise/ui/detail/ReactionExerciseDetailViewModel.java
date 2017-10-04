@@ -44,7 +44,7 @@ public class ReactionExerciseDetailViewModel {
                 .subscribeOn(Schedulers.io());
     }
 
-    public Completable setReactionExercise() {
+    public Completable loadReactionExercise() {
         return ReactionExerciseDao.getInstance().findById(exerciseId).flatMapCompletable(new Function<ReactionExercise, CompletableSource>() {
             @Override
             public CompletableSource apply(@NonNull final ReactionExercise exercise) throws Exception {

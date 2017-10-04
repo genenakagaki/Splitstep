@@ -73,7 +73,7 @@ public class ExerciseDetailViewModelTest {
         exercise.restDuration = 10;
         exercise.insert();
         ExerciseDetailViewModel viewModel = new ExerciseDetailViewModel(context, exercise.id);
-        viewModel.setExercise().test()
+        viewModel.loadExercise().test()
                 .assertComplete();
 
         DurationDisplayable durationDisplayable = new DurationDisplayable(DurationDisplayable.TYPE_REST_DURATION, 20);
@@ -93,7 +93,7 @@ public class ExerciseDetailViewModelTest {
         exercise.setDuration = 10;
         exercise.insert();
         ExerciseDetailViewModel viewModel = new ExerciseDetailViewModel(context, exercise.id);
-        viewModel.setExercise().test()
+        viewModel.loadExercise().test()
                 .assertComplete();
 
         DurationDisplayable durationDisplayable = new DurationDisplayable(DurationDisplayable.TYPE_SET_DURATION, 20);

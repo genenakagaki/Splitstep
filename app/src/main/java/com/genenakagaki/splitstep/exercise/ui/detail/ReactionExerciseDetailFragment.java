@@ -9,6 +9,9 @@ import android.view.ViewGroup;
 import com.genenakagaki.splitstep.R;
 import com.genenakagaki.splitstep.exercise.data.ExerciseSharedPref;
 import com.genenakagaki.splitstep.exercise.data.entity.ReactionExercise;
+import com.genenakagaki.splitstep.exercise.ui.ExerciseActivity;
+import com.genenakagaki.splitstep.exercise.ui.coach.CoachFragment;
+import com.genenakagaki.splitstep.exercise.ui.coach.ReactionCoachFragment;
 import com.genenakagaki.splitstep.exercise.ui.model.DurationDisplayable;
 
 import butterknife.OnClick;
@@ -63,7 +66,7 @@ public class ReactionExerciseDetailFragment extends ExerciseDetailFragment {
                     }
                 }));
 
-        getDisposable().add(mViewModel.setReactionExercise().subscribe());
+        getDisposable().add(mViewModel.loadReactionExercise().subscribe());
     }
 
     @Override
@@ -91,5 +94,12 @@ public class ReactionExerciseDetailFragment extends ExerciseDetailFragment {
         if (durationDisplayable.getType() == DurationDisplayable.TYPE_REP_DURATION) {
             getDisposable().add(mViewModel.setRepDuration(durationDisplayable).subscribe());
         }
+    }
+
+    @OnClick(R.id.start_exercise_button)
+    public void onClickStartExercise() {
+        Timber.d("onClickStartExercise");
+        ExerciseActivity activity = (ExerciseActivity) getActivity();
+        activity.showFragment(new ReactionCoachFragment(), CoachFragment.class.getSimpleName(), true);
     }
 }
