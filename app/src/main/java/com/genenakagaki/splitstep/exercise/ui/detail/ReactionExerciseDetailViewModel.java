@@ -55,7 +55,7 @@ public class ReactionExerciseDetailViewModel {
                         reactionExerciseSubject.onNext(exercise);
 
                         repDuration = new DurationDisplayable(
-                                DurationDisplayable.TYPE_REST_DURATION, exercise.repDuration);
+                                DurationDisplayable.TYPE_REP_DURATION, exercise.repDuration);
                         repDuration.setTitle(context.getString(R.string.rep_duration));
 
                         e.onComplete();

@@ -10,6 +10,7 @@ import com.genenakagaki.splitstep.exercise.ui.model.DurationDisplayable;
 
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
+import timber.log.Timber;
 
 /**
  * Created by Gene on 9/18/2017.
@@ -101,11 +102,13 @@ public class ReactionCoachFragment extends CoachFragment {
                 getDisposable().add(mRepsTimerViewModel.startTimer().subscribe(new Consumer<String>() {
                     @Override
                     public void accept(String s) throws Exception {
+                        Timber.d("in timer");
 
                     }
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
+                        Timber.d("rep timer finished");
                         getDisposable().add(mConeViewModel.getNextCone().subscribe(new Consumer<Integer>() {
                             @Override
                             public void accept(Integer integer) throws Exception {

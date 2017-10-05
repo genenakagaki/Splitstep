@@ -81,7 +81,7 @@ public class ReactionExerciseDetailFragment extends ExerciseDetailFragment {
     }
 
     @OnClick(R.id.rep_duration_layout)
-    public void onClickSetDuration() {
+    public void onClickRepDuration() {
         DurationPickerDialog fragment =
                 DurationPickerDialog.newInstance(mViewModel.getRepDuration());
         fragment.show(getFragmentManager(), DurationPickerDialog.class.getSimpleName());
