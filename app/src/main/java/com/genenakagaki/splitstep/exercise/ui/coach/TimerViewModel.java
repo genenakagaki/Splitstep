@@ -40,13 +40,13 @@ public class TimerViewModel {
     }
 
     public Observable<String> startTimer() {
-        duration.setDuration(max-1);
+        duration.setDuration(max - 1);
 
         return Observable.interval(1, TimeUnit.SECONDS).takeWhile(new Predicate<Long>() {
             @Override
             public boolean test(@NonNull Long aLong) throws Exception {
-                if (aLong < max-1) {
-                    duration.setDuration(max - aLong.intValue() -1);
+                if (aLong < max - 1) {
+                    duration.setDuration(max - aLong.intValue() - 1);
                     return true;
                 } else {
                     duration.setDuration(max);
@@ -61,6 +61,34 @@ public class TimerViewModel {
         }).observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io());
     }
+
+    public Observable<Long> startInterval() {
+        return Observable.interval(duration.getDuration(), TimeUnit.SECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.computation());
+    }
+
+    public Observable<String> startInterval(final int reps) {
+        return Observable.interval(duration.getDuration(), TimeUnit.SECONDS).takeWhile(new Predicate<Long>() {
+            @Override
+            public boolean test(@NonNull Long aLong) throws Exception {
+                if (aLong < reps - 1) {
+                    duration.setDuration(max - aLong.intValue() - 1);
+                    return true;
+                } else {
+                    duration.setDuration(max);
+                    return false;
+                }
+            }
+        }).map(new Function<Long, String>() {
+            @Override
+            public String apply(@NonNull Long aLong) throws Exception {
+                return getTimerDisplay();
+            }
+        }).observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io());
+    }
+
 
     public String getTimerDisplay() {
         StringBuilder sb = new StringBuilder();

@@ -57,7 +57,7 @@
                     android:visibility="invisible"/>
 
                 <ProgressBar
-                    android:id="@+id/timed_set_progressbar"
+                    android:id="@+id/set_progressbar"
                     style="?android:attr/progressBarStyleHorizontal"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"

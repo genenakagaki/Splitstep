@@ -29,7 +29,7 @@ public class RegularCoachFragment extends CoachFragment {
 
                 mTimedSetsTimerViewModel = new TimerViewModel(
                         new DurationDisplayable(DurationDisplayable.TYPE_SET_DURATION, setDuration));
-                mTimedSetProgressBar.setMax(mTimedSetsTimerViewModel.getMax());
+                mSetProgressBar.setMax(mTimedSetsTimerViewModel.getMax());
                 break;
         }
     }
@@ -41,9 +41,9 @@ public class RegularCoachFragment extends CoachFragment {
                 mDoneButton.setVisibility(View.VISIBLE);
                 break;
             case TIMED_SETS:
-                mTimedSetProgressBar.setVisibility(View.VISIBLE);
-                mTimedSetProgressBar.setProgress(mTimedSetsTimerViewModel.getMax());
-                animateProgress(mTimedSetProgressBar, 0, mTimedSetsTimerViewModel.getAnimateDuration());
+                mSetProgressBar.setVisibility(View.VISIBLE);
+                mSetProgressBar.setProgress(mTimedSetsTimerViewModel.getMax());
+                animateProgress(mSetProgressBar, 0, mTimedSetsTimerViewModel.getAnimateDuration());
                 mMainProgressText.setText(mTimedSetsTimerViewModel.getTimerDisplay());
 
                 getDisposable().add(mTimedSetsTimerViewModel.startTimer().subscribe(new Consumer<String>() {
@@ -58,7 +58,7 @@ public class RegularCoachFragment extends CoachFragment {
                 }, new Action() {
                     @Override
                     public void run() throws Exception {
-                        mTimedSetProgressBar.setVisibility(View.INVISIBLE);
+                        mSetProgressBar.setVisibility(View.INVISIBLE);
                         onFinishExerciseSet();
                     }
                 }));

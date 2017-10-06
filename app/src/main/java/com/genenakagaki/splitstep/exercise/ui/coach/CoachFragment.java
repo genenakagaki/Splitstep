@@ -48,8 +48,8 @@ public abstract class CoachFragment extends Fragment {
     ProgressBar mSetsProgressBar;
     @BindView(R.id.rest_progressbar)
     ProgressBar mRestProgressBar;
-    @BindView(R.id.timed_set_progressbar)
-    ProgressBar mTimedSetProgressBar;
+    @BindView(R.id.set_progressbar)
+    ProgressBar mSetProgressBar;
     @BindView(R.id.main_progressbar_container)
     LinearLayout mMainProgressBarContainer;
     @BindView(R.id.sets_progress_text)
@@ -106,8 +106,8 @@ public abstract class CoachFragment extends Fragment {
                     mContentLayout.getViewTreeObserver().removeGlobalOnLayoutListener(this);
                 }
 
-                int size = mTimedSetProgressBar.getWidth();
-                mTimedSetProgressBar.setLayoutParams(new RelativeLayout.LayoutParams(size, size));
+                int size = mSetProgressBar.getWidth();
+                mSetProgressBar.setLayoutParams(new RelativeLayout.LayoutParams(size, size));
                 mRestProgressBar.setLayoutParams(new RelativeLayout.LayoutParams(size, size));
 
                 RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
@@ -200,6 +200,7 @@ public abstract class CoachFragment extends Fragment {
     }
 
     public void onFinishExerciseSet() {
+        mAlarm.play();
         mSetsProgressViewModel.incrementProgressBy(1);
 
         if (mSetsProgressViewModel.isFinished()) {
@@ -236,10 +237,6 @@ public abstract class CoachFragment extends Fragment {
             animation.setInterpolator(new LinearInterpolator());
             animation.start();
         }
-    }
-
-    public void playAlarm() {
-        mAlarm.play();
     }
 
     public CoachViewModel getViewModel() {
