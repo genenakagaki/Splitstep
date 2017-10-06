@@ -50,6 +50,7 @@ public class RegularCoachFragment extends CoachFragment {
                     @Override
                     public void accept(String s) throws Exception {
                         mMainProgressText.setText(s);
+
                     }
                 }, new Consumer<Throwable>() {
                     @Override

@@ -85,8 +85,20 @@ public class ReactionCoachFragment extends CoachFragment {
 
     @Override
     public void startExerciseSet() {
+        mSetProgressBar.setVisibility(View.VISIBLE);
+
         switch (getViewModel().getExerciseSubType()) {
             case REPS:
+                mSetProgressBar.setProgress(mRepTimerViewModel.getMax());
+                animateProgress(mSetProgressBar, 0, mRepTimerViewModel.getAnimateDuration());
+                getDisposable().add(mConeViewModel.getNextCone().subscribe(new Consumer<Integer>() {
+                    @Override
+                    public void accept(Integer integer) throws Exception {
+                        mTextToSpeech.speak(Integer.toString(integer), TextToSpeech.QUEUE_FLUSH, null);
+                        mMainProgressText.setText(Integer.toString(integer));
+                    }
+                }));
+
                 // Timer for rep
                 getDisposable().add(mRepTimerViewModel.startInterval().subscribe(new Consumer<Long>() {
                     @Override
@@ -112,7 +124,6 @@ public class ReactionCoachFragment extends CoachFragment {
                 }));
                 break;
             case TIMED_SETS:
-                mSetProgressBar.setVisibility(View.VISIBLE);
                 mSetProgressBar.setProgress(mTimedSetsTimerViewModel.getMax());
                 animateProgress(mSetProgressBar, 0, mTimedSetsTimerViewModel.getAnimateDuration());
                 getDisposable().add(mConeViewModel.getNextCone().subscribe(new Consumer<Integer>() {
@@ -136,7 +147,6 @@ public class ReactionCoachFragment extends CoachFragment {
                 }, new Action() {
                     @Override
                     public void run() throws Exception {
-                        mSetProgressBar.setVisibility(View.INVISIBLE);
                         mRepTimerDisposable.dispose();
                         onFinishExerciseSet();
                     }
@@ -159,5 +169,12 @@ public class ReactionCoachFragment extends CoachFragment {
                 getDisposable().add(mRepTimerDisposable);
                 break;
         }
+    }
+
+    @Override
+    public void onFinishExerciseSet() {
+        mSetProgressBar.setVisibility(View.INVISIBLE);
+
+        super.onFinishExerciseSet();
     }
 }

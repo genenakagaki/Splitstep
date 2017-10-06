@@ -18,17 +18,29 @@ import io.reactivex.schedulers.Schedulers;
 
 public class RepTimerViewModel {
 
-    private DurationDisplayable duration;
+    private int max;
+    private DurationDisplayable repDuration;
     private Exercise exercise;
     private int currentRep;
+    private int animateDuration;
 
-    public RepTimerViewModel(DurationDisplayable duration, Exercise exercise) {
-        this.duration = duration;
+    public RepTimerViewModel(DurationDisplayable repDuration, Exercise exercise) {
+        this.repDuration = repDuration;
         this.exercise = exercise;
+        this.max = repDuration.getDuration() * exercise.reps * 1000;
+        animateDuration = repDuration.getDuration() * 1000 * exercise.reps;
     }
 
-    public int getCurrentRep() {
-        return currentRep;
+    public int getMax() {
+        return max;
+    }
+
+    public int getAnimateDuration() {
+        return animateDuration;
+    }
+
+    public int getCurrentProgress() {
+        return currentRep * 100;
     }
 
     public Observable<Long> startInterval() {
@@ -36,7 +48,7 @@ public class RepTimerViewModel {
             case REPS:
                 currentRep = exercise.reps;
 
-                return Observable.interval(duration.getDuration(), TimeUnit.SECONDS).takeWhile(new Predicate<Long>() {
+                return Observable.interval(repDuration.getDuration(), TimeUnit.SECONDS).takeWhile(new Predicate<Long>() {
                     @Override
                     public boolean test(@NonNull Long aLong) throws Exception {
                         if (aLong < exercise.reps - 1) {
@@ -49,7 +61,7 @@ public class RepTimerViewModel {
                 }).observeOn(AndroidSchedulers.mainThread())
                         .subscribeOn(Schedulers.io());
             case TIMED_SETS:
-                return Observable.interval(duration.getDuration(), TimeUnit.SECONDS)
+                return Observable.interval(repDuration.getDuration(), TimeUnit.SECONDS)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribeOn(Schedulers.computation());
         }
