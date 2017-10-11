@@ -2,7 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.genenakagaki.splitstep">
 
-    <uses-permission android:name="android.permission.WAKE_LOCK"></uses-permission>
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:name=".App"
@@ -23,7 +24,7 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=""></receiver>
+        <receiver android:name=".exercise.ui.receiver.CoachAlarmBroadcastReceiver"></receiver>
     </application>
 
 </manifest>

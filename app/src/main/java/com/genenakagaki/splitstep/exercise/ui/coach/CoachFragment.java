@@ -1,12 +1,19 @@
 package com.genenakagaki.splitstep.exercise.ui.coach;
 
 import android.animation.ObjectAnimator;
+import android.app.AlarmManager;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
@@ -25,6 +32,7 @@ import com.genenakagaki.splitstep.R;
 import com.genenakagaki.splitstep.exercise.data.ExerciseSharedPref;
 import com.genenakagaki.splitstep.exercise.data.entity.Exercise;
 import com.genenakagaki.splitstep.exercise.ui.model.DurationDisplayable;
+import com.genenakagaki.splitstep.exercise.ui.receiver.CoachAlarmBroadcastReceiver;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -33,6 +41,7 @@ import butterknife.Unbinder;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
+import timber.log.Timber;
 
 /**
  * Created by Gene on 9/13/2017.
@@ -172,12 +181,39 @@ public abstract class CoachFragment extends Fragment {
         }));
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onPause() {
+        Timber.d("onPause");
         super.onPause();
         if (mDisposable != null && !mDisposable.isDisposed()) {
             mDisposable.dispose();
         }
+//
+        NotificationManager nm = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+        String id = "splitstep_channel";
+//        CharSequence name = getString(R.string.channel_name);
+//        String description = getString(R.string.channel_description);
+//        int importance = NotificationManager.IMPORTANCE_HIGH;
+//        NotificationChannel channel = new NotificationChannel(id, name, importance);
+//        channel.setDescription(description);
+//        channel.enableLights(true);
+//        channel.setLightColor(Color.RED);
+//        channel.enableVibration(true);
+//        channel.setVibrationPattern(new long[] {100, 200, 300, 400, 500});
+//        nm.createNotificationChannel(channel);
+
+
+
+
+        AlarmManager am = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(getActivity(), CoachAlarmBroadcastReceiver.class);
+        intent.putExtra("a", Boolean.FALSE);
+        PendingIntent pi = PendingIntent.getBroadcast(getActivity(), 0, intent, 0);
+        //After after 5 seconds
+        am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                SystemClock.elapsedRealtime() + 5000,
+                pi);
     }
 
     @Override

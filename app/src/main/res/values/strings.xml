@@ -69,4 +69,8 @@
     <string name="error_empty_exercise_name">Enter an exercise name.</string>
     <string name="error_exercise_already_exists">An exercise with the same name already exists.</string>
     <string name="error_zero_duration">Must be more than 0 seconds</string>
+
+    <string name="channel_name">channel name</string>
+    <string name="channel_description">channel description</string>
+
 </resources>
