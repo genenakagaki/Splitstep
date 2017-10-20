@@ -24,7 +24,7 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".exercise.ui.receiver.CoachAlarmBroadcastReceiver"></receiver>
+        <receiver android:name=".exercise.receiver.CoachAlarmBroadcastReceiver"></receiver>
     </application>
 
 </manifest>

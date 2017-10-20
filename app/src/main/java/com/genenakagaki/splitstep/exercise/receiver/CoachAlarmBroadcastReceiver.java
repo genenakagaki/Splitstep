@@ -1,4 +1,4 @@
-package com.genenakagaki.splitstep.exercise.ui.receiver;
+package com.genenakagaki.splitstep.exercise.receiver;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -37,7 +37,7 @@ public class CoachAlarmBroadcastReceiver extends BroadcastReceiver {
                         .setSmallIcon(R.drawable.ic_check)
                         .setContentTitle("My notification")
                         .setContentText("Hello world!")
-                        .setVibrate(new long[] {0, 1000, 100, 100, 100, 100, 500, 1000, 500, 100, 100, 100, 100, 100, 100, 100, 100, 100})
+                        .setVibrate(new long[] {0, 1000, 100, 100, 100, 100})
                         .setChannelId(id);
 
         Intent resultIntent = new Intent(context, ExerciseActivity.class);
