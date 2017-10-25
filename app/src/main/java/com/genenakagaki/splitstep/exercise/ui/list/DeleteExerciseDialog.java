@@ -69,7 +69,8 @@ public class DeleteExerciseDialog extends DialogFragment {
                     public void run() throws Exception {
                         ExerciseListFragment fragment =
                                 (ExerciseListFragment) getFragmentManager().findFragmentByTag(ExerciseListFragment.class.getSimpleName());
-                        fragment.getExerciseList();
+                        fragment.getDisposable().add(
+                                fragment.getViewModel().loadExerciseList().subscribe());
                     }
                 }));
     }

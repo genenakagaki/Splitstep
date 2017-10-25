@@ -71,14 +71,6 @@ public class ExerciseDetailFragment extends Fragment
 
     public ExerciseDetailFragment() {}
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        long exerciseId = ExerciseSharedPref.getExerciseId(getActivity());
-        mViewModel = new ExerciseDetailViewModel(getActivity(), exerciseId);
-    }
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -97,8 +89,10 @@ public class ExerciseDetailFragment extends Fragment
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                mDisposable.add(mViewModel.setNotes(charSequence.toString())
-                        .subscribe());
+                if (mDisposable != null) {
+                    mDisposable.add(mViewModel.setNotes(charSequence.toString())
+                            .subscribe());
+                }
             }
 
             @Override
@@ -122,12 +116,20 @@ public class ExerciseDetailFragment extends Fragment
     @Override
     public void onResume() {
         super.onResume();
+        ExerciseActivity activity = (ExerciseActivity) getActivity();
+        activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        long exerciseId = ExerciseSharedPref.getExerciseId(getActivity());
+        mViewModel = new ExerciseDetailViewModel(getActivity(), exerciseId);
+
         mDisposable = new CompositeDisposable();
 
         mDisposable.add(mViewModel.getExerciseSubject()
                 .subscribe(new Consumer<Exercise>() {
                     @Override
                     public void accept(Exercise exercise) throws Exception {
+                        getActivity().setTitle(mViewModel.getExerciseDisplayable());
+
                         mExerciseNameTextView.setText(exercise.name);
                         if (exercise.favorite) {
                             mFavoriteImageSwitcher.setImageResource(R.drawable.ic_star);
@@ -195,6 +197,12 @@ public class ExerciseDetailFragment extends Fragment
             Timber.d("sets");
             mViewModel.setSets(number).subscribe();
         }
+    }
+
+    @OnClick(R.id.favorite_imageswitcher)
+    public void onClickFavorite() {
+        mDisposable.add(
+                mViewModel.toggleExerciseFavorite().subscribe());
     }
 
     @OnClick(R.id.rest_duration_layout)

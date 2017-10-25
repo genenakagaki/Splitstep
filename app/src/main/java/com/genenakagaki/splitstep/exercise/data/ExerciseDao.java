@@ -41,8 +41,8 @@ public class ExerciseDao {
     private ExerciseDao() {
     }
 
-    public Completable insert(final String name, final ExerciseType exerciseType) {
-        return insert(new Exercise(exerciseType.getValue(), name));
+    public Completable insert(final String name, final int exerciseType) {
+        return insert(new Exercise(exerciseType, name));
     }
 
     public Completable insert(final Exercise exercise) {
@@ -98,13 +98,13 @@ public class ExerciseDao {
         });
     }
 
-    public Single<List<Exercise>> findByType(final ExerciseType exerciseType) {
+    public Single<List<Exercise>> findByType(final int exerciseType) {
         return Single.create(new SingleOnSubscribe<List<Exercise>>() {
             @Override
             public void subscribe(@NonNull SingleEmitter<List<Exercise>> e) throws Exception {
                 List<Exercise> exercises = SQLite.select()
                         .from(Exercise.class)
-                        .where(Exercise_Table.type.eq(exerciseType.getValue()))
+                        .where(Exercise_Table.type.eq(exerciseType))
                         .queryList();
 
                 e.onSuccess(exercises);
@@ -145,7 +145,7 @@ public class ExerciseDao {
         return true;
     }
 
-    public Completable delete(final long exerciseId, final ExerciseType exerciseType) {
+    public Completable delete(final long exerciseId, final int exerciseType) {
         return Completable.create(new CompletableOnSubscribe() {
             @Override
             public void subscribe(@NonNull CompletableEmitter e) throws Exception {
@@ -153,7 +153,7 @@ public class ExerciseDao {
                         .where(Exercise_Table.id.eq(exerciseId))
                         .execute();
 
-                if (exerciseType == ExerciseType.REACTION) {
+                if (ExerciseType.fromValue(exerciseType) == ExerciseType.REACTION) {
                     SQLite.delete(ReactionExercise.class)
                             .where(ReactionExercise_Table.id.eq(exerciseId))
                             .execute();

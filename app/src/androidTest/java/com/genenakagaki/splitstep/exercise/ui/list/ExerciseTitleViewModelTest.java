@@ -28,7 +28,7 @@ import static org.junit.Assert.assertEquals;
  */
 
 @RunWith(AndroidJUnit4.class)
-public class ExerciseListItemViewModelTest {
+public class ExerciseTitleViewModelTest {
 
     private Context mContext = InstrumentationRegistry.getTargetContext();
 
@@ -51,7 +51,7 @@ public class ExerciseListItemViewModelTest {
         Exercise exercise = new Exercise(ExerciseType.REGULAR_VALUE, "exercise");
         exercise.insert();
 
-        ExerciseListItemViewModel viewModel = new ExerciseListItemViewModel(mContext, exercise);
+        ExerciseTitleViewModel viewModel = new ExerciseTitleViewModel(mContext, exercise);
 
         viewModel.toggleExerciseFavorite()
                 .test()
@@ -71,7 +71,7 @@ public class ExerciseListItemViewModelTest {
         exercise.favorite = true;
         exercise.insert();
 
-        ExerciseListItemViewModel viewModel = new ExerciseListItemViewModel(mContext, exercise);
+        ExerciseTitleViewModel viewModel = new ExerciseTitleViewModel(mContext, exercise);
 
         viewModel.toggleExerciseFavorite()
                 .test()
@@ -91,7 +91,7 @@ public class ExerciseListItemViewModelTest {
         exercise.favorite = true;
         exercise.insert();
 
-        ExerciseListItemViewModel viewModel = new ExerciseListItemViewModel(mContext, exercise);
+        ExerciseTitleViewModel viewModel = new ExerciseTitleViewModel(mContext, exercise);
 
         viewModel.toggleExerciseFavorite()
                 .test()
@@ -114,7 +114,7 @@ public class ExerciseListItemViewModelTest {
         String exerciseName = "exercise name";
         Exercise exercise = new Exercise(ExerciseType.REGULAR_VALUE, exerciseName);
 
-        ExerciseListItemViewModel viewModel = new ExerciseListItemViewModel(mContext, exercise);
+        ExerciseTitleViewModel viewModel = new ExerciseTitleViewModel(mContext, exercise);
 
         String deleteMessage = viewModel.getExerciseDisplayable();
         String expectedMessage = "exercise name (Regular)";
@@ -127,7 +127,7 @@ public class ExerciseListItemViewModelTest {
         String exerciseName = "exercise name";
         Exercise exercise = new Exercise(ExerciseType.REACTION_VALUE, exerciseName);
 
-        ExerciseListItemViewModel viewModel = new ExerciseListItemViewModel(mContext, exercise);
+        ExerciseTitleViewModel viewModel = new ExerciseTitleViewModel(mContext, exercise);
 
         String deleteMessage = viewModel.getExerciseDisplayable();
         String expectedMessage = "exercise name (Reaction)";

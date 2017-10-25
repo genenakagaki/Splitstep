@@ -18,25 +18,34 @@ import io.reactivex.subjects.BehaviorSubject;
  * Created by gene on 9/7/17.
  */
 
-public class ExerciseListItemViewModel {
+public class ExerciseTitleViewModel {
 
-    private Context mContext;
-    private Exercise mExercise;
+    private Context context;
+    private Exercise exercise;
 
-    private BehaviorSubject<Exercise> mExerciseSubject = BehaviorSubject.create();
+    private BehaviorSubject<Exercise> exerciseSubject;
 
-    public ExerciseListItemViewModel(Context context, Exercise exercise) {
-        mContext = context;
-        mExercise = exercise;
-        mExerciseSubject.onNext(exercise);
+    public ExerciseTitleViewModel(Context context, Exercise exercise) {
+        this(context, exercise, null);
+    }
+
+    public ExerciseTitleViewModel(Context context, Exercise exercise, BehaviorSubject<Exercise> exerciseSubject) {
+        this.context = context;
+        this.exercise = exercise;
+        if (this.exerciseSubject == null) {
+            this.exerciseSubject = BehaviorSubject.create();
+            this.exerciseSubject.onNext(exercise);
+        } else {
+            this.exerciseSubject = exerciseSubject;
+        }
     }
 
     public Exercise getExercise() {
-        return mExercise;
+        return exercise;
     }
 
     public Observable<Exercise> getExerciseSubject() {
-        return mExerciseSubject
+        return exerciseSubject
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io());
     }
@@ -45,9 +54,9 @@ public class ExerciseListItemViewModel {
         return Completable.create(new CompletableOnSubscribe() {
             @Override
             public void subscribe(@io.reactivex.annotations.NonNull CompletableEmitter e) throws Exception {
-                mExercise.favorite = !mExercise.favorite;
-                mExercise.update();
-                mExerciseSubject.onNext(mExercise);
+                exercise.favorite = !exercise.favorite;
+                exercise.update();
+                exerciseSubject.onNext(exercise);
                 e.onComplete();
             }
         }).observeOn(AndroidSchedulers.mainThread())
@@ -57,15 +66,15 @@ public class ExerciseListItemViewModel {
     public String getExerciseDisplayable() {
         String exerciseTypeString;
 
-        switch (ExerciseSubType.fromValue(mExercise.subType)) {
+        switch (ExerciseSubType.fromValue(exercise.subType)) {
             case REPS:
-                exerciseTypeString = mContext.getString(R.string.reps_subtype);
+                exerciseTypeString = context.getString(R.string.reps_subtype);
                 break;
             default: // TIMED_SETS:
-                exerciseTypeString = mContext.getString(R.string.timed_sets_subtype);
+                exerciseTypeString = context.getString(R.string.timed_sets_subtype);
         }
 
-        return mExercise.name + "  (" + exerciseTypeString + ")";
+        return exercise.name + "  (" + exerciseTypeString + ")";
 
     }
 

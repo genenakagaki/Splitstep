@@ -5,6 +5,7 @@ import android.content.Context;
 import com.genenakagaki.splitstep.R;
 import com.genenakagaki.splitstep.exercise.data.ExerciseDao;
 import com.genenakagaki.splitstep.exercise.data.entity.Exercise;
+import com.genenakagaki.splitstep.exercise.ui.list.ExerciseTitleViewModel;
 import com.genenakagaki.splitstep.exercise.ui.model.DurationDisplayable;
 
 import io.reactivex.Completable;
@@ -25,8 +26,10 @@ import io.reactivex.subjects.BehaviorSubject;
 public class ExerciseDetailViewModel {
 
     private Context context;
-    private long exerciseId;
 
+    private ExerciseTitleViewModel exerciseTitleViewModel;
+
+    private long exerciseId;
     private Exercise exercise;
     private BehaviorSubject<Exercise> exerciseSubject = BehaviorSubject.create();
 
@@ -39,6 +42,7 @@ public class ExerciseDetailViewModel {
     public ExerciseDetailViewModel(Context context, long exerciseId) {
         this.context = context;
         this.exerciseId = exerciseId;
+        exerciseTitleViewModel = new ExerciseTitleViewModel(context, exercise, exerciseSubject);
     }
 
     public Observable<Exercise> getExerciseSubject() {
@@ -70,6 +74,14 @@ public class ExerciseDetailViewModel {
             }
         }).observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.computation());
+    }
+
+    public Completable toggleExerciseFavorite() {
+        return exerciseTitleViewModel.toggleExerciseFavorite();
+    }
+
+    public String getExerciseDisplayable() {
+        return exerciseTitleViewModel.getExerciseDisplayable();
     }
 
     public Completable setReps(final int reps) {

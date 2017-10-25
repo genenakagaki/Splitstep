@@ -20,17 +20,18 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
                 <ImageSwitcher
                     android:id="@+id/favorite_imageswitcher"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingRight="@dimen/list_item_padding" />
+                    android:paddingRight="@dimen/list_item_padding"/>
 
                 <TextView
                     android:id="@+id/exercise_name_textview"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="24sp" />
             </LinearLayout>
@@ -38,7 +39,8 @@
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/notes">
+                android:hint="@string/notes"
+                android:layout_marginTop="8dp">
 
                 <android.support.design.widget.TextInputEditText
                     android:id="@+id/notes_input"

@@ -49,7 +49,6 @@ public class ExerciseTypeFragment extends Fragment {
     public void onResume() {
         Timber.d("onResume");
         super.onResume();
-        getActivity().setTitle(getString(R.string.app_name));
     }
 
     @Override

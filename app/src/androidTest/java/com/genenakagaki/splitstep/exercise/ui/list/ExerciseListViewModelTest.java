@@ -48,7 +48,7 @@ public class ExerciseListViewModelTest {
 
     @Test
     public void testGetTitle_WithRegularExercise_ShouldReturnCorrectTitle() {
-        ExerciseListViewModel viewModel = new ExerciseListViewModel(mContext, ExerciseType.REGULAR);
+        ExerciseListViewModel viewModel = new ExerciseListViewModel(mContext, ExerciseType.REGULAR.getValue());
 
         String title = viewModel.getTitle();
         String expectedTitle = mContext.getString(R.string.exercise);
@@ -58,7 +58,7 @@ public class ExerciseListViewModelTest {
 
     @Test
     public void testGetTitle_WithReactionExercise_ShouldReturnCorrectTitle() {
-        ExerciseListViewModel viewModel = new ExerciseListViewModel(mContext, ExerciseType.REACTION);
+        ExerciseListViewModel viewModel = new ExerciseListViewModel(mContext, ExerciseType.REACTION.getValue());
 
         String title = viewModel.getTitle();
         String expectedTitle = mContext.getString(R.string.reaction_exercise);
@@ -68,9 +68,9 @@ public class ExerciseListViewModelTest {
 
     @Test
     public void testGetExerciseList_WithNoExercise_SubjectShouldEmitEmptyList() {
-        ExerciseListViewModel viewModel = new ExerciseListViewModel(mContext, ExerciseType.REGULAR);
+        ExerciseListViewModel viewModel = new ExerciseListViewModel(mContext, ExerciseType.REGULAR.getValue());
 
-        viewModel.getExerciseList()
+        viewModel.loadExerciseList()
                 .test()
                 .assertComplete();
 
@@ -86,7 +86,7 @@ public class ExerciseListViewModelTest {
 
     @Test
     public void testGetExerciseList_WithRegularExercise_SubjectShouldEmitRegularExercises() {
-        ExerciseListViewModel viewModel = new ExerciseListViewModel(mContext, ExerciseType.REGULAR);
+        ExerciseListViewModel viewModel = new ExerciseListViewModel(mContext, ExerciseType.REGULAR.getValue());
 
         String[] regularExerciseNames = {
                 "repsExercise1",
@@ -96,7 +96,7 @@ public class ExerciseListViewModelTest {
 
         DatabaseUtils.insertExercises(regularExerciseNames, ExerciseType.REGULAR_VALUE);
 
-        viewModel.getExerciseList()
+        viewModel.loadExerciseList()
                 .test()
                 .assertComplete();
 
@@ -112,7 +112,7 @@ public class ExerciseListViewModelTest {
 
     @Test
     public void testGetExerciseList_WithReactionExercise_SubjectShouldEmitReactionExercises() {
-        ExerciseListViewModel viewModel = new ExerciseListViewModel(mContext, ExerciseType.REACTION);
+        ExerciseListViewModel viewModel = new ExerciseListViewModel(mContext, ExerciseType.REACTION.getValue());
 
         String[] reactionExerciseNames = {
                 "reactionExercise1",
@@ -122,7 +122,7 @@ public class ExerciseListViewModelTest {
 
         DatabaseUtils.insertExercises(reactionExerciseNames, ExerciseType.REACTION_VALUE);
 
-        viewModel.getExerciseList()
+        viewModel.loadExerciseList()
                 .test()
                 .assertComplete();
 

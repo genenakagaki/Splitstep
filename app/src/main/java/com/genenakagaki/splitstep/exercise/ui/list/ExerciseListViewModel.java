@@ -2,7 +2,6 @@ package com.genenakagaki.splitstep.exercise.ui.list;
 
 import android.content.Context;
 
-import com.genenakagaki.splitstep.R;
 import com.genenakagaki.splitstep.exercise.data.ExerciseDao;
 import com.genenakagaki.splitstep.exercise.data.entity.Exercise;
 import com.genenakagaki.splitstep.exercise.data.entity.ExerciseType;
@@ -35,9 +34,9 @@ public class ExerciseListViewModel {
 
     private BehaviorSubject<List<Exercise>> exercisesSubject = BehaviorSubject.create();
 
-    public ExerciseListViewModel(Context context, ExerciseType exerciseType) {
+    public ExerciseListViewModel(Context context, int exerciseType) {
         this.context = context;
-        this.exerciseType = exerciseType;
+        this.exerciseType = ExerciseType.fromValue(exerciseType);
     }
 
     public Observable<List<Exercise>> getExercisesSubject() {
@@ -54,19 +53,19 @@ public class ExerciseListViewModel {
         return isEditMode;
     }
 
-    public String getTitle() {
-        switch (exerciseType) {
-            case REGULAR:
-                return context.getString(R.string.exercise);
-            default: // REACTION:
-                return context.getString(R.string.reaction_exercise);
-        }
-    }
+//    public String getTitle() {
+//        switch (exerciseType) {
+//            case REGULAR:
+//                return context.getString(R.string.exercise);
+//            default: // REACTION:
+//                return context.getString(R.string.reaction_exercise);
+//        }
+//    }
 
-    public Completable getExerciseList() {
-        Timber.d("getExerciseList");
+    public Completable loadExerciseList() {
+        Timber.d("loadExerciseList");
 
-        return ExerciseDao.getInstance().findByType(exerciseType).flatMapCompletable(new Function<List<Exercise>, CompletableSource>() {
+        return ExerciseDao.getInstance().findByType(exerciseType.getValue()).flatMapCompletable(new Function<List<Exercise>, CompletableSource>() {
             @Override
             public CompletableSource apply(@NonNull final List<Exercise> exercises) throws Exception {
                 return Completable.create(new CompletableOnSubscribe() {
@@ -79,5 +78,13 @@ public class ExerciseListViewModel {
             }
         }).observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.computation());
+    }
+
+    public void setExerciseType(int exerciseType) {
+        this.exerciseType = ExerciseType.fromValue(exerciseType);
+    }
+
+    public ExerciseType getExerciseType() {
+        return exerciseType;
     }
 }

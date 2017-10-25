@@ -1,7 +1,6 @@
 package com.genenakagaki.splitstep.exercise.ui.list;
 
 import android.content.Context;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageButton;
@@ -33,12 +32,12 @@ public class ExerciseViewHolder extends RecyclerView.ViewHolder {
     @BindView(R.id.favorite_imageswitcher) ImageSwitcher mFavoriteImageSwitcher;
     @BindView(R.id.name_textview) TextView mNameTextButton;
 
-    private Context mContext;
-    private ExerciseListItemViewModel mListItemViewModel;
+    private ExerciseActivity mContext;
+    private ExerciseTitleViewModel mViewModel;
 
     public ExerciseViewHolder(View view, Context context) {
         super(view);
-        mContext = context;
+        mContext = (ExerciseActivity) context;
         ButterKnife.bind(this, view);
         mFavoriteImageSwitcher.setFactory(new ViewSwitcher.ViewFactory() {
             @Override
@@ -53,15 +52,14 @@ public class ExerciseViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void setExercise(Exercise exercise) {
-        mListItemViewModel = new ExerciseListItemViewModel(mContext, exercise);
+        mViewModel = new ExerciseTitleViewModel(mContext, exercise);
 
-        mNameTextButton.setText(mListItemViewModel.getExerciseDisplayable());
+        mNameTextButton.setText(mViewModel.getExerciseDisplayable());
 
-        ExerciseActivity activity = (ExerciseActivity) mContext;
-        ExerciseListFragment fragment = (ExerciseListFragment) activity.getSupportFragmentManager()
-                .findFragmentByTag(ExerciseListFragment.class.getSimpleName());
+        ExerciseListFragment fragment = (ExerciseListFragment)
+                mContext.findFragment(ExerciseListFragment.class.getSimpleName());
 
-        fragment.getDisposable().add(mListItemViewModel.getExerciseSubject()
+        fragment.getDisposable().add(mViewModel.getExerciseSubject()
                 .subscribe(new Consumer<Exercise>() {
                     @Override
                     public void accept(Exercise exercise) throws Exception {
@@ -76,34 +74,43 @@ public class ExerciseViewHolder extends RecyclerView.ViewHolder {
 
     @OnClick(R.id.delete_button)
     public void onDeleteButtonClick() {
-        DeleteExerciseDialog dialog = DeleteExerciseDialog.newInstance(
-                mListItemViewModel.getExercise().id, mListItemViewModel.getExerciseDisplayable());
-        AppCompatActivity activity = (AppCompatActivity) mContext;
-        dialog.show(activity.getSupportFragmentManager(), DeleteExerciseDialog.class.getSimpleName());
+        showDeleteExerciseDialog();
     }
 
     @OnClick(R.id.favorite_imageswitcher)
     public void onFavoriteClick() {
         Timber.d("onFavoriteClick");
-        mListItemViewModel.toggleExerciseFavorite().subscribe();
+        mViewModel.toggleExerciseFavorite().subscribe();
     }
 
     @OnClick(R.id.content)
     public void onExerciseClick() {
         Timber.d("onExerciseClick");
-        ExerciseActivity activity = (ExerciseActivity) mContext;
-        ExerciseSharedPref.setExerciseId(mContext, mListItemViewModel.getExercise().id);
 
-        switch (ExerciseSharedPref.getExerciseType(mContext)) {
-            case REGULAR:
-                activity.showFragment(new ExerciseDetailFragment(),
-                        ExerciseDetailFragment.class.getSimpleName(),
-                        true);
-                break;
-            default:// REACTION: 6
-                activity.showFragment(new ReactionExerciseDetailFragment(),
-                        ExerciseDetailFragment.class.getSimpleName(),
-                        true);
+        ExerciseListFragment fragment = (ExerciseListFragment) mContext.findFragment(ExerciseListFragment.class.getSimpleName());
+        ExerciseListViewModel exerciseListViewModel = fragment.getViewModel();
+        if (exerciseListViewModel.isEditMode()) {
+            showDeleteExerciseDialog();
+        } else {
+            ExerciseSharedPref.setExerciseId(mContext, mViewModel.getExercise().id);
+
+            switch (ExerciseSharedPref.getExerciseType(mContext)) {
+                case REGULAR:
+                    mContext.showFragment(new ExerciseDetailFragment(),
+                            ExerciseDetailFragment.class.getSimpleName(),
+                            true);
+                    break;
+                default:// REACTION:
+                    mContext.showFragment(new ReactionExerciseDetailFragment(),
+                            ExerciseDetailFragment.class.getSimpleName(),
+                            true);
+            }
         }
+    }
+
+    private void showDeleteExerciseDialog() {
+        DeleteExerciseDialog dialog = DeleteExerciseDialog.newInstance(
+                mViewModel.getExercise().id, mViewModel.getExerciseDisplayable());
+        dialog.show(mContext.getSupportFragmentManager(), DeleteExerciseDialog.class.getSimpleName());
     }
 }

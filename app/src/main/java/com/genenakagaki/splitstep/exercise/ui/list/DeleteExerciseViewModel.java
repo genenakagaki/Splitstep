@@ -28,7 +28,7 @@ public class DeleteExerciseViewModel {
     }
 
     public Completable deleteExerciseCompletable() {
-        return ExerciseDao.getInstance().delete(exerciseId, exerciseType)
+        return ExerciseDao.getInstance().delete(exerciseId, exerciseType.getValue())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.computation());
     }

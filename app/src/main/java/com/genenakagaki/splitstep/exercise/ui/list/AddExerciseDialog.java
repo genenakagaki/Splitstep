@@ -156,7 +156,7 @@ public class AddExerciseDialog extends DialogFragment {
     public void onExerciseInserted() {
         ExerciseListFragment fragment = (ExerciseListFragment) getFragmentManager()
                 .findFragmentByTag(ExerciseListFragment.class.getSimpleName());
-        fragment.getExerciseList();
+        fragment.getDisposable().add(fragment.getViewModel().loadExerciseList().subscribe());
         getDialog().dismiss();
     }
 

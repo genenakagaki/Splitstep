@@ -10,6 +10,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.genenakagaki.splitstep.R;
+import com.genenakagaki.splitstep.exercise.data.entity.ExerciseType;
+import com.genenakagaki.splitstep.exercise.ui.detail.ExerciseDetailFragment;
+import com.genenakagaki.splitstep.exercise.ui.list.ExerciseListFragment;
 import com.genenakagaki.splitstep.exercise.ui.type.ExerciseTypeFragment;
 
 import butterknife.ButterKnife;
@@ -22,6 +25,7 @@ public class ExerciseActivity extends AppCompatActivity {
     }
 
     private Toolbar mToolbar;
+    private String mCurrentFragmentTag;
     private OnBackPressedListener mOnBackPressedListener;
 
     @Override
@@ -45,6 +49,27 @@ public class ExerciseActivity extends AppCompatActivity {
     @Override
     public void setTitle(CharSequence title) {
         getSupportActionBar().setTitle(title);
+    }
+
+    public void setTitle() {
+        ExerciseType exerciseType = null;
+        if (mCurrentFragmentTag.equals(ExerciseTypeFragment.class.getSimpleName())) {
+            setTitle(getString(R.string.app_name));
+        } else if (mCurrentFragmentTag.equals(ExerciseListFragment.class.getSimpleName())) {
+            ExerciseListFragment fragment = (ExerciseListFragment) getCurrentFragment();
+            exerciseType = fragment.getViewModel().getExerciseType();
+        } else if (mCurrentFragmentTag.equals(ExerciseDetailFragment.class.getSimpleName()))
+
+        if (exerciseType != null) {
+            switch (exerciseType) {
+                case REGULAR:
+                    setTitle(getString(R.string.exercise));
+                default: // REACTION:
+                    setTitle(getString(R.string.reaction_exercise));
+            }
+        }
+
+        Fragment fragment = getCurrentFragment();
     }
 
     @Override
@@ -81,7 +106,7 @@ public class ExerciseActivity extends AppCompatActivity {
         // get current fragment tag
         FragmentManager fragmentManager = getSupportFragmentManager();
         if (fragmentManager.getBackStackEntryCount() > 0) {
-            String fragmentTag = fragmentManager
+            mCurrentFragmentTag = fragmentManager
                     .getBackStackEntryAt(fragmentManager.getBackStackEntryCount() - 1)
                     .getName();
 
@@ -114,6 +139,16 @@ public class ExerciseActivity extends AppCompatActivity {
         }
 
         transaction.commit();
+
+        mCurrentFragmentTag = tag;
+    }
+
+    public Fragment findFragment(String fragmentTag) {
+        return getSupportFragmentManager().findFragmentByTag(fragmentTag);
+    }
+
+    public Fragment getCurrentFragment() {
+        return getSupportFragmentManager().findFragmentByTag(mCurrentFragmentTag);
     }
 
 }

@@ -76,7 +76,7 @@ public class ExerciseDaoTest {
     public void testInsert_WithNonExistingExercise_ShouldComplete() {
         ExerciseDao exerciseDao = ExerciseDao.getInstance();
 
-        exerciseDao.insert(EXERCISE.name, ExerciseType.REGULAR)
+        exerciseDao.insert(EXERCISE.name, ExerciseType.REGULAR.getValue())
                 .test()
                 .assertComplete();
     }
@@ -85,7 +85,7 @@ public class ExerciseDaoTest {
     public void testInsert_WithEmptyNameString_ShouldEmitError() {
         ExerciseDao exerciseDao = ExerciseDao.getInstance();
 
-        exerciseDao.insert("", ExerciseType.REGULAR)
+        exerciseDao.insert("", ExerciseType.REGULAR.getValue())
                 .test()
                 .assertError(InvalidExerciseNameException.class);
     }
@@ -96,7 +96,7 @@ public class ExerciseDaoTest {
 
         EXERCISE.insert();
 
-        exerciseDao.insert(EXERCISE.name, ExerciseType.REGULAR)
+        exerciseDao.insert(EXERCISE.name, ExerciseType.REGULAR.getValue())
                 .test()
                 .assertError(ExerciseAlreadyExistsException.class);
     }
@@ -134,7 +134,7 @@ public class ExerciseDaoTest {
     public void testFindByType_WithNoInsertedExercises_ShouldEmitEmptyList() {
         ExerciseDao exerciseDao = ExerciseDao.getInstance();
 
-        exerciseDao.findByType(ExerciseType.REGULAR)
+        exerciseDao.findByType(ExerciseType.REGULAR.getValue())
                 .test()
                 .assertValue(new Predicate<List<Exercise>>() {
                     @Override
@@ -155,7 +155,7 @@ public class ExerciseDaoTest {
         };
         DatabaseUtils.insertExercises(exerciseNames, ExerciseType.REGULAR_VALUE);
 
-        exerciseDao.findByType(ExerciseType.REGULAR)
+        exerciseDao.findByType(ExerciseType.REGULAR.getValue())
                 .test()
                 .assertValue(new Predicate<List<Exercise>>() {
                     @Override
@@ -176,7 +176,7 @@ public class ExerciseDaoTest {
         };
         DatabaseUtils.insertExercises(exerciseNames, ExerciseType.REACTION_VALUE);
 
-        exerciseDao.findByType(ExerciseType.REACTION)
+        exerciseDao.findByType(ExerciseType.REACTION.getValue())
                 .test()
                 .assertValue(new Predicate<List<Exercise>>() {
                     @Override
@@ -258,7 +258,7 @@ public class ExerciseDaoTest {
 
         EXERCISE.insert();
 
-        exerciseDao.delete(EXERCISE.id, ExerciseType.REGULAR)
+        exerciseDao.delete(EXERCISE.id, ExerciseType.REGULAR.getValue())
                 .test()
                 .assertComplete();
 
@@ -277,7 +277,7 @@ public class ExerciseDaoTest {
         ReactionExercise reactionExercise = new ReactionExercise(EXERCISE.id, 1, 1);
         reactionExercise.insert();
 
-        exerciseDao.delete(EXERCISE.id, ExerciseType.REACTION)
+        exerciseDao.delete(EXERCISE.id, ExerciseType.REACTION.getValue())
                 .test()
                 .assertComplete();
 

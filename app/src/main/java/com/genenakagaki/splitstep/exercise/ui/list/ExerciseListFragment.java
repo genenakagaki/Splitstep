@@ -19,8 +19,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.genenakagaki.splitstep.R;
-import com.genenakagaki.splitstep.exercise.data.ExerciseSharedPref;
 import com.genenakagaki.splitstep.exercise.data.entity.Exercise;
+import com.genenakagaki.splitstep.exercise.ui.ExerciseActivity;
 
 import java.util.List;
 
@@ -38,6 +38,17 @@ import timber.log.Timber;
 
 public class ExerciseListFragment extends Fragment {
 
+    private static final String EXERCISE_TYPE_KEY = "EXERCISE_TYPE_KEY";
+    private static final String EDIT_MODE_KEY = "EDIT_MODE_KEY";
+
+    public static ExerciseListFragment newInstance(int exerciseType) {
+        ExerciseListFragment fragment = new ExerciseListFragment();
+        Bundle args = new Bundle();
+        args.putInt(EXERCISE_TYPE_KEY, exerciseType);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     @BindView(R.id.recyclerview) RecyclerView mRecyclerView;
     @BindView(R.id.empty_textview) TextView mEmptyTextView;
     @BindView(R.id.fab) FloatingActionButton mFab;
@@ -52,62 +63,27 @@ public class ExerciseListFragment extends Fragment {
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
+        Timber.d("onCreate");
         super.onCreate(savedInstanceState);
 
-        mViewModel = new ExerciseListViewModel(getActivity(), ExerciseSharedPref.getExerciseType(getActivity()));
         setHasOptionsMenu(true);
-    }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        Timber.d("onCreateOptionsMenu");
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.menu_exercise_list, menu);
-
-        Drawable drawable = menu.findItem(R.id.action_edit).getIcon();
-        if (drawable != null) {
-            // If we don't mutate the drawable, then all drawable's with this id will have a color
-            // filter applied to it.
-            drawable.mutate();
-            int color = ContextCompat.getColor(getActivity(), android.R.color.white);
-            drawable.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+        int exerciseType = 0;
+        if (getArguments() != null) {
+            exerciseType = getArguments().getInt(EXERCISE_TYPE_KEY);
         }
+        mViewModel = new ExerciseListViewModel(getActivity(), exerciseType);
 
-        if (mViewModel.isEditMode()) {
-            menu.findItem(R.id.action_edit).setVisible(false);
-            menu.findItem(R.id.action_cancel).setVisible(true);
-        } else {
-            menu.findItem(R.id.action_edit).setVisible(true);
-            menu.findItem(R.id.action_cancel).setVisible(false);
+        if (savedInstanceState != null) {
+            mViewModel.setEditMode(savedInstanceState.getBoolean(EDIT_MODE_KEY));
+            mViewModel.setExerciseType(savedInstanceState.getInt(EXERCISE_TYPE_KEY));
         }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_edit:
-                Timber.d("action_edit");
-                mViewModel.setEditMode(true);
-                getActivity().invalidateOptionsMenu();
-                mExerciseAdapter.notifyDataSetChanged();
-                break;
-            case R.id.action_cancel:
-                Timber.d("action_cancel");
-                mViewModel.setEditMode(false);
-                getActivity().invalidateOptionsMenu();
-                mExerciseAdapter.notifyDataSetChanged();
-                break;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Timber.d("onCreateView");
-
-        getActivity().setTitle(mViewModel.getTitle());
 
         View view = inflater.inflate(R.layout.fragment_exercise_list, container, false);
         mUnbinder = ButterKnife.bind(this, view);
@@ -148,7 +124,55 @@ public class ExerciseListFragment extends Fragment {
                     }
                 }));
 
-        getExerciseList();
+        mDisposable.add(mViewModel.loadExerciseList().subscribe());
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        Timber.d("onCreateOptionsMenu");
+        super.onCreateOptionsMenu(menu, inflater);
+
+        ExerciseActivity activity = (ExerciseActivity) getActivity();
+        activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        inflater.inflate(R.menu.menu_exercise_list, menu);
+
+        Drawable drawable = menu.findItem(R.id.action_edit).getIcon();
+        if (drawable != null) {
+            // If we don't mutate the drawable, then all drawable's with this id will have a color
+            // filter applied to it.
+            drawable.mutate();
+            int color = ContextCompat.getColor(getActivity(), android.R.color.white);
+            drawable.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+        }
+
+        if (mViewModel.isEditMode()) {
+            menu.findItem(R.id.action_edit).setVisible(false);
+            menu.findItem(R.id.action_cancel).setVisible(true);
+        } else {
+            menu.findItem(R.id.action_edit).setVisible(true);
+            menu.findItem(R.id.action_cancel).setVisible(false);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_edit:
+                Timber.d("action_edit");
+                mViewModel.setEditMode(true);
+                getActivity().invalidateOptionsMenu();
+                mExerciseAdapter.notifyDataSetChanged();
+                break;
+            case R.id.action_cancel:
+                Timber.d("action_cancel");
+                mViewModel.setEditMode(false);
+                getActivity().invalidateOptionsMenu();
+                mExerciseAdapter.notifyDataSetChanged();
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -158,6 +182,15 @@ public class ExerciseListFragment extends Fragment {
         if (mDisposable != null && !mDisposable.isDisposed()) {
             mDisposable.dispose();
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Timber.d("onSaveInstanceState");
+
+        outState.putBoolean(EDIT_MODE_KEY, mViewModel.isEditMode());
+        outState.putInt(EXERCISE_TYPE_KEY, mViewModel.getExerciseType().getValue());
     }
 
     @Override
@@ -173,8 +206,8 @@ public class ExerciseListFragment extends Fragment {
         fragment.show(getFragmentManager(), AddExerciseDialog.class.getSimpleName());
     }
 
-    public void getExerciseList() {
-        mDisposable.add(mViewModel.getExerciseList().subscribe());
+    public ExerciseListViewModel getViewModel() {
+        return mViewModel;
     }
 
     public CompositeDisposable getDisposable() {
