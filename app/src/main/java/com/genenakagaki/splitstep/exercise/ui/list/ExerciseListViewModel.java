@@ -2,6 +2,7 @@ package com.genenakagaki.splitstep.exercise.ui.list;
 
 import android.content.Context;
 
+import com.genenakagaki.splitstep.base.BaseViewModel;
 import com.genenakagaki.splitstep.exercise.data.ExerciseDao;
 import com.genenakagaki.splitstep.exercise.data.entity.Exercise;
 import com.genenakagaki.splitstep.exercise.data.entity.ExerciseType;
@@ -25,9 +26,7 @@ import timber.log.Timber;
  * Created by gene on 8/21/17.
  */
 
-public class ExerciseListViewModel {
-
-    private Context context;
+public class ExerciseListViewModel extends BaseViewModel{
 
     private ExerciseType exerciseType;
     private boolean isEditMode;
@@ -35,7 +34,7 @@ public class ExerciseListViewModel {
     private BehaviorSubject<List<Exercise>> exercisesSubject = BehaviorSubject.create();
 
     public ExerciseListViewModel(Context context, int exerciseType) {
-        this.context = context;
+        super(context);
         this.exerciseType = ExerciseType.fromValue(exerciseType);
     }
 

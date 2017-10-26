@@ -59,7 +59,7 @@ public class ExerciseViewHolder extends RecyclerView.ViewHolder {
         ExerciseListFragment fragment = (ExerciseListFragment)
                 mContext.findFragment(ExerciseListFragment.class.getSimpleName());
 
-        fragment.getDisposable().add(mViewModel.getExerciseSubject()
+        fragment.addDisposable(mViewModel.getExerciseSubject()
                 .subscribe(new Consumer<Exercise>() {
                     @Override
                     public void accept(Exercise exercise) throws Exception {
@@ -92,16 +92,15 @@ public class ExerciseViewHolder extends RecyclerView.ViewHolder {
         if (exerciseListViewModel.isEditMode()) {
             showDeleteExerciseDialog();
         } else {
-            ExerciseSharedPref.setExerciseId(mContext, mViewModel.getExercise().id);
-
+            long exerciseId = mViewModel.getExercise().id;
             switch (ExerciseSharedPref.getExerciseType(mContext)) {
                 case REGULAR:
-                    mContext.showFragment(new ExerciseDetailFragment(),
+                    mContext.showFragment(ExerciseDetailFragment.newInstance(exerciseId),
                             ExerciseDetailFragment.class.getSimpleName(),
                             true);
                     break;
                 default:// REACTION:
-                    mContext.showFragment(new ReactionExerciseDetailFragment(),
+                    mContext.showFragment(ReactionExerciseDetailFragment.newInstance(exerciseId),
                             ExerciseDetailFragment.class.getSimpleName(),
                             true);
             }

@@ -3,6 +3,7 @@ package com.genenakagaki.splitstep.exercise.ui.detail;
 import android.content.Context;
 
 import com.genenakagaki.splitstep.R;
+import com.genenakagaki.splitstep.base.BaseViewModel;
 import com.genenakagaki.splitstep.exercise.data.ReactionExerciseDao;
 import com.genenakagaki.splitstep.exercise.data.entity.ReactionExercise;
 import com.genenakagaki.splitstep.exercise.ui.model.DurationDisplayable;
@@ -22,9 +23,8 @@ import io.reactivex.subjects.BehaviorSubject;
  * Created by Gene on 9/13/2017.
  */
 
-public class ReactionExerciseDetailViewModel {
+public class ReactionExerciseDetailViewModel extends BaseViewModel {
 
-    private Context context;
     private long exerciseId;
 
     private ReactionExercise reactionExercise;
@@ -34,7 +34,7 @@ public class ReactionExerciseDetailViewModel {
     private BehaviorSubject<DurationDisplayable> repDurationSubject = BehaviorSubject.create();
 
     public ReactionExerciseDetailViewModel(Context context, long exerciseId) {
-        this.context = context;
+        super(context);
         this.exerciseId = exerciseId;
     }
 
@@ -56,7 +56,7 @@ public class ReactionExerciseDetailViewModel {
 
                         repDuration = new DurationDisplayable(
                                 DurationDisplayable.TYPE_REP_DURATION, exercise.repDuration);
-                        repDuration.setTitle(context.getString(R.string.rep_duration));
+                        repDuration.setTitle(getContext().getString(R.string.rep_duration));
 
                         e.onComplete();
                     }
@@ -109,9 +109,9 @@ public class ReactionExerciseDetailViewModel {
         int seconds = durationDisplay.getSeconds();
 
         if (minutes == 0) {
-            display = context.getString(R.string.duration_value_seconds, seconds);
+            display = getContext().getString(R.string.duration_value_seconds, seconds);
         } else {
-            display = context.getString(R.string.duration_value, minutes, seconds);
+            display = getContext().getString(R.string.duration_value, minutes, seconds);
         }
         durationDisplay.setDisplay(display);
     }

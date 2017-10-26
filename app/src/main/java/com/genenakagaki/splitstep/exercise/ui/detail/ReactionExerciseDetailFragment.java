@@ -50,7 +50,7 @@ public class ReactionExerciseDetailFragment extends ExerciseDetailFragment {
     public void onResume() {
         super.onResume();
 
-        getDisposable().add(mViewModel.getReactionExerciseSubject()
+        addDisposable(mViewModel.getReactionExerciseSubject()
                 .subscribe(new Consumer<ReactionExercise>() {
                     @Override
                     public void accept(ReactionExercise reactionExercise) throws Exception {
@@ -58,7 +58,7 @@ public class ReactionExerciseDetailFragment extends ExerciseDetailFragment {
                     }
                 }));
 
-        getDisposable().add(mViewModel.getRestDurationSubject()
+        addDisposable(mViewModel.getRestDurationSubject()
                 .subscribe(new Consumer<DurationDisplayable>() {
                     @Override
                     public void accept(DurationDisplayable durationDisplayable) throws Exception {
@@ -66,7 +66,7 @@ public class ReactionExerciseDetailFragment extends ExerciseDetailFragment {
                     }
                 }));
 
-        getDisposable().add(mViewModel.loadReactionExercise().subscribe());
+        addDisposable(mViewModel.loadReactionExercise().subscribe());
     }
 
     @Override
@@ -92,7 +92,7 @@ public class ReactionExerciseDetailFragment extends ExerciseDetailFragment {
         super.setDuration(durationDisplayable);
 
         if (durationDisplayable.getType() == DurationDisplayable.TYPE_REP_DURATION) {
-            getDisposable().add(mViewModel.setRepDuration(durationDisplayable).subscribe());
+            addDisposable(mViewModel.setRepDuration(durationDisplayable).subscribe());
         }
     }
 

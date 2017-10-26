@@ -3,6 +3,7 @@ package com.genenakagaki.splitstep.exercise.ui.detail;
 import android.content.Context;
 
 import com.genenakagaki.splitstep.R;
+import com.genenakagaki.splitstep.base.BaseViewModel;
 import com.genenakagaki.splitstep.exercise.data.ExerciseDao;
 import com.genenakagaki.splitstep.exercise.data.entity.Exercise;
 import com.genenakagaki.splitstep.exercise.ui.list.ExerciseTitleViewModel;
@@ -23,9 +24,7 @@ import io.reactivex.subjects.BehaviorSubject;
  * Created by gene on 8/21/17.
  */
 
-public class ExerciseDetailViewModel {
-
-    private Context context;
+public class ExerciseDetailViewModel extends BaseViewModel {
 
     private ExerciseTitleViewModel exerciseTitleViewModel;
 
@@ -40,7 +39,7 @@ public class ExerciseDetailViewModel {
     private BehaviorSubject<DurationDisplayable> setDurationSubject = BehaviorSubject.create();
 
     public ExerciseDetailViewModel(Context context, long exerciseId) {
-        this.context = context;
+        super(context);
         this.exerciseId = exerciseId;
         exerciseTitleViewModel = new ExerciseTitleViewModel(context, exercise, exerciseSubject);
     }
@@ -63,11 +62,11 @@ public class ExerciseDetailViewModel {
 
                         restDuration = new DurationDisplayable(
                                 DurationDisplayable.TYPE_REST_DURATION, exercise.restDuration);
-                        restDuration.setTitle(context.getString(R.string.rest_duration));
+                        restDuration.setTitle(getContext().getString(R.string.rest_duration));
 
                         setDuration = new DurationDisplayable(
                                 DurationDisplayable.TYPE_SET_DURATION, exercise.setDuration);
-                        setDuration.setTitle(context.getString(R.string.set_duration));
+                        setDuration.setTitle(getContext().getString(R.string.set_duration));
                         e.onComplete();
                     }
                 }).andThen(setRestDuration(restDuration)).andThen(setSetDuration(setDuration));
@@ -171,9 +170,9 @@ public class ExerciseDetailViewModel {
         int seconds = durationDisplay.getSeconds();
 
         if (minutes == 0) {
-            display = context.getString(R.string.duration_value_seconds, seconds);
+            display = getContext().getString(R.string.duration_value_seconds, seconds);
         } else {
-            display = context.getString(R.string.duration_value, minutes, seconds);
+            display = getContext().getString(R.string.duration_value, minutes, seconds);
         }
         durationDisplay.setDisplay(display);
     }

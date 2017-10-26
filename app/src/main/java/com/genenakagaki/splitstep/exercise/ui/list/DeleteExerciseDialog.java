@@ -5,20 +5,19 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 
 import com.genenakagaki.splitstep.R;
+import com.genenakagaki.splitstep.base.BaseDialogFragment;
 import com.genenakagaki.splitstep.exercise.data.ExerciseSharedPref;
 
-import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Action;
 
 /**
  * Created by gene on 9/7/17.
  */
 
-public class DeleteExerciseDialog extends DialogFragment {
+public class DeleteExerciseDialog extends BaseDialogFragment {
 
     private static final String ARG_EXERCISE_ID = "ARG_EXERCISE_ID";
     private static final String ARG_DELETE_MESSAGE = "ARG_DELETE_MESSAGE";
@@ -32,7 +31,6 @@ public class DeleteExerciseDialog extends DialogFragment {
         return dialog;
     }
 
-    private CompositeDisposable mDisposable;
     private DeleteExerciseViewModel mViewModel;
 
     public DeleteExerciseDialog() {}
@@ -63,29 +61,15 @@ public class DeleteExerciseDialog extends DialogFragment {
     }
 
     private void onDeleteButtonClick() {
-        mDisposable.add(mViewModel.deleteExerciseCompletable()
+        addDisposable(mViewModel.deleteExerciseCompletable()
                 .subscribe(new Action() {
                     @Override
                     public void run() throws Exception {
-                        ExerciseListFragment fragment =
-                                (ExerciseListFragment) getFragmentManager().findFragmentByTag(ExerciseListFragment.class.getSimpleName());
-                        fragment.getDisposable().add(
+                        ExerciseListFragment fragment = (ExerciseListFragment) getFragmentManager()
+                                .findFragmentByTag(ExerciseListFragment.class.getSimpleName());
+                        fragment.addDisposable(
                                 fragment.getViewModel().loadExerciseList().subscribe());
                     }
                 }));
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        mDisposable = new CompositeDisposable();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        if (mDisposable != null && !mDisposable.isDisposed()) {
-            mDisposable.dispose();
-        }
     }
 }

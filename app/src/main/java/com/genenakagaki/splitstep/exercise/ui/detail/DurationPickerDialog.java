@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,15 +13,13 @@ import android.widget.NumberPicker;
 import android.widget.TextView;
 
 import com.genenakagaki.splitstep.R;
+import com.genenakagaki.splitstep.base.BaseDialogFragment;
 import com.genenakagaki.splitstep.exercise.ui.model.DurationDisplayable;
 import com.genenakagaki.splitstep.exercise.ui.model.ErrorMessage;
 
 import org.parceler.Parcels;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.Unbinder;
-import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Consumer;
 import timber.log.Timber;
 
@@ -30,7 +27,7 @@ import timber.log.Timber;
  * Created by gene on 8/24/17.
  */
 
-public class DurationPickerDialog extends DialogFragment {
+public class DurationPickerDialog extends BaseDialogFragment {
 
     private static final String ARG_DURATION_DISPLAYABLE = "ARG_DURATION_DISPLAYABLE";
 
@@ -43,8 +40,6 @@ public class DurationPickerDialog extends DialogFragment {
     @BindView(R.id.error_textview)
     TextView mErrorTextView;
 
-    private Unbinder mUnbinder;
-    private CompositeDisposable mDisposable;
     private DurationPickerViewModel mViewModel;
 
     public static DurationPickerDialog newInstance(DurationDisplayable durationDisplayable) {
@@ -72,7 +67,7 @@ public class DurationPickerDialog extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_duration_picker, null);
-        mUnbinder = ButterKnife.bind(this, view);
+        bindView(this, view);
 
         mColonPicker.setDisplayedValues(mViewModel.COLON_PICKER_DISPLAY_VALUES);
         mMinutesPicker.setMaxValue(mViewModel.PICKER_MAX_VALUE);
@@ -110,17 +105,9 @@ public class DurationPickerDialog extends DialogFragment {
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        mUnbinder.unbind();
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
-        mDisposable = new CompositeDisposable();
-
-        mDisposable.add(mViewModel.getErrorMessageSubject()
+        addDisposable(mViewModel.getErrorMessageSubject()
                 .subscribe(new Consumer<ErrorMessage>() {
                     @Override
                     public void accept(ErrorMessage errorMessage) throws Exception {

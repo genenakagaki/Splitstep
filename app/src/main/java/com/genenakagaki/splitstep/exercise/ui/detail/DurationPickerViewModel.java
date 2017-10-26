@@ -3,6 +3,7 @@ package com.genenakagaki.splitstep.exercise.ui.detail;
 import android.content.Context;
 
 import com.genenakagaki.splitstep.R;
+import com.genenakagaki.splitstep.base.BaseViewModel;
 import com.genenakagaki.splitstep.exercise.ui.model.DurationDisplayable;
 import com.genenakagaki.splitstep.exercise.ui.model.ErrorMessage;
 
@@ -15,7 +16,7 @@ import io.reactivex.subjects.BehaviorSubject;
  * Created by gene on 9/8/17.
  */
 
-public class DurationPickerViewModel {
+public class DurationPickerViewModel extends BaseViewModel {
 
     protected static final String[] COLON_PICKER_DISPLAY_VALUES = new String[] {":"};
     protected static final String[] PICKER_DISPLAY_VALUE = buildPickerDisplayValues();
@@ -30,13 +31,12 @@ public class DurationPickerViewModel {
         return pickerDisplayValues;
     }
 
-    private Context context;
     private DurationDisplayable durationDisplayable;
 
     private BehaviorSubject<ErrorMessage> errorMessageSubject = BehaviorSubject.create();
 
     public DurationPickerViewModel(Context context, DurationDisplayable durationDisplayable) {
-        this.context = context;
+        super(context);
         this.durationDisplayable = durationDisplayable;
     }
 
@@ -57,7 +57,7 @@ public class DurationPickerViewModel {
         ErrorMessage errorMessage = new ErrorMessage();
         if (minutes == 0 && seconds == 0) {
             errorMessage.setValid(false);
-            errorMessage.setErrorMessage(context.getString(R.string.error_zero_duration));
+            errorMessage.setErrorMessage(getContext().getString(R.string.error_zero_duration));
         } else {
             errorMessage.setValid(true);
         }

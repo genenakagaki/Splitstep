@@ -7,7 +7,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
-import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +14,7 @@ import android.widget.Button;
 import android.widget.RadioButton;
 
 import com.genenakagaki.splitstep.R;
+import com.genenakagaki.splitstep.base.BaseDialogFragment;
 import com.genenakagaki.splitstep.exercise.data.ExerciseSharedPref;
 import com.genenakagaki.splitstep.exercise.data.entity.ExerciseSubType;
 import com.genenakagaki.splitstep.exercise.data.exception.ExerciseAlreadyExistsException;
@@ -22,10 +22,7 @@ import com.genenakagaki.splitstep.exercise.data.exception.InvalidExerciseNameExc
 import com.genenakagaki.splitstep.exercise.ui.model.ErrorMessage;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.Unbinder;
-import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import timber.log.Timber;
@@ -34,15 +31,13 @@ import timber.log.Timber;
  * Created by gene on 8/12/17.
  */
 
-public class AddExerciseDialog extends DialogFragment {
+public class AddExerciseDialog extends BaseDialogFragment {
 
     @BindView(R.id.name_input) TextInputEditText mExerciseNameInput;
     @BindView(R.id.name_inputlayout) TextInputLayout mExerciseNameInputLayout;
     @BindView(R.id.reps_radiobutton) RadioButton mRepsRadioButton;
     @BindView(R.id.timed_sets_radiobutton) RadioButton mTimedSetsRadioButton;
 
-    private Unbinder mUnbinder;
-    private CompositeDisposable mDisposable;
     private AddExerciseViewModel mViewModel;
 
     public AddExerciseDialog() {}
@@ -59,7 +54,7 @@ public class AddExerciseDialog extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_add_exercise, null);
-        mUnbinder = ButterKnife.bind(this, view);
+        bindView(this, view);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(getString(R.string.add_exercise_title))
@@ -91,9 +86,7 @@ public class AddExerciseDialog extends DialogFragment {
     @Override
     public void onResume() {
         super.onResume();
-        mDisposable = new CompositeDisposable();
-
-        mDisposable.add(mViewModel.getErrorMessageSubject()
+        addDisposable(mViewModel.getErrorMessageSubject()
                 .subscribe(new Consumer<ErrorMessage>() {
                     @Override
                     public void accept(ErrorMessage errorMessage) throws Exception {
@@ -102,20 +95,6 @@ public class AddExerciseDialog extends DialogFragment {
                         }
                     }
                 }));
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        if (mDisposable != null && !mDisposable.isDisposed()) {
-            mDisposable.dispose();
-        }
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        mUnbinder.unbind();
     }
 
     @OnClick(R.id.reps_radiobutton)
@@ -133,7 +112,7 @@ public class AddExerciseDialog extends DialogFragment {
     public void onSaveButtonClick() {
         final String exerciseName = mExerciseNameInput.getText().toString();
 
-        mDisposable.add(mViewModel.insertExercise(exerciseName)
+        addDisposable(mViewModel.insertExercise(exerciseName)
                 .subscribe(new Action() {
                     @Override
                     public void run() throws Exception {
@@ -156,7 +135,7 @@ public class AddExerciseDialog extends DialogFragment {
     public void onExerciseInserted() {
         ExerciseListFragment fragment = (ExerciseListFragment) getFragmentManager()
                 .findFragmentByTag(ExerciseListFragment.class.getSimpleName());
-        fragment.getDisposable().add(fragment.getViewModel().loadExerciseList().subscribe());
+        fragment.addDisposable(fragment.getViewModel().loadExerciseList().subscribe());
         getDialog().dismiss();
     }
 

@@ -5,7 +5,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -19,16 +18,14 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.genenakagaki.splitstep.R;
+import com.genenakagaki.splitstep.base.BaseFragment;
 import com.genenakagaki.splitstep.exercise.data.entity.Exercise;
 import com.genenakagaki.splitstep.exercise.ui.ExerciseActivity;
 
 import java.util.List;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.Unbinder;
-import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Consumer;
 import timber.log.Timber;
 
@@ -36,7 +33,7 @@ import timber.log.Timber;
  * Created by gene on 8/2/17.
  */
 
-public class ExerciseListFragment extends Fragment {
+public class ExerciseListFragment extends BaseFragment {
 
     private static final String EXERCISE_TYPE_KEY = "EXERCISE_TYPE_KEY";
     private static final String EDIT_MODE_KEY = "EDIT_MODE_KEY";
@@ -53,8 +50,6 @@ public class ExerciseListFragment extends Fragment {
     @BindView(R.id.empty_textview) TextView mEmptyTextView;
     @BindView(R.id.fab) FloatingActionButton mFab;
 
-    private Unbinder mUnbinder;
-    private CompositeDisposable mDisposable;
     private ExerciseListViewModel mViewModel;
 
     private ExerciseAdapter mExerciseAdapter;
@@ -68,15 +63,15 @@ public class ExerciseListFragment extends Fragment {
 
         setHasOptionsMenu(true);
 
-        int exerciseType = 0;
         if (getArguments() != null) {
-            exerciseType = getArguments().getInt(EXERCISE_TYPE_KEY);
+            int exerciseType = getArguments().getInt(EXERCISE_TYPE_KEY);
+            mViewModel = new ExerciseListViewModel(getActivity(), exerciseType);
+        } else {
+            Timber.wtf("OHNNOOOO");
         }
-        mViewModel = new ExerciseListViewModel(getActivity(), exerciseType);
 
         if (savedInstanceState != null) {
             mViewModel.setEditMode(savedInstanceState.getBoolean(EDIT_MODE_KEY));
-            mViewModel.setExerciseType(savedInstanceState.getInt(EXERCISE_TYPE_KEY));
         }
     }
 
@@ -86,7 +81,7 @@ public class ExerciseListFragment extends Fragment {
         Timber.d("onCreateView");
 
         View view = inflater.inflate(R.layout.fragment_exercise_list, container, false);
-        mUnbinder = ButterKnife.bind(this, view);
+        bindView(this, view);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         mExerciseAdapter = new ExerciseAdapter(getContext(), mViewModel);
@@ -105,9 +100,8 @@ public class ExerciseListFragment extends Fragment {
     public void onResume() {
         Timber.d("onResume");
         super.onResume();
-        mDisposable = new CompositeDisposable();
 
-        mDisposable.add(mViewModel.getExercisesSubject()
+        addDisposable(mViewModel.getExercisesSubject()
                 .subscribe(new Consumer<List<Exercise>>() {
                     @Override
                     public void accept(List<Exercise> exercises) throws Exception {
@@ -124,7 +118,7 @@ public class ExerciseListFragment extends Fragment {
                     }
                 }));
 
-        mDisposable.add(mViewModel.loadExerciseList().subscribe());
+        addDisposable(mViewModel.loadExerciseList().subscribe());
     }
 
     @Override
@@ -133,6 +127,7 @@ public class ExerciseListFragment extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
 
         ExerciseActivity activity = (ExerciseActivity) getActivity();
+        activity.setTitle(mViewModel.getExerciseType());
         activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         inflater.inflate(R.menu.menu_exercise_list, menu);
@@ -176,28 +171,11 @@ public class ExerciseListFragment extends Fragment {
     }
 
     @Override
-    public void onPause() {
-        Timber.d("onPause");
-        super.onPause();
-        if (mDisposable != null && !mDisposable.isDisposed()) {
-            mDisposable.dispose();
-        }
-    }
-
-    @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         Timber.d("onSaveInstanceState");
 
         outState.putBoolean(EDIT_MODE_KEY, mViewModel.isEditMode());
-        outState.putInt(EXERCISE_TYPE_KEY, mViewModel.getExerciseType().getValue());
-    }
-
-    @Override
-    public void onDestroyView() {
-        Timber.d("onDestroyView");
-        super.onDestroyView();
-        mUnbinder.unbind();
     }
 
     @OnClick(R.id.fab)
@@ -208,9 +186,5 @@ public class ExerciseListFragment extends Fragment {
 
     public ExerciseListViewModel getViewModel() {
         return mViewModel;
-    }
-
-    public CompositeDisposable getDisposable() {
-        return mDisposable;
     }
 }

@@ -3,7 +3,6 @@ package com.genenakagaki.splitstep.exercise.ui.detail;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
-import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -16,7 +15,7 @@ import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
 import com.genenakagaki.splitstep.R;
-import com.genenakagaki.splitstep.exercise.data.ExerciseSharedPref;
+import com.genenakagaki.splitstep.base.BaseFragment;
 import com.genenakagaki.splitstep.exercise.data.entity.Exercise;
 import com.genenakagaki.splitstep.exercise.data.entity.ExerciseSubType;
 import com.genenakagaki.splitstep.exercise.ui.ExerciseActivity;
@@ -26,10 +25,7 @@ import com.genenakagaki.splitstep.exercise.ui.model.DurationDisplayable;
 import com.genenakagaki.splitstep.exercise.ui.view.NumberInput;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.Unbinder;
-import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Consumer;
 import timber.log.Timber;
 
@@ -37,8 +33,18 @@ import timber.log.Timber;
  * Created by Gene on 9/8/2017.
  */
 
-public class ExerciseDetailFragment extends Fragment
+public class ExerciseDetailFragment extends BaseFragment
         implements NumberInput.OnInputChangedListener {
+
+    private static final String EXERCISE_ID_KEY = "EXERCISE_ID_KEY";
+
+    public static ExerciseDetailFragment newInstance(long exerciseId) {
+        ExerciseDetailFragment fragment = new ExerciseDetailFragment();
+        Bundle args = new Bundle();
+        args.putLong(EXERCISE_ID_KEY, exerciseId);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @BindView(R.id.exercise_name_textview)
     TextView mExerciseNameTextView;
@@ -65,18 +71,27 @@ public class ExerciseDetailFragment extends Fragment
     @BindView(R.id.rest_duration_textview)
     TextView mRestDurationTextView;
 
-    private Unbinder mUnbinder;
-    private CompositeDisposable mDisposable;
     private ExerciseDetailViewModel mViewModel;
 
-    public ExerciseDetailFragment() {}
+    public ExerciseDetailFragment() {
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if (getArguments() != null) {
+            long exerciseId = getArguments().getLong(EXERCISE_ID_KEY);
+            mViewModel = new ExerciseDetailViewModel(getActivity(), exerciseId);
+        }
+    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Timber.d("onCreateView");
         View view = inflater.inflate(R.layout.fragment_exercise_detail, container, false);
-        mUnbinder = ButterKnife.bind(this, view);
+        bindView(this, view);
 
         mConesNumberInput.setVisibility(View.GONE);
         mRepDurationLayout.setVisibility(View.GONE);
@@ -85,18 +100,18 @@ public class ExerciseDetailFragment extends Fragment
         mRepsNumberInput.setOnInputChangedListener(this);
         mNotesInput.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if (mDisposable != null) {
-                    mDisposable.add(mViewModel.setNotes(charSequence.toString())
-                            .subscribe());
-                }
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
             }
 
             @Override
-            public void afterTextChanged(Editable editable) {}
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                addDisposable(mViewModel.setNotes(charSequence.toString())
+                        .subscribe());
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+            }
         });
 
         mFavoriteImageSwitcher.setFactory(new ViewSwitcher.ViewFactory() {
@@ -119,16 +134,12 @@ public class ExerciseDetailFragment extends Fragment
         ExerciseActivity activity = (ExerciseActivity) getActivity();
         activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        long exerciseId = ExerciseSharedPref.getExerciseId(getActivity());
-        mViewModel = new ExerciseDetailViewModel(getActivity(), exerciseId);
-
-        mDisposable = new CompositeDisposable();
-
-        mDisposable.add(mViewModel.getExerciseSubject()
+        addDisposable(mViewModel.getExerciseSubject()
                 .subscribe(new Consumer<Exercise>() {
                     @Override
                     public void accept(Exercise exercise) throws Exception {
-                        getActivity().setTitle(mViewModel.getExerciseDisplayable());
+//                        getActivity().setTitle(mViewModel.getExerciseDisplayable());
+
 
                         mExerciseNameTextView.setText(exercise.name);
                         if (exercise.favorite) {
@@ -153,7 +164,7 @@ public class ExerciseDetailFragment extends Fragment
                     }
                 }));
 
-        mDisposable.add(mViewModel.getSetDurationSubject()
+        addDisposable(mViewModel.getSetDurationSubject()
                 .subscribe(new Consumer<DurationDisplayable>() {
                     @Override
                     public void accept(DurationDisplayable durationDisplayable) throws Exception {
@@ -161,7 +172,7 @@ public class ExerciseDetailFragment extends Fragment
                     }
                 }));
 
-        mDisposable.add(mViewModel.getRestDurationSubject()
+        addDisposable(mViewModel.getRestDurationSubject()
                 .subscribe(new Consumer<DurationDisplayable>() {
                     @Override
                     public void accept(DurationDisplayable durationDisplayable) throws Exception {
@@ -169,22 +180,7 @@ public class ExerciseDetailFragment extends Fragment
                     }
                 }));
 
-        mDisposable.add(mViewModel.loadExercise().subscribe());
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        if (mDisposable != null && !mDisposable.isDisposed()) {
-            mDisposable.dispose();
-        }
-    }
-
-    @Override
-    public void onDestroyView() {
-        Timber.d("onDestroyView");
-        super.onDestroyView();
-        mUnbinder.unbind();
+        addDisposable(mViewModel.loadExercise().subscribe());
     }
 
     @Override
@@ -201,8 +197,7 @@ public class ExerciseDetailFragment extends Fragment
 
     @OnClick(R.id.favorite_imageswitcher)
     public void onClickFavorite() {
-        mDisposable.add(
-                mViewModel.toggleExerciseFavorite().subscribe());
+        addDisposable(mViewModel.toggleExerciseFavorite().subscribe());
     }
 
     @OnClick(R.id.rest_duration_layout)
@@ -219,26 +214,22 @@ public class ExerciseDetailFragment extends Fragment
         fragment.show(getFragmentManager(), DurationPickerDialog.class.getSimpleName());
     }
 
-    public CompositeDisposable getDisposable() {
-        return mDisposable;
-    }
-
-    public void setDuration(DurationDisplayable durationDisplayable) {
-        switch (durationDisplayable.getType()) {
-            case DurationDisplayable.TYPE_REST_DURATION:
-                mDisposable.add(mViewModel.setRestDuration(durationDisplayable).subscribe());
-                break;
-            case DurationDisplayable.TYPE_SET_DURATION:
-                mDisposable.add(mViewModel.setSetDuration(durationDisplayable).subscribe());
-                break;
-        }
-    }
-
     @OnClick(R.id.start_exercise_button)
     public void onClickStartExercise() {
         Timber.d("onClickStartExercise");
         ExerciseActivity activity = (ExerciseActivity) getActivity();
         activity.showFragment(new RegularCoachFragment(), CoachFragment.class.getSimpleName(), true);
+    }
+
+    public void setDuration(DurationDisplayable durationDisplayable) {
+        switch (durationDisplayable.getType()) {
+            case DurationDisplayable.TYPE_REST_DURATION:
+                addDisposable(mViewModel.setRestDuration(durationDisplayable).subscribe());
+                break;
+            case DurationDisplayable.TYPE_SET_DURATION:
+                addDisposable(mViewModel.setSetDuration(durationDisplayable).subscribe());
+                break;
+        }
     }
 
 }

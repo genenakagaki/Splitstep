@@ -3,6 +3,7 @@ package com.genenakagaki.splitstep.exercise.ui.list;
 import android.content.Context;
 
 import com.genenakagaki.splitstep.R;
+import com.genenakagaki.splitstep.base.BaseViewModel;
 import com.genenakagaki.splitstep.exercise.data.entity.Exercise;
 import com.genenakagaki.splitstep.exercise.data.entity.ExerciseSubType;
 
@@ -18,9 +19,8 @@ import io.reactivex.subjects.BehaviorSubject;
  * Created by gene on 9/7/17.
  */
 
-public class ExerciseTitleViewModel {
+public class ExerciseTitleViewModel extends BaseViewModel {
 
-    private Context context;
     private Exercise exercise;
 
     private BehaviorSubject<Exercise> exerciseSubject;
@@ -30,7 +30,7 @@ public class ExerciseTitleViewModel {
     }
 
     public ExerciseTitleViewModel(Context context, Exercise exercise, BehaviorSubject<Exercise> exerciseSubject) {
-        this.context = context;
+        super(context);
         this.exercise = exercise;
         if (this.exerciseSubject == null) {
             this.exerciseSubject = BehaviorSubject.create();
@@ -68,10 +68,10 @@ public class ExerciseTitleViewModel {
 
         switch (ExerciseSubType.fromValue(exercise.subType)) {
             case REPS:
-                exerciseTypeString = context.getString(R.string.reps_subtype);
+                exerciseTypeString = getContext().getString(R.string.reps_subtype);
                 break;
             default: // TIMED_SETS:
-                exerciseTypeString = context.getString(R.string.timed_sets_subtype);
+                exerciseTypeString = getContext().getString(R.string.timed_sets_subtype);
         }
 
         return exercise.name + "  (" + exerciseTypeString + ")";

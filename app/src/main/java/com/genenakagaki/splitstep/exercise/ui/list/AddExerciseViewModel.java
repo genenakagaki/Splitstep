@@ -3,6 +3,7 @@ package com.genenakagaki.splitstep.exercise.ui.list;
 import android.content.Context;
 
 import com.genenakagaki.splitstep.R;
+import com.genenakagaki.splitstep.base.BaseViewModel;
 import com.genenakagaki.splitstep.exercise.data.ExerciseDao;
 import com.genenakagaki.splitstep.exercise.data.entity.Exercise;
 import com.genenakagaki.splitstep.exercise.data.entity.ExerciseSubType;
@@ -19,9 +20,8 @@ import io.reactivex.subjects.BehaviorSubject;
  * Created by Gene on 9/6/2017.
  */
 
-public class AddExerciseViewModel {
+public class AddExerciseViewModel extends BaseViewModel {
 
-    private Context context;
     private ExerciseType exerciseType;
     private ExerciseSubType exerciseSubType;
 
@@ -29,7 +29,7 @@ public class AddExerciseViewModel {
     private BehaviorSubject<ErrorMessage> errorMessageSubject = BehaviorSubject.create();
 
     public AddExerciseViewModel(Context context, ExerciseType exerciseType) {
-        this.context = context;
+        super(context);
         this.exerciseType = exerciseType;
         this.exerciseSubType = ExerciseSubType.REPS;
         errorMessage = new ErrorMessage();
@@ -54,13 +54,13 @@ public class AddExerciseViewModel {
 
     public void setExerciseAlreadyExistsError() {
         errorMessage.setValid(false);
-        errorMessage.setErrorMessage(context.getString(R.string.error_exercise_already_exists));
+        errorMessage.setErrorMessage(getContext().getString(R.string.error_exercise_already_exists));
         errorMessageSubject.onNext(errorMessage);
     }
 
     public void setInvalidExerciseNameError() {
         errorMessage.setValid(false);
-        errorMessage.setErrorMessage(context.getString(R.string.error_empty_exercise_name));
+        errorMessage.setErrorMessage(getContext().getString(R.string.error_empty_exercise_name));
         errorMessageSubject.onNext(errorMessage);
     }
 }
