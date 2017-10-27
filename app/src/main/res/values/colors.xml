@@ -6,6 +6,7 @@
 
     <color name="error">#FFDD2C00</color>
 
+    <color name="textGray">#999</color>
     <color name="lightGray">#EEEEEE</color>
     <color name="restProgressColor">#00BCD4</color>
     <color name="green">#64DD17</color>

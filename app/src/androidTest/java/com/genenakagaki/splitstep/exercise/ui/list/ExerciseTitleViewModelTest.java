@@ -116,7 +116,7 @@ public class ExerciseTitleViewModelTest {
 
         ExerciseTitleViewModel viewModel = new ExerciseTitleViewModel(mContext, exercise);
 
-        String deleteMessage = viewModel.getExerciseDisplayable();
+        String deleteMessage = viewModel.getExerciseDisplay();
         String expectedMessage = "exercise name (Regular)";
 
         assertEquals(expectedMessage, deleteMessage);
@@ -129,7 +129,7 @@ public class ExerciseTitleViewModelTest {
 
         ExerciseTitleViewModel viewModel = new ExerciseTitleViewModel(mContext, exercise);
 
-        String deleteMessage = viewModel.getExerciseDisplayable();
+        String deleteMessage = viewModel.getExerciseDisplay();
         String expectedMessage = "exercise name (Reaction)";
 
         assertEquals(expectedMessage, deleteMessage);

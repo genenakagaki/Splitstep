@@ -44,6 +44,10 @@ public class ExerciseTitleViewModel extends BaseViewModel {
         return exercise;
     }
 
+    public void setExercise(Exercise exercise) {
+        this.exercise = exercise;
+    }
+
     public Observable<Exercise> getExerciseSubject() {
         return exerciseSubject
                 .observeOn(AndroidSchedulers.mainThread())
@@ -63,7 +67,7 @@ public class ExerciseTitleViewModel extends BaseViewModel {
                 .subscribeOn(Schedulers.computation());
     }
 
-    public String getExerciseDisplayable() {
+    public String getExerciseDisplay() {
         String exerciseTypeString;
 
         switch (ExerciseSubType.fromValue(exercise.subType)) {

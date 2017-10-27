@@ -3,8 +3,12 @@ package com.genenakagaki.splitstep.exercise.ui.detail;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
+import android.support.v4.content.ContextCompat;
 import android.text.Editable;
+import android.text.SpannableString;
 import android.text.TextWatcher;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.RelativeSizeSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +22,7 @@ import com.genenakagaki.splitstep.R;
 import com.genenakagaki.splitstep.base.BaseFragment;
 import com.genenakagaki.splitstep.exercise.data.entity.Exercise;
 import com.genenakagaki.splitstep.exercise.data.entity.ExerciseSubType;
+import com.genenakagaki.splitstep.exercise.data.entity.ExerciseType;
 import com.genenakagaki.splitstep.exercise.ui.ExerciseActivity;
 import com.genenakagaki.splitstep.exercise.ui.coach.CoachFragment;
 import com.genenakagaki.splitstep.exercise.ui.coach.RegularCoachFragment;
@@ -134,35 +139,17 @@ public class ExerciseDetailFragment extends BaseFragment
         ExerciseActivity activity = (ExerciseActivity) getActivity();
         activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        addDisposable(mViewModel.getExerciseSubject()
-                .subscribe(new Consumer<Exercise>() {
-                    @Override
-                    public void accept(Exercise exercise) throws Exception {
-//                        getActivity().setTitle(mViewModel.getExerciseDisplayable());
+        addDisposable(mViewModel.getExerciseSubject().subscribe(new Consumer<Exercise>() {
+            @Override
+            public void accept(Exercise exercise) throws Exception {
+                ((ExerciseActivity) getActivity())
+                        .setTitle(ExerciseType.fromValue(exercise.type));
 
+                setExerciseNameText(exercise);
 
-                        mExerciseNameTextView.setText(exercise.name);
-                        if (exercise.favorite) {
-                            mFavoriteImageSwitcher.setImageResource(R.drawable.ic_star);
-                        } else {
-                            mFavoriteImageSwitcher.setImageResource(R.drawable.ic_star_border);
-                        }
-
-                        mNotesInput.setText(exercise.notes);
-
-                        mSetsNumberInput.setNumber(exercise.sets);
-
-                        switch (ExerciseSubType.fromValue(exercise.subType)) {
-                            case REPS:
-                                mSetDurationLayout.setVisibility(View.GONE);
-                                mRepsNumberInput.setNumber(exercise.reps);
-                                break;
-                            case TIMED_SETS:
-                                mRepsNumberInput.setVisibility(View.GONE);
-                                break;
-                        }
-                    }
-                }));
+                setInputValues(exercise);
+            }
+        }));
 
         addDisposable(mViewModel.getSetDurationSubject()
                 .subscribe(new Consumer<DurationDisplayable>() {
@@ -231,5 +218,39 @@ public class ExerciseDetailFragment extends BaseFragment
                 break;
         }
     }
+
+    public void setExerciseNameText(Exercise exercise) {
+        String exerciseDisplay = mViewModel.getExerciseDisplay();
+        SpannableString exerciseTypeString = new SpannableString(exerciseDisplay);
+        int iStart = exercise.name.length();
+        int iEnd = exerciseDisplay.length();
+        exerciseTypeString.setSpan(new RelativeSizeSpan(0.8f), iStart, iEnd, 0);
+        int color = ContextCompat.getColor(getActivity(), R.color.textGray);
+        exerciseTypeString.setSpan(new ForegroundColorSpan(color), iStart, iEnd, 0);
+        mExerciseNameTextView.setText(exerciseTypeString);
+    }
+
+    public void setInputValues(Exercise exercise) {
+        if (exercise.favorite) {
+            mFavoriteImageSwitcher.setImageResource(R.drawable.ic_star);
+        } else {
+            mFavoriteImageSwitcher.setImageResource(R.drawable.ic_star_border);
+        }
+
+        mNotesInput.setText(exercise.notes);
+
+        mSetsNumberInput.setNumber(exercise.sets);
+
+        switch (ExerciseSubType.fromValue(exercise.subType)) {
+            case REPS:
+                mSetDurationLayout.setVisibility(View.GONE);
+                mRepsNumberInput.setNumber(exercise.reps);
+                break;
+            case TIMED_SETS:
+                mRepsNumberInput.setVisibility(View.GONE);
+                break;
+        }
+    }
+
 
 }

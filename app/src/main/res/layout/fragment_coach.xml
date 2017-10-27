@@ -38,6 +38,13 @@
                 android:layout_weight="20"
                 android:layout_height="wrap_content">
 
+                <ImageView
+                    android:id="@+id/rest_imageview"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/rest"/>
+
                 <ProgressBar
                     android:id="@+id/rest_progressbar"
                     style="?android:attr/progressBarStyleHorizontal"
@@ -111,6 +118,7 @@
                         android:layout_weight="1.5"/>
 
                 </LinearLayout>
+
 
             </RelativeLayout>
 

@@ -21,6 +21,7 @@ import android.view.ViewTreeObserver;
 import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -29,8 +30,8 @@ import android.widget.TextView;
 import com.genenakagaki.splitstep.R;
 import com.genenakagaki.splitstep.exercise.data.ExerciseSharedPref;
 import com.genenakagaki.splitstep.exercise.data.entity.Exercise;
-import com.genenakagaki.splitstep.exercise.ui.model.DurationDisplayable;
 import com.genenakagaki.splitstep.exercise.receiver.CoachAlarmBroadcastReceiver;
+import com.genenakagaki.splitstep.exercise.ui.model.DurationDisplayable;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -53,6 +54,8 @@ public abstract class CoachFragment extends Fragment {
     TextView mExerciseNameTextView;
     @BindView(R.id.sets_progressbar)
     ProgressBar mSetsProgressBar;
+    @BindView(R.id.rest_imageview)
+    ImageView mRestImageView;
     @BindView(R.id.rest_progressbar)
     ProgressBar mRestProgressBar;
     @BindView(R.id.set_progressbar)
@@ -116,6 +119,7 @@ public abstract class CoachFragment extends Fragment {
                 int size = mSetProgressBar.getWidth();
                 mSetProgressBar.setLayoutParams(new RelativeLayout.LayoutParams(size, size));
                 mRestProgressBar.setLayoutParams(new RelativeLayout.LayoutParams(size, size));
+                mRestImageView.setLayoutParams(new RelativeLayout.LayoutParams(size, (int)(size/1.2f)));
 
                 RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
                         (int) (size / 1.1f), (int) (size / 1.1f));

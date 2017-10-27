@@ -1,7 +1,10 @@
 package com.genenakagaki.splitstep.exercise.ui.list;
 
 import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageSwitcher;
@@ -54,7 +57,7 @@ public class ExerciseViewHolder extends RecyclerView.ViewHolder {
     public void setExercise(Exercise exercise) {
         mViewModel = new ExerciseTitleViewModel(mContext, exercise);
 
-        mNameTextButton.setText(mViewModel.getExerciseDisplayable());
+        setExerciseNameText(exercise);
 
         ExerciseListFragment fragment = (ExerciseListFragment)
                 mContext.findFragment(ExerciseListFragment.class.getSimpleName());
@@ -109,7 +112,17 @@ public class ExerciseViewHolder extends RecyclerView.ViewHolder {
 
     private void showDeleteExerciseDialog() {
         DeleteExerciseDialog dialog = DeleteExerciseDialog.newInstance(
-                mViewModel.getExercise().id, mViewModel.getExerciseDisplayable());
+                mViewModel.getExercise().id, mViewModel.getExerciseDisplay());
         dialog.show(mContext.getSupportFragmentManager(), DeleteExerciseDialog.class.getSimpleName());
+    }
+
+    private void setExerciseNameText(Exercise exercise) {
+        String exerciseDisplay = mViewModel.getExerciseDisplay();
+        SpannableString exerciseTypeString = new SpannableString(exerciseDisplay);
+        int iStart = exercise.name.length();
+        int iEnd = exerciseDisplay.length();
+        int color = ContextCompat.getColor(mContext, R.color.textGray);
+        exerciseTypeString.setSpan(new ForegroundColorSpan(color), iStart, iEnd, 0);
+        mNameTextButton.setText(exerciseTypeString);
     }
 }

@@ -57,7 +57,7 @@ public class ExerciseDetailViewModel extends BaseViewModel {
                 return Completable.create(new CompletableOnSubscribe() {
                     @Override
                     public void subscribe(@NonNull CompletableEmitter e) throws Exception {
-                        ExerciseDetailViewModel.this.exercise = exercise;
+                        setExercise(exercise);
                         exerciseSubject.onNext(exercise);
 
                         restDuration = new DurationDisplayable(
@@ -79,8 +79,8 @@ public class ExerciseDetailViewModel extends BaseViewModel {
         return exerciseTitleViewModel.toggleExerciseFavorite();
     }
 
-    public String getExerciseDisplayable() {
-        return exerciseTitleViewModel.getExerciseDisplayable();
+    public String getExerciseDisplay() {
+        return exerciseTitleViewModel.getExerciseDisplay();
     }
 
     public Completable setReps(final int reps) {
@@ -175,6 +175,11 @@ public class ExerciseDetailViewModel extends BaseViewModel {
             display = getContext().getString(R.string.duration_value, minutes, seconds);
         }
         durationDisplay.setDisplay(display);
+    }
+
+    private void setExercise(Exercise exercise) {
+        this.exercise = exercise;
+        this.exerciseTitleViewModel.setExercise(exercise);
     }
 
 }
