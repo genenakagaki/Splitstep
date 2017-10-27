@@ -14,6 +14,7 @@ import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,8 +55,14 @@ public abstract class CoachFragment extends Fragment {
     TextView mExerciseNameTextView;
     @BindView(R.id.sets_progressbar)
     ProgressBar mSetsProgressBar;
+    @BindView(R.id.rest_imageview_container)
+    FrameLayout mRestImageViewContainer;
     @BindView(R.id.rest_imageview)
     ImageView mRestImageView;
+    @BindView(R.id.set_imageview_container)
+    FrameLayout mSetImageViewContainer;
+    @BindView(R.id.set_imageview)
+    ImageView mSetImageView;
     @BindView(R.id.rest_progressbar)
     ProgressBar mRestProgressBar;
     @BindView(R.id.set_progressbar)
@@ -119,11 +126,20 @@ public abstract class CoachFragment extends Fragment {
                 int size = mSetProgressBar.getWidth();
                 mSetProgressBar.setLayoutParams(new RelativeLayout.LayoutParams(size, size));
                 mRestProgressBar.setLayoutParams(new RelativeLayout.LayoutParams(size, size));
-                mRestImageView.setLayoutParams(new RelativeLayout.LayoutParams(size, (int)(size/1.2f)));
 
                 RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
                         (int) (size / 1.1f), (int) (size / 1.1f));
                 layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+                mSetImageViewContainer.setLayoutParams(layoutParams);
+                mRestImageViewContainer.setLayoutParams(layoutParams);
+                FrameLayout.LayoutParams imageLayoutParams = new FrameLayout.LayoutParams(
+                        (int) (size / 1.2f), (int) (size / 1.2f));
+                imageLayoutParams.gravity = Gravity.CENTER;
+                mSetImageView.setLayoutParams(imageLayoutParams);
+                mRestImageView.setLayoutParams(imageLayoutParams);
+
+
+
                 mDoneButton.setLayoutParams(layoutParams);
                 mCompleteLayout.setLayoutParams(layoutParams);
 

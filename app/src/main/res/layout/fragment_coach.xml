@@ -38,12 +38,33 @@
                 android:layout_weight="20"
                 android:layout_height="wrap_content">
 
-                <ImageView
-                    android:id="@+id/rest_imageview"
+                <FrameLayout
+                    android:id="@+id/set_imageview_container"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:scaleType="fitCenter"
-                    android:src="@drawable/rest"/>
+                    android:background="@drawable/background_circle_white">
+                    <ImageView
+                        android:id="@+id/set_imageview"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:scaleType="fitCenter"
+                        android:padding="20dp"
+                        android:src="@drawable/run"/>
+                </FrameLayout>
+
+                <FrameLayout
+                    android:id="@+id/rest_imageview_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@drawable/background_circle_white">
+                    <ImageView
+                        android:id="@+id/rest_imageview"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:scaleType="fitCenter"
+                        android:padding="20dp"
+                        android:src="@drawable/rest"/>
+                </FrameLayout>
 
                 <ProgressBar
                     android:id="@+id/rest_progressbar"
