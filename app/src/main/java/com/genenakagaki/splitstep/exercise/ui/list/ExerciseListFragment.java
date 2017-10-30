@@ -20,7 +20,10 @@ import android.widget.TextView;
 import com.genenakagaki.splitstep.R;
 import com.genenakagaki.splitstep.base.BaseFragment;
 import com.genenakagaki.splitstep.exercise.data.entity.Exercise;
+import com.genenakagaki.splitstep.exercise.data.entity.ExerciseType;
 import com.genenakagaki.splitstep.exercise.ui.ExerciseActivity;
+
+import org.parceler.Parcels;
 
 import java.util.List;
 
@@ -38,10 +41,10 @@ public class ExerciseListFragment extends BaseFragment {
     private static final String EXERCISE_TYPE_KEY = "EXERCISE_TYPE_KEY";
     private static final String EDIT_MODE_KEY = "EDIT_MODE_KEY";
 
-    public static ExerciseListFragment newInstance(int exerciseType) {
+    public static ExerciseListFragment newInstance(ExerciseType exerciseType) {
         ExerciseListFragment fragment = new ExerciseListFragment();
         Bundle args = new Bundle();
-        args.putInt(EXERCISE_TYPE_KEY, exerciseType);
+        args.putParcelable(EXERCISE_TYPE_KEY, Parcels.wrap(exerciseType));
         fragment.setArguments(args);
         return fragment;
     }
@@ -64,7 +67,7 @@ public class ExerciseListFragment extends BaseFragment {
         setHasOptionsMenu(true);
 
         if (getArguments() != null) {
-            int exerciseType = getArguments().getInt(EXERCISE_TYPE_KEY);
+            ExerciseType exerciseType = Parcels.unwrap(getArguments().getParcelable(EXERCISE_TYPE_KEY));
             mViewModel = new ExerciseListViewModel(getActivity(), exerciseType);
         } else {
             Timber.wtf("OHNNOOOO");
@@ -180,7 +183,7 @@ public class ExerciseListFragment extends BaseFragment {
 
     @OnClick(R.id.fab)
     public void onFabClick() {
-        AddExerciseDialog fragment = new AddExerciseDialog();
+        AddExerciseDialog fragment = AddExerciseDialog.newInstance(mViewModel.getExerciseType());
         fragment.show(getFragmentManager(), AddExerciseDialog.class.getSimpleName());
     }
 

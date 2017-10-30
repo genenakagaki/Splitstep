@@ -15,11 +15,13 @@ import android.widget.RadioButton;
 
 import com.genenakagaki.splitstep.R;
 import com.genenakagaki.splitstep.base.BaseDialogFragment;
-import com.genenakagaki.splitstep.exercise.data.ExerciseSharedPref;
 import com.genenakagaki.splitstep.exercise.data.entity.ExerciseSubType;
+import com.genenakagaki.splitstep.exercise.data.entity.ExerciseType;
 import com.genenakagaki.splitstep.exercise.data.exception.ExerciseAlreadyExistsException;
 import com.genenakagaki.splitstep.exercise.data.exception.InvalidExerciseNameException;
 import com.genenakagaki.splitstep.exercise.ui.model.ErrorMessage;
+
+import org.parceler.Parcels;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -32,6 +34,16 @@ import timber.log.Timber;
  */
 
 public class AddExerciseDialog extends BaseDialogFragment {
+
+    private static final String EXERCISE_TYPE_KEY = "EXERCISE_TYPE_KEY";
+
+    public static AddExerciseDialog newInstance(ExerciseType exerciseType) {
+        AddExerciseDialog fragment = new AddExerciseDialog();
+        Bundle args = new Bundle();
+        args.putParcelable(EXERCISE_TYPE_KEY, Parcels.wrap(exerciseType));
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @BindView(R.id.name_input) TextInputEditText mExerciseNameInput;
     @BindView(R.id.name_inputlayout) TextInputLayout mExerciseNameInputLayout;
@@ -46,8 +58,10 @@ public class AddExerciseDialog extends BaseDialogFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mViewModel = new AddExerciseViewModel(
-                getActivity(), ExerciseSharedPref.getExerciseType(getActivity()));
+        if (getArguments() != null) {
+            ExerciseType exerciseType = Parcels.unwrap(getArguments().getParcelable(EXERCISE_TYPE_KEY));
+            mViewModel = new AddExerciseViewModel(getActivity(), exerciseType);
+        }
     }
 
     @NonNull

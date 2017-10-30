@@ -14,8 +14,8 @@ import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
 import com.genenakagaki.splitstep.R;
-import com.genenakagaki.splitstep.exercise.data.ExerciseSharedPref;
 import com.genenakagaki.splitstep.exercise.data.entity.Exercise;
+import com.genenakagaki.splitstep.exercise.data.entity.ExerciseType;
 import com.genenakagaki.splitstep.exercise.ui.ExerciseActivity;
 import com.genenakagaki.splitstep.exercise.ui.detail.ExerciseDetailFragment;
 import com.genenakagaki.splitstep.exercise.ui.detail.ReactionExerciseDetailFragment;
@@ -96,7 +96,7 @@ public class ExerciseViewHolder extends RecyclerView.ViewHolder {
             showDeleteExerciseDialog();
         } else {
             long exerciseId = mViewModel.getExercise().id;
-            switch (ExerciseSharedPref.getExerciseType(mContext)) {
+            switch (ExerciseType.fromValue(mViewModel.getExercise().type)) {
                 case REGULAR:
                     mContext.showFragment(ExerciseDetailFragment.newInstance(exerciseId),
                             ExerciseDetailFragment.class.getSimpleName(),

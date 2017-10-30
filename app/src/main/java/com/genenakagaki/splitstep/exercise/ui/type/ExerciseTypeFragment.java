@@ -58,7 +58,7 @@ public class ExerciseTypeFragment extends BaseFragment {
 
         ExerciseActivity activity = (ExerciseActivity) getActivity();
         activity.showFragment(
-                ExerciseListFragment.newInstance(exerciseType.getValue()),
+                ExerciseListFragment.newInstance(exerciseType),
                 ExerciseListFragment.class.getSimpleName(),
                 true);
     }

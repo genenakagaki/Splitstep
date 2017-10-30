@@ -1,9 +1,12 @@
 package com.genenakagaki.splitstep.exercise.data.entity;
 
+import org.parceler.Parcel;
+
 /**
  * Created by gene on 8/14/17.
  */
 
+@Parcel
 public enum ExerciseType {
     REGULAR, REACTION;
 

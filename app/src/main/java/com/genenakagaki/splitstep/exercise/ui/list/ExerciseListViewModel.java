@@ -33,9 +33,9 @@ public class ExerciseListViewModel extends BaseViewModel{
 
     private BehaviorSubject<List<Exercise>> exercisesSubject = BehaviorSubject.create();
 
-    public ExerciseListViewModel(Context context, int exerciseType) {
+    public ExerciseListViewModel(Context context, ExerciseType exerciseType) {
         super(context);
-        this.exerciseType = ExerciseType.fromValue(exerciseType);
+        this.exerciseType = exerciseType;
     }
 
     public Observable<List<Exercise>> getExercisesSubject() {

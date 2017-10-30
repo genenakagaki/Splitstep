@@ -9,7 +9,7 @@ import io.reactivex.subjects.BehaviorSubject;
 public class NumberInputViewModel {
 
     public static final int MAX_DEFAULT = 999;
-    public static final int MIN_DEFAULT = 0;
+    public static final int MIN_DEFAULT = 1;
 
     private int max = MAX_DEFAULT;
     private int min = MIN_DEFAULT;
