@@ -9,7 +9,9 @@ import android.support.v7.app.AlertDialog;
 
 import com.genenakagaki.splitstep.R;
 import com.genenakagaki.splitstep.base.BaseDialogFragment;
-import com.genenakagaki.splitstep.exercise.data.ExerciseSharedPref;
+import com.genenakagaki.splitstep.exercise.data.entity.ExerciseType;
+
+import org.parceler.Parcels;
 
 import io.reactivex.functions.Action;
 
@@ -20,12 +22,14 @@ import io.reactivex.functions.Action;
 public class DeleteExerciseDialog extends BaseDialogFragment {
 
     private static final String ARG_EXERCISE_ID = "ARG_EXERCISE_ID";
+    private static final String ARG_EXERCISE_TYPE = "ARG_EXERCISE_TYPE";
     private static final String ARG_DELETE_MESSAGE = "ARG_DELETE_MESSAGE";
 
-    public static DeleteExerciseDialog newInstance(long exerciseId, String deleteMessage) {
+    public static DeleteExerciseDialog newInstance(long exerciseId, ExerciseType exerciseType, String deleteMessage) {
         DeleteExerciseDialog dialog = new DeleteExerciseDialog();
         Bundle args = new Bundle();
         args.putLong(ARG_EXERCISE_ID, exerciseId);
+        args.putParcelable(ARG_EXERCISE_TYPE, Parcels.wrap(exerciseType));
         args.putString(ARG_DELETE_MESSAGE, deleteMessage);
         dialog.setArguments(args);
         return dialog;
@@ -40,8 +44,9 @@ public class DeleteExerciseDialog extends BaseDialogFragment {
         super.onCreate(savedInstanceState);
 
         long exerciseId = getArguments().getLong(ARG_EXERCISE_ID);
+        ExerciseType exerciseType = Parcels.unwrap(getArguments().getParcelable(ARG_EXERCISE_TYPE));
         String deleteMessage = getArguments().getString(ARG_DELETE_MESSAGE);
-        mViewModel = new DeleteExerciseViewModel(exerciseId, ExerciseSharedPref.getExerciseType(getActivity()), deleteMessage);
+        mViewModel = new DeleteExerciseViewModel(exerciseId, exerciseType, deleteMessage);
     }
 
     @NonNull

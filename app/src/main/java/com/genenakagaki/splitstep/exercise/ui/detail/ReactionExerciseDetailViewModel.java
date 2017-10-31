@@ -44,6 +44,10 @@ public class ReactionExerciseDetailViewModel extends BaseViewModel {
                 .subscribeOn(Schedulers.io());
     }
 
+    public long getExerciseId() {
+        return exerciseId;
+    }
+
     public Completable loadReactionExercise() {
         return ReactionExerciseDao.getInstance().findById(exerciseId).flatMapCompletable(new Function<ReactionExercise, CompletableSource>() {
             @Override
@@ -87,7 +91,7 @@ public class ReactionExerciseDetailViewModel extends BaseViewModel {
         return Completable.create(new CompletableOnSubscribe() {
             @Override
             public void subscribe(@NonNull CompletableEmitter e) throws Exception {
-                if (durationDisplayable != null) {
+                if (durationDisplayable != null && durationDisplayable.getDuration() > 0) {
                     repDuration = durationDisplayable;
                 }
 

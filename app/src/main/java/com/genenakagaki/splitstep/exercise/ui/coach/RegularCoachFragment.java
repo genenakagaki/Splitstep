@@ -15,6 +15,10 @@ import io.reactivex.functions.Consumer;
 
 public class RegularCoachFragment extends CoachFragment {
 
+    public static CoachFragment newInstance(long exerciseId) {
+        return CoachFragment.newInstance(exerciseId, new RegularCoachFragment());
+    }
+
     private TimerViewModel mTimedSetsTimerViewModel;
 
     @Override

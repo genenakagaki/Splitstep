@@ -111,8 +111,9 @@ public class ExerciseViewHolder extends RecyclerView.ViewHolder {
     }
 
     private void showDeleteExerciseDialog() {
+        Exercise exercise = mViewModel.getExercise();
         DeleteExerciseDialog dialog = DeleteExerciseDialog.newInstance(
-                mViewModel.getExercise().id, mViewModel.getExerciseDisplay());
+                exercise.id, ExerciseType.fromValue(exercise.type), mViewModel.getExerciseDisplay());
         dialog.show(mContext.getSupportFragmentManager(), DeleteExerciseDialog.class.getSimpleName());
     }
 

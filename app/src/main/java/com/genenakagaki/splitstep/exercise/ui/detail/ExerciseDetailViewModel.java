@@ -19,6 +19,7 @@ import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
+import timber.log.Timber;
 
 /**
  * Created by gene on 8/21/17.
@@ -57,6 +58,15 @@ public class ExerciseDetailViewModel extends BaseViewModel {
                 return Completable.create(new CompletableOnSubscribe() {
                     @Override
                     public void subscribe(@NonNull CompletableEmitter e) throws Exception {
+                        Timber.d("Rest duration is: " + exercise.restDuration);
+                        Timber.d("Rep  is: " + exercise.reps);
+                        Timber.d("Set is: " + exercise.sets);
+                        Timber.d("Type is: " + exercise.type);
+                        Timber.d("SubType is: " + exercise.subType);
+                        Timber.d("Name is: " + exercise.name);
+                        Timber.d("Notes is: " + exercise.notes);
+                        Timber.d("Favorite is: " + exercise.favorite);
+                        Timber.d("Setduration is: " + exercise.setDuration);
                         setExercise(exercise);
                         exerciseSubject.onNext(exercise);
 
@@ -73,6 +83,10 @@ public class ExerciseDetailViewModel extends BaseViewModel {
             }
         }).observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.computation());
+    }
+
+    public long getExerciseId() {
+        return exerciseId;
     }
 
     public Completable toggleExerciseFavorite() {
@@ -118,7 +132,7 @@ public class ExerciseDetailViewModel extends BaseViewModel {
         return Completable.create(new CompletableOnSubscribe() {
             @Override
             public void subscribe(@NonNull CompletableEmitter e) throws Exception {
-                if (durationDisplayable != null) {
+                if (durationDisplayable != null && durationDisplayable.getDuration() > 0) {
                     restDuration = durationDisplayable;
                 }
 
@@ -148,7 +162,7 @@ public class ExerciseDetailViewModel extends BaseViewModel {
         return Completable.create(new CompletableOnSubscribe() {
             @Override
             public void subscribe(@NonNull CompletableEmitter e) throws Exception {
-                if (durationDisplayable != null) {
+                if (durationDisplayable != null && durationDisplayable.getDuration() > 0) {
                     setDuration = durationDisplayable;
                 }
 

@@ -117,7 +117,7 @@ public class DurationPickerDialog extends BaseDialogFragment {
                             fragment.setDuration(mViewModel.getDurationDisplayable());
                             dismiss();
                         } else {
-                            mErrorTextView.setText(errorMessage.getErrorMessage());
+                            mErrorTextView.setVisibility(View.VISIBLE);
                         }
                     }
                 }));

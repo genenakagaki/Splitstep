@@ -37,6 +37,10 @@ public class ReactionCoachViewModel {
                 .subscribeOn(Schedulers.computation());
     }
 
+    public long getExerciseId() {
+        return exerciseId;
+    }
+
     public ReactionExercise getExercise() {
         return exercise;
     }

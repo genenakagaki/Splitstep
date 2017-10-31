@@ -90,7 +90,6 @@ public class AddExerciseDialog extends BaseDialogFragment {
                 public void onClick(View v) {
                     Timber.d("OnClick BUTTON_POSITIVE");
 
-                    enableSaveButton(false);
                     onSaveButtonClick();
                 }
             });
@@ -124,6 +123,8 @@ public class AddExerciseDialog extends BaseDialogFragment {
     }
 
     public void onSaveButtonClick() {
+        enableSaveButton(false);
+
         final String exerciseName = mExerciseNameInput.getText().toString();
 
         addDisposable(mViewModel.insertExercise(exerciseName)

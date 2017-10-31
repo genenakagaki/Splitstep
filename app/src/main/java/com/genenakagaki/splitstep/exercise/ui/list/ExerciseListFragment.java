@@ -69,8 +69,6 @@ public class ExerciseListFragment extends BaseFragment {
         if (getArguments() != null) {
             ExerciseType exerciseType = Parcels.unwrap(getArguments().getParcelable(EXERCISE_TYPE_KEY));
             mViewModel = new ExerciseListViewModel(getActivity(), exerciseType);
-        } else {
-            Timber.wtf("OHNNOOOO");
         }
 
         if (savedInstanceState != null) {

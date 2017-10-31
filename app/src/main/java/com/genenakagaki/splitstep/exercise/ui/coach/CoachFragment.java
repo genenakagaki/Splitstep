@@ -29,7 +29,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.genenakagaki.splitstep.R;
-import com.genenakagaki.splitstep.exercise.data.ExerciseSharedPref;
 import com.genenakagaki.splitstep.exercise.data.entity.Exercise;
 import com.genenakagaki.splitstep.exercise.receiver.CoachAlarmBroadcastReceiver;
 import com.genenakagaki.splitstep.exercise.ui.model.DurationDisplayable;
@@ -48,6 +47,15 @@ import timber.log.Timber;
  */
 
 public abstract class CoachFragment extends Fragment {
+
+    private static final String EXERCISE_ID_KEY = "EXERCISE_ID_KEY";
+
+    public static CoachFragment newInstance(long exerciseId, CoachFragment fragment) {
+        Bundle args = new Bundle();
+        args.putLong(EXERCISE_ID_KEY, exerciseId);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @BindView(R.id.content)
     RelativeLayout mContentLayout;
@@ -99,7 +107,10 @@ public abstract class CoachFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mViewModel = new CoachViewModel(getActivity(), ExerciseSharedPref.getExerciseId(getActivity()));
+        if (getArguments() != null) {
+            long exerciseId = getArguments().getLong(EXERCISE_ID_KEY);
+            mViewModel = new CoachViewModel(getActivity(), exerciseId);
+        }
 
         Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         mAlarm = RingtoneManager.getRingtone(getActivity(), notification);

@@ -53,6 +53,10 @@ public class CoachViewModel {
                 .subscribeOn(Schedulers.computation());
     }
 
+    public long getExerciseId() {
+        return exerciseId;
+    }
+
     public Exercise getExercise() {
         return exercise;
     }

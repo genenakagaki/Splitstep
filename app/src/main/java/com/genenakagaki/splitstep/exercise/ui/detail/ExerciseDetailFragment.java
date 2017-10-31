@@ -3,6 +3,7 @@ package com.genenakagaki.splitstep.exercise.ui.detail;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.SpannableString;
@@ -205,7 +206,8 @@ public class ExerciseDetailFragment extends BaseFragment
     public void onClickStartExercise() {
         Timber.d("onClickStartExercise");
         ExerciseActivity activity = (ExerciseActivity) getActivity();
-        activity.showFragment(new RegularCoachFragment(), CoachFragment.class.getSimpleName(), true);
+        Fragment fragment = RegularCoachFragment.newInstance(mViewModel.getExerciseId());
+        activity.showFragment(fragment, CoachFragment.class.getSimpleName(), true);
     }
 
     public void setDuration(DurationDisplayable durationDisplayable) {

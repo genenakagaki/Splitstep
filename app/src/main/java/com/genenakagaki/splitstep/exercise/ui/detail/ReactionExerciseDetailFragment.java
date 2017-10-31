@@ -2,12 +2,12 @@ package com.genenakagaki.splitstep.exercise.ui.detail;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.genenakagaki.splitstep.R;
-import com.genenakagaki.splitstep.exercise.data.ExerciseSharedPref;
 import com.genenakagaki.splitstep.exercise.data.entity.ReactionExercise;
 import com.genenakagaki.splitstep.exercise.ui.ExerciseActivity;
 import com.genenakagaki.splitstep.exercise.ui.coach.CoachFragment;
@@ -24,13 +24,28 @@ import timber.log.Timber;
 
 public class ReactionExerciseDetailFragment extends ExerciseDetailFragment {
 
+    protected static final String EXERCISE_ID_KEY = "EXERCISE_ID_KEY";
+
+    public static ReactionExerciseDetailFragment newInstance(long exerciseId) {
+        ReactionExerciseDetailFragment fragment = new ReactionExerciseDetailFragment();
+        Bundle args = new Bundle();
+        args.putLong(EXERCISE_ID_KEY, exerciseId);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     private ReactionExerciseDetailViewModel mViewModel;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Timber.d("oncreate reaction");
 
-        mViewModel = new ReactionExerciseDetailViewModel(getActivity(), ExerciseSharedPref.getExerciseId(getActivity()));
+        if (getArguments() != null) {
+            long exerciseId = getArguments().getLong(EXERCISE_ID_KEY);
+            mViewModel = new ReactionExerciseDetailViewModel(getActivity(), exerciseId);
+        }
+
     }
 
     @Nullable
@@ -100,6 +115,7 @@ public class ReactionExerciseDetailFragment extends ExerciseDetailFragment {
     public void onClickStartExercise() {
         Timber.d("onClickStartExercise");
         ExerciseActivity activity = (ExerciseActivity) getActivity();
-        activity.showFragment(new ReactionCoachFragment(), CoachFragment.class.getSimpleName(), true);
+        Fragment fragment = ReactionCoachFragment.newInstance(mViewModel.getExerciseId());
+        activity.showFragment(fragment, CoachFragment.class.getSimpleName(), true);
     }
 }

@@ -5,7 +5,6 @@ import android.speech.tts.TextToSpeech;
 import android.support.annotation.Nullable;
 import android.view.View;
 
-import com.genenakagaki.splitstep.exercise.data.ExerciseSharedPref;
 import com.genenakagaki.splitstep.exercise.data.entity.ReactionExercise;
 import com.genenakagaki.splitstep.exercise.ui.model.DurationDisplayable;
 
@@ -22,6 +21,10 @@ import timber.log.Timber;
 
 public class ReactionCoachFragment extends CoachFragment {
 
+    public static CoachFragment newInstance(long exerciseId) {
+        return CoachFragment.newInstance(exerciseId, new ReactionCoachFragment());
+    }
+
     private ReactionCoachViewModel mReactionCoachViewModel;
     private TimerViewModel mTimedSetsTimerViewModel;
     private ConeViewModel mConeViewModel;
@@ -35,8 +38,10 @@ public class ReactionCoachFragment extends CoachFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mReactionCoachViewModel = new ReactionCoachViewModel(
-                getActivity(), ExerciseSharedPref.getExerciseId(getActivity()));
+        if (getArguments() != null) {
+            long exerciseId = getViewModel().getExerciseId();
+            mReactionCoachViewModel = new ReactionCoachViewModel(getActivity(), exerciseId);
+        }
 
         mTextToSpeech = new TextToSpeech(getActivity(), new TextToSpeech.OnInitListener() {
             @Override
