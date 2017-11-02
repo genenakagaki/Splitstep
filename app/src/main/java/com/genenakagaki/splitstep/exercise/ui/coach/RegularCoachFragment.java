@@ -50,7 +50,7 @@ public class RegularCoachFragment extends CoachFragment {
                 animateProgress(mSetProgressBar, 0, mTimedSetsTimerViewModel.getAnimateDuration());
                 mMainProgressText.setText(mTimedSetsTimerViewModel.getTimerDisplay());
 
-                getDisposable().add(mTimedSetsTimerViewModel.startTimer().subscribe(new Consumer<String>() {
+                addDisposable(mTimedSetsTimerViewModel.startTimer().subscribe(new Consumer<String>() {
                     @Override
                     public void accept(String s) throws Exception {
                         mMainProgressText.setText(s);

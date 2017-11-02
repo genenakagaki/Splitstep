@@ -12,7 +12,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -29,15 +28,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.genenakagaki.splitstep.R;
+import com.genenakagaki.splitstep.base.BaseFragment;
 import com.genenakagaki.splitstep.exercise.data.entity.Exercise;
 import com.genenakagaki.splitstep.exercise.receiver.CoachAlarmBroadcastReceiver;
 import com.genenakagaki.splitstep.exercise.ui.model.DurationDisplayable;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.Unbinder;
-import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import timber.log.Timber;
@@ -46,7 +43,7 @@ import timber.log.Timber;
  * Created by Gene on 9/13/2017.
  */
 
-public abstract class CoachFragment extends Fragment {
+public abstract class CoachFragment extends BaseFragment {
 
     private static final String EXERCISE_ID_KEY = "EXERCISE_ID_KEY";
 
@@ -92,8 +89,6 @@ public abstract class CoachFragment extends Fragment {
     @BindView(R.id.overlay_textview)
     TextView mOverlayTextView;
 
-    private Unbinder mUnbinder;
-    private CompositeDisposable mDisposable;
     private CoachViewModel mViewModel;
     private ReversedProgressViewModel mSetsProgressViewModel;
     private TimerViewModel mRestTimerViewModel;
@@ -120,7 +115,7 @@ public abstract class CoachFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_coach, container, false);
-        mUnbinder = ButterKnife.bind(this, view);
+        bindView(this, view);
 
         mOverlayTextView.setText(Integer.toString(3));
 
@@ -166,9 +161,7 @@ public abstract class CoachFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        mDisposable = new CompositeDisposable();
-
-        mDisposable.add(mViewModel.getStartCountDown()
+        addDisposable(mViewModel.getStartCountDown()
                 .subscribe(new Consumer<Long>() {
                     @Override
                     public void accept(Long aLong) throws Exception {
@@ -186,14 +179,14 @@ public abstract class CoachFragment extends Fragment {
                     }
                 }));
 
-        mDisposable.add(mViewModel.loadExercise().subscribe(new Consumer<Exercise>() {
+        addDisposable(mViewModel.loadExercise().subscribe(new Consumer<Exercise>() {
             @Override
             public void accept(Exercise exercise) throws Exception {
                 mExerciseNameTextView.setText(exercise.name);
 
                 mSetsProgressViewModel = new ReversedProgressViewModel(exercise.sets, 0);
                 mSetsProgressBar.setMax(mSetsProgressViewModel.getMax());
-                mDisposable.add(mSetsProgressViewModel.getProgress().subscribe(new Consumer<Integer>() {
+                addDisposable(mSetsProgressViewModel.getProgress().subscribe(new Consumer<Integer>() {
                     @Override
                     public void accept(Integer integer) throws Exception {
                         mSetsProgressText.setText(mSetsProgressViewModel.getDisplayProgress());
@@ -214,9 +207,6 @@ public abstract class CoachFragment extends Fragment {
     public void onPause() {
         Timber.d("onPause");
         super.onPause();
-        if (mDisposable != null && !mDisposable.isDisposed()) {
-            mDisposable.dispose();
-        }
 
         AlarmManager am = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(getActivity(), CoachAlarmBroadcastReceiver.class);
@@ -226,12 +216,6 @@ public abstract class CoachFragment extends Fragment {
         am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
                 SystemClock.elapsedRealtime() + 5000,
                 pi);
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        mUnbinder.unbind();
     }
 
     @OnClick(R.id.overlay)
@@ -258,7 +242,7 @@ public abstract class CoachFragment extends Fragment {
             animateProgress(mRestProgressBar, 0, mRestTimerViewModel.getAnimateDuration());
             mMainProgressText.setText(mRestTimerViewModel.getTimerDisplay());
 
-            mDisposable.add(mRestTimerViewModel.startTimer().subscribe(new Consumer<String>() {
+            addDisposable(mRestTimerViewModel.startTimer().subscribe(new Consumer<String>() {
                 @Override
                 public void accept(String s) throws Exception {
                     mMainProgressText.setText(s);
@@ -289,10 +273,6 @@ public abstract class CoachFragment extends Fragment {
 
     public CoachViewModel getViewModel() {
         return mViewModel;
-    }
-
-    public CompositeDisposable getDisposable() {
-        return mDisposable;
     }
 
     public abstract void setupExerciseSet();

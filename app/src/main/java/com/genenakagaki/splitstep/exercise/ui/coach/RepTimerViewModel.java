@@ -27,8 +27,8 @@ public class RepTimerViewModel {
     public RepTimerViewModel(DurationDisplayable repDuration, Exercise exercise) {
         this.repDuration = repDuration;
         this.exercise = exercise;
-        this.max = repDuration.getDuration() * exercise.reps * 1000;
-        animateDuration = repDuration.getDuration() * 1000 * exercise.reps;
+        this.max = repDuration.getDuration() * exercise.reps * 100;
+        animateDuration = repDuration.getDuration() * 1000;
     }
 
     public int getMax() {
@@ -40,13 +40,13 @@ public class RepTimerViewModel {
     }
 
     public int getCurrentProgress() {
-        return currentRep * 100;
+        return max - currentRep * repDuration.getDuration() * 100;
     }
 
     public Observable<Long> startInterval() {
         switch (ExerciseSubType.fromValue(exercise.subType)) {
             case REPS:
-                currentRep = exercise.reps;
+                currentRep = 1;
 
                 return Observable.interval(repDuration.getDuration(), TimeUnit.SECONDS).takeWhile(new Predicate<Long>() {
                     @Override

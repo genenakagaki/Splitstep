@@ -57,7 +57,7 @@ public class ReactionCoachFragment extends CoachFragment {
     public void onResume() {
         super.onResume();
 
-        getDisposable().add(mReactionCoachViewModel.loadExercise().subscribe(new Consumer<ReactionExercise>() {
+        addDisposable(mReactionCoachViewModel.loadExercise().subscribe(new Consumer<ReactionExercise>() {
             @Override
             public void accept(ReactionExercise exercise) throws Exception {
             }
@@ -66,8 +66,17 @@ public class ReactionCoachFragment extends CoachFragment {
 
     @Override
     public void setupExerciseSet() {
+        mConeViewModel = new ConeViewModel(mReactionCoachViewModel.getExercise().cones);
+
+        int repDuration = mReactionCoachViewModel.getExercise().repDuration;
+        Timber.d("repDuration" + repDuration);
+        mRepTimerViewModel = new RepTimerViewModel(
+                new DurationDisplayable(DurationDisplayable.TYPE_REP_DURATION, repDuration),
+                getViewModel().getExercise());
+
         switch (getViewModel().getExerciseSubType()) {
             case REPS:
+                mSetProgressBar.setMax(mRepTimerViewModel.getMax());
 //                mMainProgressTopText.setText(getString(R.string.reps_count, exercise.reps));
                 break;
             case TIMED_SETS:
@@ -78,14 +87,6 @@ public class ReactionCoachFragment extends CoachFragment {
                 mSetProgressBar.setMax(mTimedSetsTimerViewModel.getMax());
                 break;
         }
-
-        mConeViewModel = new ConeViewModel(mReactionCoachViewModel.getExercise().cones);
-
-        int repDuration = mReactionCoachViewModel.getExercise().repDuration;
-        Timber.d("repDuration" + repDuration);
-        mRepTimerViewModel = new RepTimerViewModel(
-                new DurationDisplayable(DurationDisplayable.TYPE_REP_DURATION, repDuration),
-                getViewModel().getExercise());
     }
 
     @Override
@@ -95,26 +96,13 @@ public class ReactionCoachFragment extends CoachFragment {
         switch (getViewModel().getExerciseSubType()) {
             case REPS:
                 mSetProgressBar.setProgress(mRepTimerViewModel.getMax());
-                animateProgress(mSetProgressBar, 0, mRepTimerViewModel.getAnimateDuration());
-                getDisposable().add(mConeViewModel.getNextCone().subscribe(new Consumer<Integer>() {
-                    @Override
-                    public void accept(Integer integer) throws Exception {
-                        mTextToSpeech.speak(Integer.toString(integer), TextToSpeech.QUEUE_FLUSH, null);
-                        mMainProgressText.setText(Integer.toString(integer));
-                    }
-                }));
+                showNextCone();
 
                 // Timer for rep
-                getDisposable().add(mRepTimerViewModel.startInterval().subscribe(new Consumer<Long>() {
+                addDisposable(mRepTimerViewModel.startInterval().subscribe(new Consumer<Long>() {
                     @Override
                     public void accept(Long aLong) throws Exception {
-                        mConeViewModel.getNextCone().subscribe(new Consumer<Integer>() {
-                            @Override
-                            public void accept(Integer integer) throws Exception {
-                                mTextToSpeech.speak(Integer.toString(integer), TextToSpeech.QUEUE_FLUSH, null);
-                                mMainProgressText.setText(Integer.toString(integer));
-                            }
-                        });
+                        showNextCone();
                     }
                 }, new Consumer<Throwable>() {
                     @Override
@@ -131,7 +119,7 @@ public class ReactionCoachFragment extends CoachFragment {
             case TIMED_SETS:
                 mSetProgressBar.setProgress(mTimedSetsTimerViewModel.getMax());
                 animateProgress(mSetProgressBar, 0, mTimedSetsTimerViewModel.getAnimateDuration());
-                getDisposable().add(mConeViewModel.getNextCone().subscribe(new Consumer<Integer>() {
+                addDisposable(mConeViewModel.getNextCone().subscribe(new Consumer<Integer>() {
                     @Override
                     public void accept(Integer integer) throws Exception {
                         mTextToSpeech.speak(Integer.toString(integer), TextToSpeech.QUEUE_FLUSH, null);
@@ -140,7 +128,7 @@ public class ReactionCoachFragment extends CoachFragment {
                 }));
 
                 // Timer for set
-                getDisposable().add(mTimedSetsTimerViewModel.startTimer().subscribe(new Consumer<String>() {
+                addDisposable(mTimedSetsTimerViewModel.startTimer().subscribe(new Consumer<String>() {
                     @Override
                     public void accept(String s) throws Exception {
                     }
@@ -171,7 +159,7 @@ public class ReactionCoachFragment extends CoachFragment {
                     }
                 });
 
-                getDisposable().add(mRepTimerDisposable);
+                addDisposable(mRepTimerDisposable);
                 break;
         }
     }
@@ -181,5 +169,16 @@ public class ReactionCoachFragment extends CoachFragment {
         mSetProgressBar.setVisibility(View.INVISIBLE);
 
         super.onFinishExerciseSet();
+    }
+
+    private void showNextCone() {
+        addDisposable(mConeViewModel.getNextCone().subscribe(new Consumer<Integer>() {
+            @Override
+            public void accept(Integer integer) throws Exception {
+                mTextToSpeech.speak(Integer.toString(integer), TextToSpeech.QUEUE_FLUSH, null);
+                mMainProgressText.setText(Integer.toString(integer));
+                animateProgress(mSetProgressBar, mRepTimerViewModel.getCurrentProgress(), mRepTimerViewModel.getAnimateDuration());
+            }
+        }));
     }
 }
