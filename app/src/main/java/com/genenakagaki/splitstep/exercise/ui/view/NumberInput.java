@@ -97,6 +97,7 @@ public class NumberInput extends FrameLayout implements TextWatcher {
 
     @Override
     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        Timber.d("onTextChanged");
         if (mOnInputChangedListener != null && charSequence.length() > 0) {
             int number = Integer.parseInt(charSequence.toString());
             mViewModel.setNumber(number);

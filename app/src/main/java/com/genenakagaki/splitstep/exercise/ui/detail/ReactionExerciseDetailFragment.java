@@ -13,6 +13,7 @@ import com.genenakagaki.splitstep.exercise.ui.ExerciseActivity;
 import com.genenakagaki.splitstep.exercise.ui.coach.CoachFragment;
 import com.genenakagaki.splitstep.exercise.ui.coach.ReactionCoachFragment;
 import com.genenakagaki.splitstep.exercise.ui.model.DurationDisplayable;
+import com.genenakagaki.splitstep.exercise.ui.view.NumberInput;
 
 import butterknife.OnClick;
 import io.reactivex.functions.Consumer;
@@ -56,14 +57,20 @@ public class ReactionExerciseDetailFragment extends ExerciseDetailFragment {
         mConesNumberInput.setVisibility(View.VISIBLE);
         mRepDurationLayout.setVisibility(View.VISIBLE);
 
-        mConesNumberInput.setOnInputChangedListener(this);
-
         return view;
     }
 
     @Override
     public void onResume() {
         super.onResume();
+
+        mConesNumberInput.setOnInputChangedListener(new NumberInput.OnInputChangedListener() {
+            @Override
+            public void onInputChanged(View view, int number) {
+                Timber.d("onInputChanged cones");
+                mViewModel.setCones(number).subscribe();
+            }
+        });
 
         addDisposable(mViewModel.getReactionExerciseSubject()
                 .subscribe(new Consumer<ReactionExercise>() {
@@ -82,17 +89,6 @@ public class ReactionExerciseDetailFragment extends ExerciseDetailFragment {
                 }));
 
         addDisposable(mViewModel.loadReactionExercise().subscribe());
-    }
-
-    @Override
-    public void onInputChanged(View view, int number) {
-        super.onInputChanged(view, number);
-
-        Timber.d("onInputChanged " + number);
-        if (view.getId() == mConesNumberInput.getId()) {
-            Timber.d("cones");
-            mViewModel.setCones(number).subscribe();
-        }
     }
 
     @OnClick(R.id.rep_duration_layout)

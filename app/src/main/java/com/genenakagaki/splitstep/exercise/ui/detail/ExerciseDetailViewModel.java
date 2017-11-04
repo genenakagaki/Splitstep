@@ -31,18 +31,21 @@ public class ExerciseDetailViewModel extends BaseViewModel {
 
     private long exerciseId;
     private Exercise exercise;
-    private BehaviorSubject<Exercise> exerciseSubject = BehaviorSubject.create();
+    private BehaviorSubject<Exercise> exerciseSubject;
 
     private DurationDisplayable restDuration;
-    private BehaviorSubject<DurationDisplayable> restDurationSubject = BehaviorSubject.create();
+    private BehaviorSubject<DurationDisplayable> restDurationSubject;
 
     private DurationDisplayable setDuration;
-    private BehaviorSubject<DurationDisplayable> setDurationSubject = BehaviorSubject.create();
+    private BehaviorSubject<DurationDisplayable> setDurationSubject;
 
     public ExerciseDetailViewModel(Context context, long exerciseId) {
         super(context);
         this.exerciseId = exerciseId;
         exerciseTitleViewModel = new ExerciseTitleViewModel(context, exercise, exerciseSubject);
+        exerciseSubject = BehaviorSubject.create();
+        restDurationSubject = BehaviorSubject.create();
+        setDurationSubject = BehaviorSubject.create();
     }
 
     public Observable<Exercise> getExerciseSubject() {
@@ -98,6 +101,9 @@ public class ExerciseDetailViewModel extends BaseViewModel {
     }
 
     public Completable setReps(final int reps) {
+        if (exercise == null) {
+            return Completable.complete();
+        }
         exercise.reps = reps;
         return ExerciseDao.getInstance().update(exercise)
                 .observeOn(AndroidSchedulers.mainThread())
@@ -105,13 +111,21 @@ public class ExerciseDetailViewModel extends BaseViewModel {
     }
 
     public Completable setSets(final int sets) {
+        if (exercise == null) {
+            return Completable.complete();
+        }
+
         exercise.sets = sets;
         return ExerciseDao.getInstance().update(exercise)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.computation());
+                    .subscribeOn(Schedulers.computation());
     }
 
     public Completable setNotes(final String notes) {
+        if (exercise == null) {
+            return Completable.complete();
+        }
+
         exercise.notes = notes;
         return ExerciseDao.getInstance().update(exercise)
                 .observeOn(AndroidSchedulers.mainThread())

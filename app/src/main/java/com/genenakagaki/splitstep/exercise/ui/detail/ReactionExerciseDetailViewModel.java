@@ -71,6 +71,10 @@ public class ReactionExerciseDetailViewModel extends BaseViewModel {
     }
 
     public Completable setCones(int cones) {
+        if (reactionExercise == null) {
+            return Completable.complete();
+        }
+
         reactionExercise.cones = cones;
         return ReactionExerciseDao.getInstance().update(reactionExercise)
                 .observeOn(AndroidSchedulers.mainThread())

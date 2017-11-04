@@ -39,8 +39,7 @@ import timber.log.Timber;
  * Created by Gene on 9/8/2017.
  */
 
-public class ExerciseDetailFragment extends BaseFragment
-        implements NumberInput.OnInputChangedListener {
+public class ExerciseDetailFragment extends BaseFragment {
 
     private static final String EXERCISE_ID_KEY = "EXERCISE_ID_KEY";
 
@@ -102,24 +101,6 @@ public class ExerciseDetailFragment extends BaseFragment
         mConesNumberInput.setVisibility(View.GONE);
         mRepDurationLayout.setVisibility(View.GONE);
 
-        mSetsNumberInput.setOnInputChangedListener(this);
-        mRepsNumberInput.setOnInputChangedListener(this);
-        mNotesInput.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                addDisposable(mViewModel.setNotes(charSequence.toString())
-                        .subscribe());
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-            }
-        });
-
         mFavoriteImageSwitcher.setFactory(new ViewSwitcher.ViewFactory() {
             @Override
             public View makeView() {
@@ -136,9 +117,12 @@ public class ExerciseDetailFragment extends BaseFragment
 
     @Override
     public void onResume() {
+        Timber.d("onResume");
         super.onResume();
         ExerciseActivity activity = (ExerciseActivity) getActivity();
         activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        setListeners();
 
         addDisposable(mViewModel.getExerciseSubject().subscribe(new Consumer<Exercise>() {
             @Override
@@ -169,18 +153,6 @@ public class ExerciseDetailFragment extends BaseFragment
                 }));
 
         addDisposable(mViewModel.loadExercise().subscribe());
-    }
-
-    @Override
-    public void onInputChanged(View view, int number) {
-        Timber.d("onInputChanged " + number);
-        if (view.getId() == mRepsNumberInput.getId()) {
-            Timber.d("reps");
-            mViewModel.setReps(number).subscribe();
-        } else if (view.getId() == mSetsNumberInput.getId()) {
-            Timber.d("sets");
-            mViewModel.setSets(number).subscribe();
-        }
     }
 
     @OnClick(R.id.favorite_imageswitcher)
@@ -254,5 +226,34 @@ public class ExerciseDetailFragment extends BaseFragment
         }
     }
 
+    private void setListeners() {
+        mSetsNumberInput.setOnInputChangedListener(new NumberInput.OnInputChangedListener() {
+            @Override
+            public void onInputChanged(View view, int number) {
+                Timber.d("onInputChanged Sets");
+                mViewModel.setSets(number).subscribe();
+            }
+        });
+        mRepsNumberInput.setOnInputChangedListener(new NumberInput.OnInputChangedListener() {
+            @Override
+            public void onInputChanged(View view, int number) {
+                Timber.d("onInputChanged Reps");
+                mViewModel.setSets(number).subscribe();
+            }
+        });
+        mNotesInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
 
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                addDisposable(mViewModel.setNotes(charSequence.toString()).subscribe());
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+            }
+        });
+    }
 }
