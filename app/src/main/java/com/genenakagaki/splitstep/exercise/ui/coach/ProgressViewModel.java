@@ -9,7 +9,7 @@ import io.reactivex.subjects.BehaviorSubject;
  * Created by Gene on 9/15/2017.
  */
 
-public class ReversedProgressViewModel {
+public class ProgressViewModel {
 
     private static final int ANIMATE_DURATION_DEFAULT = 500;
 
@@ -18,7 +18,7 @@ public class ReversedProgressViewModel {
     private int progress;
     private BehaviorSubject<Integer> progressSubject = BehaviorSubject.create();
 
-    public ReversedProgressViewModel(int max, int progress) {
+    public ProgressViewModel(int max, int progress) {
         this.max = max;
         this.progress = progress;
         animateDuration = ANIMATE_DURATION_DEFAULT;

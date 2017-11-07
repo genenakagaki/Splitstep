@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="DurationPicker">
-        <attr name="enabled_label" format="string" />
-        <attr name="disabled_label" format="string" />
-        <attr name="show_switch" format="boolean" />
+    <declare-styleable name="CircularProgressBar">
+        <attr name="color" format="color"/>
+        <attr name="interpolator" format="integer"/>
     </declare-styleable>
-
+    
     <declare-styleable name="NumberInput">
         <attr name="label" format="string"/>
         <attr name="max" format="integer"/>

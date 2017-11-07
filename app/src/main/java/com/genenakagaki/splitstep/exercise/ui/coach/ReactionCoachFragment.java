@@ -76,7 +76,7 @@ public class ReactionCoachFragment extends CoachFragment {
 
         switch (getViewModel().getExerciseSubType()) {
             case REPS:
-                mSetProgressBar.setMax(mRepTimerViewModel.getMax());
+                mMainProgressBar.setMax(mRepTimerViewModel.getMax());
 //                mMainProgressTopText.setText(getString(R.string.reps_count, exercise.reps));
                 break;
             case TIMED_SETS:
@@ -84,18 +84,18 @@ public class ReactionCoachFragment extends CoachFragment {
 
                 mTimedSetsTimerViewModel = new TimerViewModel(
                         new DurationDisplayable(DurationDisplayable.TYPE_SET_DURATION, setDuration));
-                mSetProgressBar.setMax(mTimedSetsTimerViewModel.getMax());
+                mMainProgressBar.setMax(mTimedSetsTimerViewModel.getMax());
                 break;
         }
     }
 
     @Override
     public void startExerciseSet() {
-        mSetProgressBar.setVisibility(View.VISIBLE);
+        mMainProgressBar.setVisibility(View.VISIBLE);
 
         switch (getViewModel().getExerciseSubType()) {
             case REPS:
-                mSetProgressBar.setProgress(mRepTimerViewModel.getMax());
+                mMainProgressBar.setProgress(mRepTimerViewModel.getMax());
                 showNextCone();
 
                 // Timer for rep
@@ -117,8 +117,8 @@ public class ReactionCoachFragment extends CoachFragment {
                 }));
                 break;
             case TIMED_SETS:
-                mSetProgressBar.setProgress(mTimedSetsTimerViewModel.getMax());
-                animateProgress(mSetProgressBar, 0, mTimedSetsTimerViewModel.getAnimateDuration());
+                mMainProgressBar.setProgress(mTimedSetsTimerViewModel.getMax());
+                animateProgress(mMainProgressBar, 0, mTimedSetsTimerViewModel.getAnimateDuration());
                 addDisposable(mConeViewModel.getNextCone().subscribe(new Consumer<Integer>() {
                     @Override
                     public void accept(Integer integer) throws Exception {
@@ -166,7 +166,7 @@ public class ReactionCoachFragment extends CoachFragment {
 
     @Override
     public void onFinishExerciseSet() {
-        mSetProgressBar.setVisibility(View.INVISIBLE);
+        mMainProgressBar.setVisibility(View.INVISIBLE);
 
         super.onFinishExerciseSet();
     }
@@ -177,7 +177,7 @@ public class ReactionCoachFragment extends CoachFragment {
             public void accept(Integer integer) throws Exception {
                 mTextToSpeech.speak(Integer.toString(integer), TextToSpeech.QUEUE_FLUSH, null);
                 mMainProgressText.setText(Integer.toString(integer));
-                animateProgress(mSetProgressBar, mRepTimerViewModel.getCurrentProgress(), mRepTimerViewModel.getAnimateDuration());
+                animateProgress(mMainProgressBar, mRepTimerViewModel.getCurrentProgress(), mRepTimerViewModel.getAnimateDuration());
             }
         }));
     }

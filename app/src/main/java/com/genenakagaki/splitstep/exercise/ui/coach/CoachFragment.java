@@ -58,8 +58,8 @@ public abstract class CoachFragment extends BaseFragment {
     RelativeLayout mContentLayout;
     @BindView(R.id.exercise_name_textview)
     TextView mExerciseNameTextView;
-    @BindView(R.id.sets_progressbar)
-    ProgressBar mSetsProgressBar;
+    @BindView(R.id.sub_progressbar)
+    ProgressBar mSubProgressBar;
     @BindView(R.id.rest_imageview_container)
     FrameLayout mRestImageViewContainer;
     @BindView(R.id.rest_imageview)
@@ -70,12 +70,12 @@ public abstract class CoachFragment extends BaseFragment {
     ImageView mSetImageView;
     @BindView(R.id.rest_progressbar)
     ProgressBar mRestProgressBar;
-    @BindView(R.id.set_progressbar)
-    ProgressBar mSetProgressBar;
+    @BindView(R.id.main_progressbar)
+    ProgressBar mMainProgressBar;
     @BindView(R.id.main_progressbar_container)
     LinearLayout mMainProgressBarContainer;
-    @BindView(R.id.sets_progress_text)
-    TextView mSetsProgressText;
+    @BindView(R.id.sub_progress_text)
+    TextView mSubProgressText;
     @BindView(R.id.main_progress_text)
     TextView mMainProgressText;
     @BindView(R.id.main_progress_top_text)
@@ -90,7 +90,7 @@ public abstract class CoachFragment extends BaseFragment {
     TextView mOverlayTextView;
 
     private CoachViewModel mViewModel;
-    private ReversedProgressViewModel mSetsProgressViewModel;
+    private ProgressViewModel mSetsProgressViewModel;
     private TimerViewModel mRestTimerViewModel;
 
     private Ringtone mAlarm;
@@ -129,8 +129,8 @@ public abstract class CoachFragment extends BaseFragment {
                     mContentLayout.getViewTreeObserver().removeGlobalOnLayoutListener(this);
                 }
 
-                int size = mSetProgressBar.getWidth();
-                mSetProgressBar.setLayoutParams(new RelativeLayout.LayoutParams(size, size));
+                int size = mMainProgressBar.getWidth();
+                mMainProgressBar.setLayoutParams(new RelativeLayout.LayoutParams(size, size));
                 mRestProgressBar.setLayoutParams(new RelativeLayout.LayoutParams(size, size));
 
                 RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
@@ -144,14 +144,12 @@ public abstract class CoachFragment extends BaseFragment {
                 mSetImageView.setLayoutParams(imageLayoutParams);
                 mRestImageView.setLayoutParams(imageLayoutParams);
 
-
-
                 mDoneButton.setLayoutParams(layoutParams);
                 mCompleteLayout.setLayoutParams(layoutParams);
 
-                size = mSetsProgressBar.getWidth();
+                size = mSubProgressBar.getWidth();
                 FrameLayout.LayoutParams frameLayoutParams = new FrameLayout.LayoutParams(size, size);
-                mSetsProgressBar.setLayoutParams(frameLayoutParams);
+                mSubProgressBar.setLayoutParams(frameLayoutParams);
             }
         });
 
@@ -184,13 +182,13 @@ public abstract class CoachFragment extends BaseFragment {
             public void accept(Exercise exercise) throws Exception {
                 mExerciseNameTextView.setText(exercise.name);
 
-                mSetsProgressViewModel = new ReversedProgressViewModel(exercise.sets, 0);
-                mSetsProgressBar.setMax(mSetsProgressViewModel.getMax());
+                mSetsProgressViewModel = new ProgressViewModel(exercise.sets, 0);
+                mSubProgressBar.setMax(mSetsProgressViewModel.getMax());
                 addDisposable(mSetsProgressViewModel.getProgress().subscribe(new Consumer<Integer>() {
                     @Override
                     public void accept(Integer integer) throws Exception {
-                        mSetsProgressText.setText(mSetsProgressViewModel.getDisplayProgress());
-                        animateProgress(mSetsProgressBar, integer, mSetsProgressViewModel.getAnimateDuration());
+                        mSubProgressText.setText(mSetsProgressViewModel.getDisplayProgress());
+                        animateProgress(mSubProgressBar, integer, mSetsProgressViewModel.getAnimateDuration());
                     }
                 }));
 

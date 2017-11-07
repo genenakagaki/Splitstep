@@ -19,7 +19,6 @@ import butterknife.OnClick;
 import butterknife.Unbinder;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
@@ -73,12 +72,7 @@ public class NumberInput extends FrameLayout implements TextWatcher {
         mDisposable.add(mViewModel.getNumberSubject()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .subscribe(new Consumer<Integer>() {
-                    @Override
-                    public void accept(Integer integer) throws Exception {
-                        mInput.setText(Integer.toString(integer));
-                    }
-                }));
+                .subscribe(integer -> mInput.setText(Integer.toString(integer))));
     }
 
     @Override
