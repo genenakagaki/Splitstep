@@ -31,11 +31,9 @@ import com.genenakagaki.splitstep.R;
 import com.genenakagaki.splitstep.base.BaseFragment;
 import com.genenakagaki.splitstep.exercise.data.entity.Exercise;
 import com.genenakagaki.splitstep.exercise.receiver.CoachAlarmBroadcastReceiver;
-import com.genenakagaki.splitstep.exercise.ui.model.DurationDisplayable;
 
 import butterknife.BindView;
 import butterknife.OnClick;
-import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import timber.log.Timber;
 
@@ -68,8 +66,10 @@ public abstract class CoachFragment extends BaseFragment {
     FrameLayout mSetImageViewContainer;
     @BindView(R.id.set_imageview)
     ImageView mSetImageView;
+//    @BindView(R.id.rest_progressbar)
+//    ProgressBar mRestProgressBar;
     @BindView(R.id.rest_progressbar)
-    ProgressBar mRestProgressBar;
+    CircularProgressBar mRestProgressBar;
     @BindView(R.id.main_progressbar)
     ProgressBar mMainProgressBar;
     @BindView(R.id.main_progressbar_container)
@@ -91,7 +91,7 @@ public abstract class CoachFragment extends BaseFragment {
 
     private CoachViewModel mViewModel;
     private ProgressViewModel mSetsProgressViewModel;
-    private TimerViewModel mRestTimerViewModel;
+//    private TimerViewModel mRestTimerViewModel;
 
     private Ringtone mAlarm;
 
@@ -159,22 +159,12 @@ public abstract class CoachFragment extends BaseFragment {
     @Override
     public void onResume() {
         super.onResume();
-        addDisposable(mViewModel.getStartCountDown()
-                .subscribe(new Consumer<Long>() {
-                    @Override
-                    public void accept(Long aLong) throws Exception {
-                        mOverlayTextView.setText(Long.toString(aLong));
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                    }
-                }, new Action() {
-                    @Override
-                    public void run() throws Exception {
-                        mOverlay.setVisibility(View.GONE);
-                        startExerciseSet();
-                    }
+        addDisposable(mViewModel.getStartCountDown().subscribe(
+                count -> mOverlayTextView.setText(Long.toString(count)),
+                throwable -> {},
+                () -> {
+                    mOverlay.setVisibility(View.GONE);
+                    startExerciseSet();
                 }));
 
         addDisposable(mViewModel.loadExercise().subscribe(new Consumer<Exercise>() {
@@ -184,17 +174,16 @@ public abstract class CoachFragment extends BaseFragment {
 
                 mSetsProgressViewModel = new ProgressViewModel(exercise.sets, 0);
                 mSubProgressBar.setMax(mSetsProgressViewModel.getMax());
-                addDisposable(mSetsProgressViewModel.getProgress().subscribe(new Consumer<Integer>() {
-                    @Override
-                    public void accept(Integer integer) throws Exception {
-                        mSubProgressText.setText(mSetsProgressViewModel.getDisplayProgress());
-                        animateProgress(mSubProgressBar, integer, mSetsProgressViewModel.getAnimateDuration());
-                    }
+                addDisposable(mSetsProgressViewModel.getProgress().subscribe(integer -> {
+                    mSubProgressText.setText(mSetsProgressViewModel.getDisplayProgress());
+                    animateProgress(mSubProgressBar, integer, mSetsProgressViewModel.getAnimateDuration());
                 }));
 
-                mRestTimerViewModel = new TimerViewModel(
-                        new DurationDisplayable(DurationDisplayable.TYPE_REST_DURATION, exercise.restDuration));
-                mRestProgressBar.setMax(mRestTimerViewModel.getMax());
+//                mRestTimerViewModel = new TimerViewModel(
+//                        new DurationDisplayable(DurationDisplayable.TYPE_REST_DURATION, exercise.restDuration));
+//                mRestProgressBar.setMax(mRestTimerViewModel.getMax());
+                mRestProgressBar.setMax(exercise.restDuration);
+                mRestProgressBar.setAnimateDuration(exercise.restDuration);
 
                 setupExerciseSet();
             }
@@ -236,25 +225,16 @@ public abstract class CoachFragment extends BaseFragment {
         if (mSetsProgressViewModel.isFinished()) {
             mCompleteLayout.setVisibility(View.VISIBLE);
         } else {
-            mRestProgressBar.setProgress(mRestTimerViewModel.getMax());
-            animateProgress(mRestProgressBar, 0, mRestTimerViewModel.getAnimateDuration());
-            mMainProgressText.setText(mRestTimerViewModel.getTimerDisplay());
+//            mRestProgressBar.setStartProgress(mRestTimerViewModel.getMax());
+            mRestProgressBar.setToMax();
+//            mRestProgressBar.setProgress(0);
+//            animateProgress(mR\estProgressBar, 0, mRestTimerViewModel.getAnimateDuration());
+//            mMainProgressText.setText(mRestTimerViewModel.getTimerDisplay());
 
-            addDisposable(mRestTimerViewModel.startTimer().subscribe(new Consumer<String>() {
-                @Override
-                public void accept(String s) throws Exception {
-                    mMainProgressText.setText(s);
-                }
-            }, new Consumer<Throwable>() {
-                @Override
-                public void accept(Throwable throwable) throws Exception {
-                }
-            }, new Action() {
-                @Override
-                public void run() throws Exception {
-                    startExerciseSet();
-                }
-            }));
+//            addDisposable(mRestTimerViewModel.startTimer().subscribe(
+//                    s -> mMainProgressText.setText(s),
+//                    throwable -> {},
+//                    () -> startExerciseSet()));
         }
     }
 

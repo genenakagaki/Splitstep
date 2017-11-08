@@ -66,13 +66,18 @@
                         android:src="@drawable/rest"/>
                 </FrameLayout>
 
-                <ProgressBar
+                <com.genenakagaki.splitstep.exercise.ui.coach.CircularProgressBar
                     android:id="@+id/rest_progressbar"
-                    style="?android:attr/progressBarStyleHorizontal"
                     android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:progressDrawable="@drawable/progress_bar_circular"
-                    android:progressTint="@color/restProgressColor"/>
+                    android:layout_height="1dp"/>
+
+                <!--<ProgressBar-->
+                    <!--android:id="@+id/rest_progressbar"-->
+                    <!--style="?android:attr/progressBarStyleHorizontal"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="1dp"-->
+                    <!--android:progressDrawable="@drawable/progress_bar_circular"-->
+                    <!--android:progressTint="@color/restProgressColor"/>-->
 
                 <Button
                     android:id="@+id/done_button"

@@ -46,7 +46,7 @@ public class RegularCoachFragment extends CoachFragment {
                 break;
             case TIMED_SETS:
                 mMainProgressBar.setVisibility(View.VISIBLE);
-//                mMainProgressBar.setProgress(mTimedSetsTimerViewModel.getMax());
+//                mMainProgressBar.setStartProgress(mTimedSetsTimerViewModel.getMax());
                 animateProgress(mMainProgressBar, 0, mTimedSetsTimerViewModel.getAnimateDuration());
                 mMainProgressText.setText(mTimedSetsTimerViewModel.getTimerDisplay());
 

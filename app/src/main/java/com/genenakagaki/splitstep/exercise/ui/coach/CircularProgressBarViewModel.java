@@ -35,10 +35,15 @@ public class CircularProgressBarViewModel {
 
     public void incrementProgressBy(int diff) {
         progress += diff;
+        setProgress(progress);
+    }
+
+    public void setProgress(int progress) {
+        this.progress = progress;
         if (progress > max) {
-            progress = max;
+            this.progress = max;
         } else if (progress < 0) {
-            progress = 0;
+            this.progress = 0;
         }
 
         progressSubject.onNext(progress * 100);
@@ -57,15 +62,23 @@ public class CircularProgressBarViewModel {
     }
 
     public int getMax() {
-        return max;
+        return max * 100;
     }
 
     public void setMax(int max) {
         this.max = max;
     }
 
-    public void setProgress(int progress) {
+    public void setStartProgress(int progress) {
         this.progress = progress;
+    }
+
+    public int getAnimateDuration() {
+        return animateDuration;
+    }
+
+    public void setAnimateDuration(int animateDuration) {
+        this.animateDuration = animateDuration;
     }
 
 
