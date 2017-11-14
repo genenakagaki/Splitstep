@@ -66,7 +66,7 @@
                         android:src="@drawable/rest"/>
                 </FrameLayout>
 
-                <com.genenakagaki.splitstep.exercise.ui.coach.CircularProgressBar
+                <com.genenakagaki.splitstep.exercise.ui.view.CircularProgressBar
                     android:id="@+id/rest_progressbar"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"/>

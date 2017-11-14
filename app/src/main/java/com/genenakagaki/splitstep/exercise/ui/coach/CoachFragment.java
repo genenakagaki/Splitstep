@@ -29,12 +29,11 @@ import android.widget.TextView;
 
 import com.genenakagaki.splitstep.R;
 import com.genenakagaki.splitstep.base.BaseFragment;
-import com.genenakagaki.splitstep.exercise.data.entity.Exercise;
 import com.genenakagaki.splitstep.exercise.receiver.CoachAlarmBroadcastReceiver;
+import com.genenakagaki.splitstep.exercise.ui.view.CircularProgressBar;
 
 import butterknife.BindView;
 import butterknife.OnClick;
-import io.reactivex.functions.Consumer;
 import timber.log.Timber;
 
 /**
@@ -69,7 +68,7 @@ public abstract class CoachFragment extends BaseFragment {
 //    @BindView(R.id.rest_progressbar)
 //    ProgressBar mRestProgressBar;
     @BindView(R.id.rest_progressbar)
-    CircularProgressBar mRestProgressBar;
+CircularProgressBar mRestProgressBar;
     @BindView(R.id.main_progressbar)
     ProgressBar mMainProgressBar;
     @BindView(R.id.main_progressbar_container)
@@ -119,20 +118,22 @@ public abstract class CoachFragment extends BaseFragment {
 
         mOverlayTextView.setText(Integer.toString(3));
 
+        // Adjust views
         mContentLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                // Adjust views
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                     mContentLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 } else {
                     mContentLayout.getViewTreeObserver().removeGlobalOnLayoutListener(this);
                 }
 
+                // Progress bars
                 int size = mMainProgressBar.getWidth();
                 mMainProgressBar.setLayoutParams(new RelativeLayout.LayoutParams(size, size));
                 mRestProgressBar.setLayoutParams(new RelativeLayout.LayoutParams(size, size));
 
+                // Images
                 RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
                         (int) (size / 1.1f), (int) (size / 1.1f));
                 layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
@@ -144,6 +145,7 @@ public abstract class CoachFragment extends BaseFragment {
                 mSetImageView.setLayoutParams(imageLayoutParams);
                 mRestImageView.setLayoutParams(imageLayoutParams);
 
+                // Big circle buttons
                 mDoneButton.setLayoutParams(layoutParams);
                 mCompleteLayout.setLayoutParams(layoutParams);
 
@@ -167,26 +169,23 @@ public abstract class CoachFragment extends BaseFragment {
                     startExerciseSet();
                 }));
 
-        addDisposable(mViewModel.loadExercise().subscribe(new Consumer<Exercise>() {
-            @Override
-            public void accept(Exercise exercise) throws Exception {
-                mExerciseNameTextView.setText(exercise.name);
+        addDisposable(mViewModel.loadExercise().subscribe(exercise -> {
+            mExerciseNameTextView.setText(exercise.name);
 
-                mSetsProgressViewModel = new ProgressViewModel(exercise.sets, 0);
-                mSubProgressBar.setMax(mSetsProgressViewModel.getMax());
-                addDisposable(mSetsProgressViewModel.getProgress().subscribe(integer -> {
-                    mSubProgressText.setText(mSetsProgressViewModel.getDisplayProgress());
-                    animateProgress(mSubProgressBar, integer, mSetsProgressViewModel.getAnimateDuration());
-                }));
+            mSetsProgressViewModel = new ProgressViewModel(exercise.sets, 0);
+            mSubProgressBar.setMax(mSetsProgressViewModel.getMax());
+            addDisposable(mSetsProgressViewModel.getProgress().subscribe(integer -> {
+                mSubProgressText.setText(mSetsProgressViewModel.getDisplayProgress());
+                animateProgress(mSubProgressBar, integer, mSetsProgressViewModel.getAnimateDuration());
+            }));
 
 //                mRestTimerViewModel = new TimerViewModel(
 //                        new DurationDisplayable(DurationDisplayable.TYPE_REST_DURATION, exercise.restDuration));
 //                mRestProgressBar.setMax(mRestTimerViewModel.getMax());
-                mRestProgressBar.setMax(exercise.restDuration);
-                mRestProgressBar.setAnimateDuration(exercise.restDuration);
+            mRestProgressBar.setMax(exercise.restDuration);
+            mRestProgressBar.setAnimateDuration(exercise.restDuration);
 
-                setupExerciseSet();
-            }
+            setupExerciseSet();
         }));
     }
 
@@ -227,6 +226,7 @@ public abstract class CoachFragment extends BaseFragment {
         } else {
 //            mRestProgressBar.setStartProgress(mRestTimerViewModel.getMax());
             mRestProgressBar.setToMax();
+            mRestProgressBar.setProgress(0);
 //            mRestProgressBar.setProgress(0);
 //            animateProgress(mR\estProgressBar, 0, mRestTimerViewModel.getAnimateDuration());
 //            mMainProgressText.setText(mRestTimerViewModel.getTimerDisplay());

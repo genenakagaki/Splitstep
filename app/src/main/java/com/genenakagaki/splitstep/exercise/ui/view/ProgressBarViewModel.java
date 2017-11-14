@@ -1,4 +1,4 @@
-package com.genenakagaki.splitstep.exercise.ui.coach;
+package com.genenakagaki.splitstep.exercise.ui.view;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -9,7 +9,7 @@ import io.reactivex.subjects.BehaviorSubject;
  * Created by Gene on 11/6/2017.
  */
 
-public class CircularProgressBarViewModel {
+public class ProgressBarViewModel {
 
     private static final int MAX_DEFAULT = 100;
     private static final int PROGRESS_DEFAULT = 0;
@@ -20,11 +20,10 @@ public class CircularProgressBarViewModel {
     private int animateDuration;
     private BehaviorSubject<Integer> progressSubject = BehaviorSubject.create();
 
-    public CircularProgressBarViewModel() {
+    public ProgressBarViewModel() {
         this.max = MAX_DEFAULT;
         this.progress = PROGRESS_DEFAULT;
         animateDuration = ANIMATE_DURATION_DEFAULT;
-        progressSubject.onNext(progress * 100);
     }
 
     public Observable<Integer> getProgress() {
@@ -34,8 +33,7 @@ public class CircularProgressBarViewModel {
     }
 
     public void incrementProgressBy(int diff) {
-        progress += diff;
-        setProgress(progress);
+        setProgress(progress + diff);
     }
 
     public void setProgress(int progress) {
@@ -49,12 +47,13 @@ public class CircularProgressBarViewModel {
         progressSubject.onNext(progress * 100);
     }
 
-    public String getDisplayRemaining() {
-        return Integer.toString(max - progress);
-    }
-
-    public String getDisplayProgress() {
-        return Integer.toString(progress);
+    public void setStartProgress(int progress) {
+        this.progress = progress;
+        if (progress > max) {
+            this.progress = max;
+        } else if (progress < 0) {
+            this.progress = 0;
+        }
     }
 
     public boolean isFinished() {
@@ -69,17 +68,11 @@ public class CircularProgressBarViewModel {
         this.max = max;
     }
 
-    public void setStartProgress(int progress) {
-        this.progress = progress;
-    }
-
     public int getAnimateDuration() {
-        return animateDuration;
+        return animateDuration * 1000;
     }
 
     public void setAnimateDuration(int animateDuration) {
         this.animateDuration = animateDuration;
     }
-
-
 }

@@ -6,9 +6,6 @@ import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.annotations.NonNull;
-import io.reactivex.functions.Function;
-import io.reactivex.functions.Predicate;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -42,23 +39,15 @@ public class TimerViewModel {
     public Observable<String> startTimer() {
         duration.setDuration(max - 1);
 
-        return Observable.interval(1, TimeUnit.SECONDS).takeWhile(new Predicate<Long>() {
-            @Override
-            public boolean test(@NonNull Long aLong) throws Exception {
-                if (aLong < max - 1) {
-                    duration.setDuration(max - aLong.intValue() - 1);
-                    return true;
-                } else {
-                    duration.setDuration(max);
-                    return false;
-                }
+        return Observable.interval(1, TimeUnit.SECONDS).takeWhile(aLong -> {
+            if (aLong < max - 1) {
+                duration.setDuration(max - aLong.intValue() - 1);
+                return true;
+            } else {
+                duration.setDuration(max);
+                return false;
             }
-        }).map(new Function<Long, String>() {
-            @Override
-            public String apply(@NonNull Long aLong) throws Exception {
-                return getTimerDisplay();
-            }
-        }).observeOn(AndroidSchedulers.mainThread())
+        }).map(aLong -> getTimerDisplay()).observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io());
     }
 
@@ -69,26 +58,18 @@ public class TimerViewModel {
     }
 
     public Observable<String> startInterval(final int reps) {
-        return Observable.interval(duration.getDuration(), TimeUnit.SECONDS).takeWhile(new Predicate<Long>() {
-            @Override
-            public boolean test(@NonNull Long aLong) throws Exception {
-                if (aLong < reps - 1) {
-                    duration.setDuration(max - aLong.intValue() - 1);
-                    return true;
-                } else {
-                    duration.setDuration(max);
-                    return false;
-                }
+        return Observable.interval(duration.getDuration(), TimeUnit.SECONDS).takeWhile(aLong -> {
+            if (aLong < reps - 1) {
+                duration.setDuration(max - aLong.intValue() - 1);
+                return true;
+            } else {
+                duration.setDuration(max);
+                return false;
             }
-        }).map(new Function<Long, String>() {
-            @Override
-            public String apply(@NonNull Long aLong) throws Exception {
-                return getTimerDisplay();
-            }
-        }).observeOn(AndroidSchedulers.mainThread())
+        }).map(aLong -> getTimerDisplay())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io());
     }
-
 
     public String getTimerDisplay() {
         StringBuilder sb = new StringBuilder();

@@ -1,4 +1,4 @@
-package com.genenakagaki.splitstep.exercise.ui.coach;
+package com.genenakagaki.splitstep.exercise.ui.view;
 
 import android.animation.ObjectAnimator;
 import android.animation.TimeInterpolator;
@@ -37,70 +37,29 @@ public class CircularProgressBar extends FrameLayout {
 
     private Unbinder mUnbinder;
     private CompositeDisposable mDisposable;
-    private CircularProgressBarViewModel mViewModel;
+    private ProgressBarViewModel mViewModel;
     private OnProgressChangeListener mOnProgressChangeListener;
 
     private TimeInterpolator mInterpolator;
 
     public CircularProgressBar(Context context, AttributeSet attrs) {
         super(context, attrs);
-        mViewModel = new CircularProgressBarViewModel();
+        mViewModel = new ProgressBarViewModel();
 
         LayoutInflater.from(context).inflate(R.layout.circular_progressbar, this);
         mUnbinder = ButterKnife.bind(this);
 
-        mProgressBar.setMax(mViewModel.getMax());
-
         setInterpolator(new LinearInterpolator());
-
-//        int size = getWidth();
-//        if (getHeight() > size) {
-//            size = getHeight();
-//        }
-//        setLayoutParams(new FrameLayout.LayoutParams(size, size));
-
-//        mContentLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-//            @Override
-//            public void onGlobalLayout() {
-//                // Adjust views
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-//                    mContentLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-//                } else {
-//                    mContentLayout.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-//                }
-//
-//                int size = mMainProgressBar.getWidth();
-//                mMainProgressBar.setLayoutParams(new RelativeLayout.LayoutParams(size, size));
-//                mRestProgressBar.setLayoutParams(new RelativeLayout.LayoutParams(size, size));
-//
-//                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
-//                        (int) (size / 1.1f), (int) (size / 1.1f));
-//                layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
-//                mSetImageViewContainer.setLayoutParams(layoutParams);
-//                mRestImageViewContainer.setLayoutParams(layoutParams);
-//                FrameLayout.LayoutParams imageLayoutParams = new FrameLayout.LayoutParams(
-//                        (int) (size / 1.2f), (int) (size / 1.2f));
-//                imageLayoutParams.gravity = Gravity.CENTER;
-//                mSetImageView.setLayoutParams(imageLayoutParams);
-//                mRestImageView.setLayoutParams(imageLayoutParams);
-//
-//                mDoneButton.setLayoutParams(layoutParams);
-//                mCompleteLayout.setLayoutParams(layoutParams);
-//
-//                size = mSubProgressBar.getWidth();
-//                FrameLayout.LayoutParams frameLayoutParams = new FrameLayout.LayoutParams(size, size);
-//                mSubProgressBar.setLayoutParams(frameLayoutParams);
-//            }
-//        });
     }
 
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
+        Timber.d("onAttachedToWindow");
         mDisposable = new CompositeDisposable();
 
         mDisposable.add(mViewModel.getProgress().subscribe(progress -> {
-            animateProgress(progress);
+            animateProgress(progress, mViewModel.getAnimateDuration());
 
             if (mOnProgressChangeListener != null) {
                 mOnProgressChangeListener.onProgressChanged(progress);
@@ -122,24 +81,18 @@ public class CircularProgressBar extends FrameLayout {
         mViewModel.setProgress(progress);
     }
 
-    private void animateProgress(int progress) {
+    private void animateProgress(int progress, int duration) {
         if (android.os.Build.VERSION.SDK_INT < 11) {
             mProgressBar.setProgress(progress);
         } else {
-            Timber.d("animateProgress: " + progress);
+            Timber.d("setProgress: " + progress);
             ObjectAnimator animation = ObjectAnimator.ofInt(mProgressBar, "progress", progress);
-            Timber.d("animateProgress duration: " + mViewModel.getAnimateDuration() * 1000);
-            animation.setDuration(mViewModel.getAnimateDuration() * 1000);
+            animation.setDuration(duration);
             animation.setInterpolator(mInterpolator);
             animation.start();
         }
     }
 
-    public void setToMax() {
-        mViewModel.setStartProgress(mViewModel.getMax());
-        mProgressBar.setProgress(mViewModel.getMax());
-        Timber.d("setToMax: " + mProgressBar.getProgress());
-    }
 
     public void incrementProgressBy(int diff) {
         mViewModel.incrementProgressBy(diff);
@@ -152,15 +105,20 @@ public class CircularProgressBar extends FrameLayout {
     // ----------------------------------------
     //   Setup
     // ----------------------------------------
+    public void setToMax() {
+        mViewModel.setStartProgress(mViewModel.getMax());
+        mProgressBar.setProgress(mViewModel.getMax());
+    }
+
     public void setMax(int max) {
+        Timber.d("setMax: " + max);
         mViewModel.setMax(max);
         mProgressBar.setMax(mViewModel.getMax());
-        Timber.d("setMax: " + mProgressBar.getMax());
     }
 
     public void setStartProgress(int progress) {
         mViewModel.setStartProgress(progress);
-        mProgressBar.setProgress(progress);
+        mProgressBar.setProgress(0);
     }
 
     public void setAnimateDuration(int animateDuration) {

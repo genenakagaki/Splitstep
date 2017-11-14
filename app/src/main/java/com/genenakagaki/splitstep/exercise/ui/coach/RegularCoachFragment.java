@@ -6,8 +6,6 @@ import com.genenakagaki.splitstep.R;
 import com.genenakagaki.splitstep.exercise.ui.model.DurationDisplayable;
 
 import butterknife.OnClick;
-import io.reactivex.functions.Action;
-import io.reactivex.functions.Consumer;
 
 /**
  * Created by Gene on 9/13/2017.
@@ -50,23 +48,13 @@ public class RegularCoachFragment extends CoachFragment {
                 animateProgress(mMainProgressBar, 0, mTimedSetsTimerViewModel.getAnimateDuration());
                 mMainProgressText.setText(mTimedSetsTimerViewModel.getTimerDisplay());
 
-                addDisposable(mTimedSetsTimerViewModel.startTimer().subscribe(new Consumer<String>() {
-                    @Override
-                    public void accept(String s) throws Exception {
-                        mMainProgressText.setText(s);
-
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                    }
-                }, new Action() {
-                    @Override
-                    public void run() throws Exception {
-                        mMainProgressBar.setVisibility(View.INVISIBLE);
-                        onFinishExerciseSet();
-                    }
-                }));
+                addDisposable(mTimedSetsTimerViewModel.startTimer().subscribe(
+                        s -> mMainProgressText.setText(s),
+                        throwable -> {},
+                        () -> {
+                            mMainProgressBar.setVisibility(View.INVISIBLE);
+                            onFinishExerciseSet();
+                        }));
                 break;
         }
     }
